@@ -1,0 +1,38 @@
+{
+  "properties": [
+    {
+      "name": "retention-policy",
+      "type": "java.lang.String",
+      "description": "Description for retention-policy."
+    },
+    {
+      "name": "database",
+      "type": "java.lang.String",
+      "description": "Description for database."
+    },
+    {
+      "name": "password",
+      "type": "java.lang.String",
+      "description": "Description for password."
+    },
+    {
+      "name": "username",
+      "type": "java.lang.String",
+      "description": "Description for username."
+    },
+    {
+      "name": "url",
+      "type": "java.lang.String",
+      "description": "Description for url."
+    },
+    {
+      "name": "influxdb",
+      "type": "java.lang.String",
+      "description": "Description for influxdb."
+    },
+    {
+      "name": "spring",
+      "type": "java.lang.String",
+      "description": "Description for spring."
+    }
+  ] }
