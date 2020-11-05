@@ -1,29 +1,29 @@
 package de.bublitz.balancer.server.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
 /**
  * Consumer ist ein statischer Verbraucher, welcher nicht gesteuert werden kann.
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Consumer {
+@Table(name = "consumers")
+public class Consumer extends AbstractConsumer {
 
-    private float maxLoad;
-    private float currentLoad;
-    private String name;
+    private double maxLoad;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long consumerID;
 
     public Consumer() {
+        super();
         maxLoad = 0;
-        currentLoad = 0;
-        name = "Consumer";
+        setName("Consumer");
     }
 
 }

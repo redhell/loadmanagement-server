@@ -1,11 +1,9 @@
 package de.bublitz.balancer.server.repository;
 
-import de.bublitz.balancer.server.model.Consumer;
+import de.bublitz.balancer.server.controller.strategies.Strategy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
-public interface ConsumerRepository extends JpaRepository<Consumer, Long> {
-    Consumer getConsumerByName(String name);
+public interface StrategyRepository extends JpaRepository<Strategy, Long> {
 }

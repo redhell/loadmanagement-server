@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @RestController
@@ -37,7 +34,7 @@ public class ConsumerController {
     public void deleteConsumer(@RequestParam String name, HttpServletResponse response) {
         Consumer delConsumer = consumerRepository.getConsumerByName(name);
         if(delConsumer != null) {
-            consumerRepository.deleteById(delConsumer.getId());
+            consumerRepository.deleteById(delConsumer.getConsumerID());
         } else {
            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Consumer not found");
         }

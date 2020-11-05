@@ -4,10 +4,12 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import lombok.Data;
 
+import javax.persistence.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Entity
 @Data
-public abstract class Strategy {
+public class Strategy {
     /**
      * MaxLoad = maximale Last die möglich ist
      */
@@ -21,24 +23,32 @@ public abstract class Strategy {
      */
     private float hardLimit = 0;
     private LoadStrategy loadStrategy;
+
+    @OneToOne
+    @JoinColumn
     private Anschluss anschluss;
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     public Strategy() {
         loadStrategy = LoadStrategy.NONE;
     }
 
-    public boolean isSoftlimitReached(){
+    public boolean isSoftlimitReached() {
         return computeLoad(softLimit);
     }
 
-    public boolean isHardlimitReached(){
+    public boolean isHardlimitReached() {
         return computeLoad(hardLimit);
     }
 
-    private boolean computeLoad(float limit) {
-        AtomicReference<Float> load = new AtomicReference<>((float) 0);
+    private boolean computeLoad(double limit) {
+        AtomicReference<Double> load = new AtomicReference<>((double) 0);
         anschluss.getConsumerList().forEach(consumer -> load.updateAndGet(v -> v + consumer.getCurrentLoad()));
-        anschluss.getChargeBoxList().forEach(chargeBox -> load.updateAndGet(v -> v + chargeBox.getCurrentLoad()));
+        anschluss.getChargeboxList().forEach(chargeBox -> load.updateAndGet(v -> v + chargeBox.getCurrentLoad()));
         return !(load.get() <= limit);
     }
 }

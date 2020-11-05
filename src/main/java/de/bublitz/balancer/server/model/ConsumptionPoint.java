@@ -31,4 +31,7 @@ public class ConsumptionPoint {
     @Column(name = "consumption")
     private Double consumption;
 
+    @Column(name = "measurand")
+    private String measurand;
+
 }

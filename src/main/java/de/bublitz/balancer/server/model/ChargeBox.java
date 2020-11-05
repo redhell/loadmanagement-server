@@ -3,40 +3,45 @@ package de.bublitz.balancer.server.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
  * Eine Chargebox ist ein besonderer Verbraucher, welcher angesteuert werden kann
  */
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-public class ChargeBox extends Consumer {
+@Table(name = "chargeboxes")
+public class ChargeBox extends AbstractConsumer {
 
     /**
      * priority = 100 (ganz wichtig) 0 (unwichtig)
      * chargeboxid = Ladepunktnummer
      * startURL = URL zum starten des LV
      * stopURL = URL zum stoppen
-     * outlet = Ladepunkt (physisch)
      * emaid = vertragsnummer/tag zum starten bspw.
      */
     private int priority = 100;
-    private String chargeboxID;
+    @Column(unique = true)
+    private String evseid;
     private URL startURL;
     private URL stopURL;
 
-    private int outlet;
     private String emaid;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long chargeboxId;
+
 
     public ChargeBox() {
         super();
         emaid = "";
-        chargeboxID = "";
+        evseid = "";
         setName("ChargeBox");
-        outlet = 1;
     }
 
     public void setStartURL(String url) {

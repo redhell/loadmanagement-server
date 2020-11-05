@@ -19,14 +19,14 @@ public class ChargeBoxController {
 
     @GetMapping("/add")
     public boolean addChargeBox(@RequestParam String name,
-                                @RequestParam String chargeboxID,
+                                @RequestParam String evseid,
                                 @RequestParam String startURL,
                                 @RequestParam String stopURL) {
         ChargeBox chargeBox = new ChargeBox();
         chargeBox.setName(name);
         chargeBox.setStartURL(startURL);
         chargeBox.setStopURL(stopURL);
-        chargeBox.setChargeboxID(chargeboxID);
+        chargeBox.setEvseid(evseid);
         chargeboxRepository.save(chargeBox);
         return true;
     }
@@ -48,17 +48,17 @@ public class ChargeBoxController {
     }
 
     @GetMapping("/getById")
-    public ChargeBox getChargeBoxById(@RequestParam String id) {
-        return chargeboxRepository.getChargeBoxByChargeboxID(id);
+    public ChargeBox getChargeBoxById(@RequestParam String evseid) {
+        return chargeboxRepository.getChargeBoxByEvseid(evseid);
     }
 
     @GetMapping("/remove")
     public void deleteChargeBox(@RequestParam String name, HttpServletResponse response) {
         ChargeBox delChargeBox = chargeboxRepository.getChargeBoxByName(name);
         if(delChargeBox != null) {
-            chargeboxRepository.deleteById(delChargeBox.getId());
+            chargeboxRepository.deleteById(delChargeBox.getChargeboxId());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Consumer not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chargebox not found");
         }
     }
 
