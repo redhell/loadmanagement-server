@@ -52,7 +52,7 @@ public class ChargeBoxController {
         return chargeboxRepository.getChargeBoxByEvseid(evseid);
     }
 
-    @GetMapping("/remove")
+    @DeleteMapping("/remove")
     public void deleteChargeBox(@RequestParam String name, HttpServletResponse response) {
         ChargeBox delChargeBox = chargeboxRepository.getChargeBoxByName(name);
         if(delChargeBox != null) {

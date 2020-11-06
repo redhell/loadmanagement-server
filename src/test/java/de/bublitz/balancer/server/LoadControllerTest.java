@@ -2,14 +2,15 @@ package de.bublitz.balancer.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,24 +18,23 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.testng.Assert.assertTrue;
 
 @SpringBootTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 @AutoConfigureMockMvc
-public class LoadControllerTest {
+public class LoadControllerTest extends AbstractTestNGSpringContextTests {
 
     @Autowired
     private MockMvc mockMvc;
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @AfterAll
+    @AfterClass
     public void tearDown() throws Exception {
         mockMvc.perform(delete("/load/delete").param("name", "Test"));
     }
 
-    @BeforeAll
+    @BeforeClass
     public void setUp() {
         mapper.findAndRegisterModules();
     }
@@ -70,6 +70,6 @@ public class LoadControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/load/getByName").param("name", "Test")).andExpect(status().isOk()).andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         List<ConsumptionPoint> list = mapper.readValue(response, List.class);
-        Assertions.assertTrue(list.size() >= 101);
+        assertTrue(list.size() >= 101);
     }
 }

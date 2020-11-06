@@ -1,0 +1,10 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="Suite1" verbose="1">
+    <test name="ControllerTest">
+        <classes>
+            <class name="de.bublitz.balancer.server.ChargeboxControllerTest"/>
+            <class name="de.bublitz.balancer.server.LoadControllerTest"/>
+            <class name="de.bublitz.balancer.server.AnschlussControllerTest"/>
+        </classes>
+    </test>
+</suite>

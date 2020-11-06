@@ -2,13 +2,11 @@ package de.bublitz.balancer.server.controller;
 
 import de.bublitz.balancer.server.model.ConsumptionPoint;
 import lombok.extern.slf4j.Slf4j;
-import org.influxdb.BatchOptions;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.InfluxDBIOException;
 import org.influxdb.dto.*;
 import org.influxdb.impl.InfluxDBResultMapper;
-
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +30,7 @@ public class InfluxController {
 
     private InfluxDB connectDatabase() {
         // Connect to database assumed on localhost with default credentials.
-        return InfluxDBFactory.connect("http://localhost:8086", "admin", "admin");
+        return InfluxDBFactory.connect("http://192.168.188.25:32771", "admin", "admin");
     }
 
     private void createDatabase() {

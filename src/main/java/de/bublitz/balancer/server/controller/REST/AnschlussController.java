@@ -50,8 +50,8 @@ public class AnschlussController {
         return anschlussRepository.getAnschlussByName(name);
     }
 
-    @GetMapping("/remove")
-    public void deleteChargeBox(@RequestParam String name, HttpServletResponse response) {
+    @DeleteMapping("/remove")
+    public void deleteAnschluss(@RequestParam String name, HttpServletResponse response) {
         Anschluss delAnschluss = anschlussRepository.getAnschlussByName(name);
         if (delAnschluss != null) {
             anschlussRepository.deleteById(delAnschluss.getId());
