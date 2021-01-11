@@ -21,6 +21,13 @@ public class ConsumptionPoint {
         this.name = name;
     }
 
+    public ConsumptionPoint(String name, double consumption, Instant time, String measurand) {
+        this.time = time;
+        this.consumption = consumption;
+        this.name = name;
+        this.measurand = measurand;
+    }
+
     @TimeColumn
     @Column(name = "time")
     private Instant time;

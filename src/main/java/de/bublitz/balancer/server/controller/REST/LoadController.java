@@ -1,10 +1,18 @@
 package de.bublitz.balancer.server.controller.REST;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bublitz.balancer.server.controller.InfluxController;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/load")
@@ -17,14 +25,35 @@ public class LoadController {
         return influxController.getAllPoints();
     }
 
-    @PostMapping(value ="/addPoint", consumes = "application/json")
+    @PostMapping(value = "/addPoint", consumes = "application/json")
     public void addPoint(@RequestBody ConsumptionPoint consumptionPoint) {
         influxController.addPoint(consumptionPoint);
     }
 
-    @PostMapping(value ="/addPoints", consumes = "application/json")
+    @PostMapping(value = "/addPoints", consumes = "application/json")
     public void addPoints(@RequestBody List<ConsumptionPoint> consumptionPoints) {
         influxController.addPoints(consumptionPoints);
+    }
+
+    @PostMapping("/{name}/rawPoints")
+    public void addRawPoints(@PathVariable String name, @RequestBody Map<LocalDateTime, String> pointMap) {
+        List<ConsumptionPoint> tmpList = new LinkedList<>();
+        ObjectMapper mapper = new ObjectMapper();
+        TypeReference<LinkedHashMap<String, String>> typeRef = new TypeReference<>() {
+        };
+        pointMap.entrySet().stream().forEach(data -> {
+            try {
+                Map<String, String> tmpMap = mapper.readValue(data.getValue(), typeRef);
+                ConsumptionPoint consumptionPoint = new ConsumptionPoint(name,
+                        Double.parseDouble(tmpMap.get("I")),
+                        data.getKey().atZone(ZoneId.of("Europe/Berlin")).toInstant(),
+                        tmpMap.get("unit"));
+                tmpList.add(consumptionPoint);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
+        influxController.addPoints(tmpList);
     }
 
     @GetMapping("/getByName")

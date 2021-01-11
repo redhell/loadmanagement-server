@@ -8,6 +8,8 @@ import org.influxdb.InfluxDBIOException;
 import org.influxdb.dto.*;
 import org.influxdb.impl.InfluxDBResultMapper;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -76,6 +78,7 @@ public class InfluxController {
                 .time(System.currentTimeMillis() - 100, TimeUnit.MILLISECONDS)
                 .addField("name", consumptionPoint.getName())
                 .addField("consumption", consumptionPoint.getConsumption())
+                .addField("measurand", consumptionPoint.getMeasurand())
                 .build();
         influxDB.write(point);
     }
@@ -90,6 +93,7 @@ public class InfluxController {
                     .time(consumptionPoint.getTime().toEpochMilli(), TimeUnit.MILLISECONDS)
                     .addField("name", consumptionPoint.getName())
                     .addField("consumption", consumptionPoint.getConsumption())
+                    .addField("measurand", consumptionPoint.getMeasurand())
                     .build();
             batchPoints.point(point);
         });
@@ -112,7 +116,22 @@ public class InfluxController {
 
             // Map it
             InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
-            return resultMapper.toPOJO(queryResult, ConsumptionPoint.class);
+            List<ConsumptionPoint> returnList = new ArrayList<>();
+            queryResult.getResults()
+                    .get(0)
+                    .getSeries()
+                    .forEach(series -> series
+                            .getValues()
+                            .forEach(point -> {
+                                ConsumptionPoint consumptionPoint = new ConsumptionPoint();
+                                consumptionPoint.setTime(Instant.parse((String) point.get(0)));
+                                consumptionPoint.setConsumption((double) point.get(1));
+                                consumptionPoint.setMeasurand((String) point.get(2));
+                                consumptionPoint.setName((String) point.get(3));
+                                returnList.add(consumptionPoint);
+                            }));
+            return returnList;
+            //return resultMapper.toPOJO(queryResult, ConsumptionPoint.class);
         } else {
             return new LinkedList<>();
         }
