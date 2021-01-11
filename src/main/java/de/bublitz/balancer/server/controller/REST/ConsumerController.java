@@ -1,13 +1,11 @@
 package de.bublitz.balancer.server.controller.REST;
 
 import de.bublitz.balancer.server.model.Consumer;
-import de.bublitz.balancer.server.repository.ConsumerRepository;
+import de.bublitz.balancer.server.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @RestController
@@ -15,28 +13,31 @@ import javax.servlet.http.HttpServletResponse;
 public class ConsumerController {
 
     @Autowired
-    private ConsumerRepository consumerRepository;
+    private ConsumerService consumerService;
 
     @PostMapping("/add")
     public boolean addConsumer(@RequestParam String name) {
-        Consumer consumer = new Consumer();
-        consumer.setName(name);
-        consumerRepository.save(consumer);
+        consumerService.addConsumer(name);
         return true;
     }
 
     @GetMapping("/getAll")
-    public Iterable<Consumer> getAllConsumers() {
-        return consumerRepository.findAll();
+    public List<Consumer> getAllConsumers() {
+        return consumerService.getAllConsumers();
     }
 
     @GetMapping("/remove")
-    public void deleteConsumer(@RequestParam String name, HttpServletResponse response) {
-        Consumer delConsumer = consumerRepository.getConsumerByName(name);
-        if(delConsumer != null) {
-            consumerRepository.deleteById(delConsumer.getConsumerID());
-        } else {
-           throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Consumer not found");
-        }
+    public void deleteConsumer(@RequestParam String name) {
+        consumerService.deleteConsumer(name);
+    }
+
+    @PutMapping("/{name}/putCurrentLoad")
+    public void putCurrentLoad(@PathVariable String name, @RequestBody double currentLoad) {
+        consumerService.putCurrentLoad(name, currentLoad);
+    }
+
+    @GetMapping("/{name}/details")
+    public Consumer getConsumerDetails(@PathVariable String name) {
+        return consumerService.getConsumerByName(name);
     }
 }

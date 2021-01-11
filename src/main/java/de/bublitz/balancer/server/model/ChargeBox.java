@@ -29,8 +29,9 @@ public class ChargeBox extends AbstractConsumer {
     private String evseid;
     private URL startURL;
     private URL stopURL;
-
+    private double idleConsumption;
     private String emaid;
+    private boolean charging;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,6 +42,8 @@ public class ChargeBox extends AbstractConsumer {
         super();
         emaid = "";
         evseid = "";
+        idleConsumption = 0;
+        charging = false;
         setName("ChargeBox");
     }
 

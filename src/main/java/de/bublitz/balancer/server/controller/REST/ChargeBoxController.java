@@ -1,7 +1,7 @@
 package de.bublitz.balancer.server.controller.REST;
 
 import de.bublitz.balancer.server.model.ChargeBox;
-import de.bublitz.balancer.server.repository.ChargeboxRepository;
+import de.bublitz.balancer.server.service.ChargeboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 public class ChargeBoxController {
 
     @Autowired
-    private ChargeboxRepository chargeboxRepository;
+    private ChargeboxService chargeboxService;
 
     @GetMapping("/add")
     public boolean addChargeBox(@RequestParam String name,
@@ -27,39 +27,45 @@ public class ChargeBoxController {
         chargeBox.setStartURL(startURL);
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
-        chargeboxRepository.save(chargeBox);
+        chargeboxService.addChargeBox(chargeBox);
         return true;
     }
 
     @PostMapping("/add")
     public boolean addChargeBox(@RequestBody ChargeBox pChargebox) {
-        chargeboxRepository.save(pChargebox);
+        chargeboxService.addChargeBox(pChargebox);
         return true;
     }
 
     @GetMapping("/getAll")
     public Iterable<ChargeBox> getAllChargeBox() {
-        return chargeboxRepository.findAll();
+        return chargeboxService.getAllChargeBox();
     }
 
     @GetMapping("/getByName")
     public ChargeBox getChargeBoxByName(@RequestParam String name) {
-        return chargeboxRepository.getChargeBoxByName(name);
+        return chargeboxService.getChargeBoxByName(name);
     }
 
     @GetMapping("/getById")
     public ChargeBox getChargeBoxById(@RequestParam String evseid) {
-        return chargeboxRepository.getChargeBoxByEvseid(evseid);
+        return chargeboxService.getChargeBoxById(evseid);
     }
 
     @DeleteMapping("/remove")
     public void deleteChargeBox(@RequestParam String name, HttpServletResponse response) {
-        ChargeBox delChargeBox = chargeboxRepository.getChargeBoxByName(name);
-        if(delChargeBox != null) {
-            chargeboxRepository.deleteById(delChargeBox.getChargeboxId());
-        } else {
+        if (!chargeboxService.deleteChargeBox(name)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chargebox not found");
         }
     }
 
+    @GetMapping("/startCharging")
+    public void startCharging(@RequestParam String name) {
+        chargeboxService.setCharging(name, true);
+    }
+
+    @GetMapping("/stopCharging")
+    public void stopCharging(@RequestParam String name) {
+        chargeboxService.setCharging(name, false);
+    }
 }

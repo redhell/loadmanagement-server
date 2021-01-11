@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ConsumerRepository extends JpaRepository<Consumer, Long> {
     Consumer getConsumerByName(String name);
+
+    void deleteConsumerByName(String name);
 }
