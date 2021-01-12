@@ -9,13 +9,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
+
 @RestController
 @RequestMapping(value = "/anschluss")
 public class AnschlussController {
 
     @Autowired
     private AnschlussService anschlussService;
+
 
     @GetMapping("/add")
     public boolean addAnschluss(@RequestParam String name, @RequestParam double maxLoad) {

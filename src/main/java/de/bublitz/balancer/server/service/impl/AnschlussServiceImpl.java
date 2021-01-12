@@ -11,14 +11,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+
 @Service
 public class AnschlussServiceImpl implements AnschlussService {
+    private final AnschlussRepository anschlussRepository;
+    private final ChargeboxRepository chargeboxRepository;
+    private final ConsumerRepository consumerRepository;
+
     @Autowired
-    private AnschlussRepository anschlussRepository;
-    @Autowired
-    private ChargeboxRepository chargeboxRepository;
-    @Autowired
-    private ConsumerRepository consumerRepository;
+    public AnschlussServiceImpl(AnschlussRepository anschlussRepository, ChargeboxRepository chargeboxRepository, ConsumerRepository consumerRepository) {
+        this.anschlussRepository = anschlussRepository;
+        this.chargeboxRepository = chargeboxRepository;
+        this.consumerRepository = consumerRepository;
+    }
+
+    @PostConstruct
+    public void createDefault() {
+        addAnschluss(new Anschluss());
+    }
 
     @Transactional
     public Anschluss getAnschlussByName(String name) {
@@ -27,7 +38,9 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @Transactional
     public void addAnschluss(Anschluss anschluss) {
-        anschlussRepository.save(anschluss);
+        if (!anschlussRepository.existsAnschlussByName(anschluss.getName())) {
+            anschlussRepository.save(anschluss);
+        }
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package de.bublitz.balancer.server.controller.REST;
 
 import de.bublitz.balancer.server.model.ChargeBox;
+import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ChargeboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ public class ChargeBoxController {
     @Autowired
     private ChargeboxService chargeboxService;
 
+    @Autowired
+    private AnschlussService anschlussService;
+
     @GetMapping("/add")
     public boolean addChargeBox(@RequestParam String name,
                                 @RequestParam String evseid,
@@ -28,12 +32,14 @@ public class ChargeBoxController {
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
         chargeboxService.addChargeBox(chargeBox);
+        anschlussService.addChargeboxToAnschluss("Anschluss", name);
         return true;
     }
 
     @PostMapping("/add")
     public boolean addChargeBox(@RequestBody ChargeBox pChargebox) {
         chargeboxService.addChargeBox(pChargebox);
+        anschlussService.addChargeboxToAnschluss("Anschluss", pChargebox.getName());
         return true;
     }
 

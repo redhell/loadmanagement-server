@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AnschlussRepository extends JpaRepository<Anschluss, Long> {
     Anschluss getAnschlussByName(String name);
+
+    Boolean existsAnschlussByName(String name);
 }

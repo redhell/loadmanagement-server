@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bublitz.balancer.server.controller.InfluxController;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -15,10 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Log4j2
 @RequestMapping("/load")
 public class LoadController {
-
-    InfluxController influxController = new InfluxController();
+    @Autowired
+    private InfluxController influxController;
 
     @GetMapping("/getAll")
     public List<ConsumptionPoint> getAllPoints() {
@@ -50,6 +53,7 @@ public class LoadController {
                         tmpMap.get("unit"));
                 tmpList.add(consumptionPoint);
             } catch (JsonProcessingException e) {
+                log.error(e.getMessage());
                 e.printStackTrace();
             }
         });

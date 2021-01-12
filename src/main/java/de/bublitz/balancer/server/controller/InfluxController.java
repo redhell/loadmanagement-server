@@ -6,7 +6,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.InfluxDBIOException;
 import org.influxdb.dto.*;
-import org.influxdb.impl.InfluxDBResultMapper;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
+@Component
 @SuppressWarnings({"Deprecated", "deprecation"})
 public class InfluxController {
 
@@ -59,7 +60,7 @@ public class InfluxController {
                 log.error("Error pinging server.");
                 return false;
             } else {
-                log.info("Database version: {}", response.getVersion());
+                log.debug("Database version: {}", response.getVersion());
                 return true;
             }
         } catch (InfluxDBIOException idbo) {
@@ -97,7 +98,7 @@ public class InfluxController {
                     .build();
             batchPoints.point(point);
         });
-        log.info("Consumption List size: " + consumptionPoints.size());
+        log.debug("Consumption List size: " + consumptionPoints.size());
         influxDB.write(batchPoints);
         influxDB.flush();
     }
@@ -108,28 +109,41 @@ public class InfluxController {
         return getData(query);
     }
 
+    public ConsumptionPoint getLastPoint(String name) {
+        try {
+            String query = "select * from consumption where \"name\" = '" + name + "' order by time desc LIMIT 1";
+            return getData(query).get(0);
+        } catch (NullPointerException ex) {
+            return null;
+        }
+    }
+
     private List<ConsumptionPoint> getData(String query) {
-        if(pingServer()) {
+        if (pingServer()) {
             // Run the query
             Query queryObject = new Query(query, dbName);
             QueryResult queryResult = influxDB.query(queryObject);
 
             // Map it
-            InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
+            //InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
             List<ConsumptionPoint> returnList = new ArrayList<>();
-            queryResult.getResults()
-                    .get(0)
-                    .getSeries()
-                    .forEach(series -> series
-                            .getValues()
-                            .forEach(point -> {
-                                ConsumptionPoint consumptionPoint = new ConsumptionPoint();
-                                consumptionPoint.setTime(Instant.parse((String) point.get(0)));
-                                consumptionPoint.setConsumption((double) point.get(1));
-                                consumptionPoint.setMeasurand((String) point.get(2));
-                                consumptionPoint.setName((String) point.get(3));
-                                returnList.add(consumptionPoint);
-                            }));
+            try {
+                queryResult.getResults()
+                        .get(0)
+                        .getSeries()
+                        .forEach(series -> series
+                                .getValues()
+                                .forEach(point -> {
+                                    ConsumptionPoint consumptionPoint = new ConsumptionPoint();
+                                    consumptionPoint.setTime(Instant.parse((String) point.get(0)));
+                                    consumptionPoint.setConsumption((double) point.get(1));
+                                    consumptionPoint.setMeasurand((String) point.get(2));
+                                    consumptionPoint.setName((String) point.get(3));
+                                    returnList.add(consumptionPoint);
+                                }));
+            } catch (NullPointerException ex) {
+                log.warn("No data found");
+            }
             return returnList;
             //return resultMapper.toPOJO(queryResult, ConsumptionPoint.class);
         } else {
