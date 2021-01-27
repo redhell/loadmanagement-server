@@ -65,7 +65,7 @@ public class BalancerComponent {
         anschluss.getChargeboxList().forEach(this::updateChargeBox);
         anschluss.getConsumerList().forEach(this::updateConsumer);
         anschluss.computeLoad();
-        log.info("Current load: " + anschluss.getCurrentLoad() + "A");
+        log.info("Current load of " + anschluss.getName() + ": " + anschluss.getCurrentLoad() + "A");
         anschlussRepository.save(anschluss);
     }
 
