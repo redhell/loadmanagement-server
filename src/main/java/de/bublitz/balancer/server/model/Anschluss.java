@@ -70,12 +70,13 @@ public class Anschluss {
     public void computeLoad() {
         AtomicReference<Double> load = new AtomicReference<>((double) 0);
         consumerList.forEach(consumer -> load.updateAndGet(v -> v + consumer.getCurrentLoad()));
-        chargeboxList.forEach(chargeBox -> load.updateAndGet(v -> v + chargeBox.getCurrentLoad()));
+        // Only compute connected load!
+        chargeboxList.stream().filter(ChargeBox::isConnected)
+                .forEach(chargeBox -> load.updateAndGet(v -> v + chargeBox.getCurrentLoad()));
         currentLoad = load.get();
     }
 
     public void sendStopCharging(ChargeBox chargeBox) {
-
     }
 
     public void sendStartCharging(ChargeBox chargeBox) {

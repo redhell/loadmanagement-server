@@ -32,6 +32,7 @@ public class ChargeBox extends AbstractConsumer {
     private double idleConsumption;
     private String emaid;
     private boolean charging;
+    private boolean isConnected;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,6 +45,7 @@ public class ChargeBox extends AbstractConsumer {
         evseid = "";
         idleConsumption = 0;
         charging = false;
+        isConnected = true;
         setName("ChargeBox");
     }
 

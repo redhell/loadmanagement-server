@@ -113,7 +113,7 @@ public class InfluxController {
         try {
             String query = "select * from consumption where \"name\" = '" + name + "' order by time desc LIMIT 1";
             return getData(query).get(0);
-        } catch (NullPointerException ex) {
+        } catch (Exception ex) {
             return null;
         }
     }

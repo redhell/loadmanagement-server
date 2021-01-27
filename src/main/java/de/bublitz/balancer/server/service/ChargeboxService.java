@@ -14,4 +14,6 @@ public interface ChargeboxService {
     boolean deleteChargeBox(String name);
 
     void setCharging(String name, boolean active);
+
+    void setConnected(String name);
 }

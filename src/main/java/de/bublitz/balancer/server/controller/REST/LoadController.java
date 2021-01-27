@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.bublitz.balancer.server.controller.InfluxController;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
+import de.bublitz.balancer.server.service.ChargeboxService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,9 @@ public class LoadController {
     @Autowired
     private InfluxController influxController;
 
+    @Autowired
+    private ChargeboxService chargeboxService;
+
     @GetMapping("/getAll")
     public List<ConsumptionPoint> getAllPoints() {
         return influxController.getAllPoints();
@@ -40,6 +44,7 @@ public class LoadController {
 
     @PostMapping("/{name}/rawPoints")
     public void addRawPoints(@PathVariable String name, @RequestBody Map<LocalDateTime, String> pointMap) {
+        chargeboxService.setConnected(name);
         List<ConsumptionPoint> tmpList = new LinkedList<>();
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<LinkedHashMap<String, String>> typeRef = new TypeReference<>() {
