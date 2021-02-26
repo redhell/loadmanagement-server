@@ -45,18 +45,20 @@ public class Anschluss {
         chargeboxList = new ArrayList<>();
         maxLoad = 0;
         currentLoad = 0;
-        loadStrategy = LoadStrategy.SIMPLE;
+        loadStrategy = LoadStrategy.FIFO;
         name = "Anschluss";
     }
 
     public void addConsumer(Consumer consumer) {
         consumer.setAnschluss(this);
         consumerList.add(consumer);
+        computeLoad();
     }
 
     public void addChargeBox(ChargeBox chargeBox) {
         chargeBox.setAnschluss(this);
         chargeboxList.add(chargeBox);
+        computeLoad();
     }
 
     public boolean isSoftlimitReached() {
