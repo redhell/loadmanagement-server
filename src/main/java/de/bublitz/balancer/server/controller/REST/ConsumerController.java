@@ -40,4 +40,9 @@ public class ConsumerController {
     public Consumer getConsumerDetails(@PathVariable String name) {
         return consumerService.getConsumerByName(name);
     }
+
+    @GetMapping("/updateConsumer")
+    public void updateConsumer(@RequestBody Consumer consumer) {
+        consumerService.updateConsumer(consumer);
+    }
 }

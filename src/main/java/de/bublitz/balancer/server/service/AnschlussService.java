@@ -16,4 +16,9 @@ public interface AnschlussService {
 
     void addConsumerToAnschluss(String anschlussName, String consumerName);
 
+    void removeChargebox(String anschlussName, String chargeboxName);
+
+    void removeConsumer(String anschlussName, String consumerName);
+
+    void updateAnschluss(Anschluss anschluss);
 }

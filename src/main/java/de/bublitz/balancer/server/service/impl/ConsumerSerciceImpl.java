@@ -5,10 +5,12 @@ import de.bublitz.balancer.server.repository.ConsumerRepository;
 import de.bublitz.balancer.server.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class ConsumerSerciceImpl implements ConsumerService {
     @Autowired
     private ConsumerRepository consumerRepository;
@@ -39,6 +41,11 @@ public class ConsumerSerciceImpl implements ConsumerService {
     @Override
     public Consumer getConsumerByName(String name) {
         return consumerRepository.getConsumerByName(name);
+    }
+
+    @Override
+    public void updateConsumer(Consumer consumer) {
+        consumerRepository.save(consumer);
     }
 
 }

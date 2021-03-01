@@ -59,4 +59,19 @@ public class AnschlussController {
     public void addConsumerToAnschluss(@RequestParam String anschlussName, @RequestParam String consumerName) {
         anschlussService.addConsumerToAnschluss(anschlussName, consumerName);
     }
+
+    @GetMapping("/removeConsumer")
+    public void removeConsumer(@RequestParam String anschlussName, @RequestParam String consumerName) {
+        anschlussService.removeConsumer(anschlussName, consumerName);
+    }
+
+    @GetMapping("/removeChargebox")
+    public void removeChargebox(@RequestParam String anschlussName, @RequestParam String chargeboxName) {
+        anschlussService.removeChargebox(anschlussName, chargeboxName);
+    }
+
+    @PostMapping("/updateAnschluss")
+    public void updateAnschluss(@RequestBody Anschluss anschluss) {
+        anschlussService.updateAnschluss(anschluss);
+    }
 }

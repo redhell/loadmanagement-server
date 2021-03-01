@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 
 @Service
+@Transactional
 public class AnschlussServiceImpl implements AnschlussService {
     private final AnschlussRepository anschlussRepository;
     private final ChargeboxRepository chargeboxRepository;
@@ -68,12 +69,33 @@ public class AnschlussServiceImpl implements AnschlussService {
         anschlussRepository.save(anschluss);
     }
 
-    @Transactional
+    @Override
     public void addConsumerToAnschluss(String anschlussName, String consumerName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
         Consumer consumer = consumerRepository.getConsumerByName(consumerName);
         anschluss.addConsumer(consumer);
 
+        anschlussRepository.save(anschluss);
+    }
+
+    @Override
+    public void removeChargebox(String anschlussName, String chargeboxName) {
+        Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
+        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
+        anschluss.getChargeboxList().remove(chargeBox);
+        chargeboxRepository.delete(chargeBox);
+    }
+
+    @Override
+    public void removeConsumer(String anschlussName, String consumerName) {
+        Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
+        Consumer consumer = consumerRepository.getConsumerByName(consumerName);
+        anschluss.getConsumerList().remove(consumer);
+        consumerRepository.delete(consumer);
+    }
+
+    @Override
+    public void updateAnschluss(Anschluss anschluss) {
         anschlussRepository.save(anschluss);
     }
 }
