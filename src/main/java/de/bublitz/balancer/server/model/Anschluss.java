@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Entity
@@ -83,5 +84,34 @@ public class Anschluss {
 
     public void sendStartCharging(ChargeBox chargeBox) {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Anschluss)) return false;
+
+        Anschluss anschluss = (Anschluss) o;
+
+        if (Double.compare(anschluss.maxLoad, maxLoad) != 0) return false;
+        if (Double.compare(anschluss.softLimit, softLimit) != 0) return false;
+        if (Double.compare(anschluss.hardLimit, hardLimit) != 0) return false;
+        if (loadStrategy != anschluss.loadStrategy) return false;
+        return Objects.equals(name, anschluss.name);
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(maxLoad);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(softLimit);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(hardLimit);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (loadStrategy != null ? loadStrategy.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 }

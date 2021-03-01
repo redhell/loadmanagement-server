@@ -110,19 +110,15 @@ public abstract class Strategy {
 
         int ind = n;
         int weight = W;
-        String s = "";
         while (ind > 0) {
             if (K[ind][weight] != K[ind - 1][weight]) {
-                s = "1," + s;
                 booleans.add(true);
                 weight -= wt[ind - 1];
             } else {
                 booleans.add(false);
-                s = "0," + s;
             }
             ind -= 1;
         }
-        s = s.substring(0, s.length() - 1);
         return booleans;
         //return K[n][W];
     }

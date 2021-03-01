@@ -16,4 +16,8 @@ public interface ChargeboxService {
     void setCharging(String name, boolean active);
 
     void setConnected(String name);
+
+    void calibrate();
+
+    void setListener(String name);
 }

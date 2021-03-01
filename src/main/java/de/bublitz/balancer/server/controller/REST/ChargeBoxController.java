@@ -10,16 +10,18 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 
-@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @RestController
 @RequestMapping(value = "/chargebox")
 public class ChargeBoxController {
 
-    @Autowired
-    private ChargeboxService chargeboxService;
+    private final ChargeboxService chargeboxService;
+    private final AnschlussService anschlussService;
 
     @Autowired
-    private AnschlussService anschlussService;
+    public ChargeBoxController(ChargeboxService chargeboxService, AnschlussService anschlussService) {
+        this.chargeboxService = chargeboxService;
+        this.anschlussService = anschlussService;
+    }
 
     @GetMapping("/add")
     public boolean addChargeBox(@RequestParam String name,

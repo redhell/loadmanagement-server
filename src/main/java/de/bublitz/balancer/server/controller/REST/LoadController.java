@@ -45,16 +45,17 @@ public class LoadController {
     @PostMapping("/{name}/rawPoints")
     public void addRawPoints(@PathVariable String name, @RequestBody Map<LocalDateTime, String> pointMap) {
         chargeboxService.setConnected(name);
+        chargeboxService.setListener(name);
         List<ConsumptionPoint> tmpList = new LinkedList<>();
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<LinkedHashMap<String, String>> typeRef = new TypeReference<>() {
         };
-        pointMap.entrySet().stream().forEach(data -> {
+        pointMap.forEach((key, value) -> {
             try {
-                Map<String, String> tmpMap = mapper.readValue(data.getValue(), typeRef);
+                Map<String, String> tmpMap = mapper.readValue(value, typeRef);
                 ConsumptionPoint consumptionPoint = new ConsumptionPoint(name,
                         Double.parseDouble(tmpMap.get("I")),
-                        data.getKey().atZone(ZoneId.of("Europe/Berlin")).toInstant(),
+                        key.atZone(ZoneId.of("Europe/Berlin")).toInstant(),
                         tmpMap.get("unit"));
                 tmpList.add(consumptionPoint);
             } catch (JsonProcessingException e) {
@@ -63,6 +64,9 @@ public class LoadController {
             }
         });
         influxController.addPoints(tmpList);
+
+        // Noch nicht kalibriert für Idle!
+        chargeboxService.calibrate();
     }
 
     @GetMapping("/getByName")
