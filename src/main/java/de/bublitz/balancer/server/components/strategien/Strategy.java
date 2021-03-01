@@ -5,7 +5,11 @@ import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -143,5 +147,28 @@ public abstract class Strategy {
         });
         stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "}");
         return stringBuilder.toString();
+    }
+
+    protected void stop(ChargeBox chargeBox) {
+        try {
+            queryURL(chargeBox.getStopURL());
+        } catch (IOException ex) {
+            log.error("Could not stop charging session");
+            log.error(ex.getMessage());
+        }
+    }
+
+    protected void start(ChargeBox chargeBox) {
+        try {
+            queryURL(chargeBox.getStartURL());
+        } catch (IOException ex) {
+            log.error("Could not stop charging session");
+            log.error(ex.getMessage());
+        }
+    }
+
+    private void queryURL(String url) throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        client.execute(new HttpGet(url));
     }
 }

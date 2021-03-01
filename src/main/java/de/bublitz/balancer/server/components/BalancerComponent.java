@@ -29,7 +29,7 @@ public class BalancerComponent {
 
     private final AnschlussRepository anschlussRepository;
     private final InfluxController influxController;
-    private final Map<Long, Strategy> anschlussStrategyMap;
+    private final Map<Anschluss, Strategy> anschlussStrategyMap;
 
     @Autowired
     public BalancerComponent(AnschlussRepository anschlussRepository, InfluxController influxController) {
@@ -68,10 +68,14 @@ public class BalancerComponent {
     }
 
     protected void balance(Anschluss anschluss) {
-        if (anschlussStrategyMap.containsKey(anschluss.getId())) {
-            anschlussStrategyMap.get(anschluss.getId()).optimize();
+        Strategy strategy;
+        if (anschlussStrategyMap.containsKey(anschluss)) {
+            strategy = anschlussStrategyMap.get(anschluss);
+            // Update
+            strategy.setAnschluss(anschluss);
+            strategy.optimize();
         } else {
-            Strategy strategy;
+
             switch (anschluss.getLoadStrategy()) {
                 case PQ:
                     strategy = new PriorityQueueStrategy(anschluss);
@@ -83,7 +87,7 @@ public class BalancerComponent {
                 default:
                     strategy = new FirstInFirstOutStrategy(anschluss);
             }
-            anschlussStrategyMap.put(anschluss.getId(), strategy);
+            anschlussStrategyMap.put(anschluss, strategy);
         }
         // Calculate load
         anschluss.getChargeboxList().forEach(this::updateChargeBox);
@@ -97,14 +101,14 @@ public class BalancerComponent {
     }
 
     private void updateChargeBox(ChargeBox chargeBox) {
-        Strategy strategy = anschlussStrategyMap.get(chargeBox.getAnschluss().getId());
+        Strategy strategy = anschlussStrategyMap.get(chargeBox.getAnschluss());
         if (chargeBox.isConnected()) {
             Optional<ConsumptionPoint> consumption =
                     Optional.ofNullable(influxController.getLastPoint(chargeBox.getName()));
             if (consumption.isPresent()) {
                 chargeBox.setCurrentLoad(consumption.get().getConsumption());
                 // 20% Buffer
-                if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption() * 1.15) {
+                if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption() * 1.1) {
                     if (!chargeBox.isCharging()) {
                         // not charging -> charging
                         log.info("Start charging");
@@ -112,7 +116,7 @@ public class BalancerComponent {
                         chargeBox.setCharging(true);
                     }
                 } else {
-                    if (chargingListContains(strategy, chargeBox)) {
+                    if (strategy.getChargingList().contains(chargeBox)) {
                         chargeBox.setCharging(false);
                         strategy.removeLV(chargeBox);
                         log.info("Stop charging");
@@ -128,9 +132,5 @@ public class BalancerComponent {
         } else {
             log.debug(chargeBox.getName() + " is not connected");
         }
-    }
-
-    private boolean chargingListContains(Strategy strategy, ChargeBox chargeBox) {
-        return strategy.getChargingList().stream().anyMatch(cb -> cb.getEvseid().equals(chargeBox.getEvseid()));
     }
 }
