@@ -10,6 +10,14 @@
 <body>
 <nav th:replace="fragments/header.html :: header"></nav>
 <div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li aria-current="page" class="breadcrumb-item active">Ladeboxen</li>
+            </ol>
+        </nav>
+    </div>
     <div class="row">
         <h1>&Uuml;bersicht aller Ladeboxen</h1>
     </div>

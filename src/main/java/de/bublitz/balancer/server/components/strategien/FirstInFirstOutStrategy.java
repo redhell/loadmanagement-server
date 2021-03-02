@@ -12,7 +12,7 @@ public class FirstInFirstOutStrategy extends Strategy {
 
     @Override
     public void optimize() {
-        anschlussLoad = anschluss.getCurrentLoad();
+        //anschlussLoad = anschluss.getCurrentLoad();
         if (!getSuspended().isEmpty()) {
             ChargeBox u0 = suspended.getFirst();
             suspended.remove(u0);
@@ -38,10 +38,10 @@ public class FirstInFirstOutStrategy extends Strategy {
         } else {
             cbLoad = chargeBox.getLastLoad();
         }
-        if (anschlussLoad + cbLoad <= anschluss.getMaxLoad()) {
+        if (anschlussLoad + cbLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
         } else {
-            while (anschlussLoad + cbLoad > anschluss.getMaxLoad()) {
+            while (anschlussLoad + cbLoad > anschluss.getHardLimit()) {
                 ChargeBox l0 = chargingList.getFirst();
                 chargingList.remove(l0);
                 anschlussLoad -= l0.getCurrentLoad();

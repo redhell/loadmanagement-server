@@ -10,6 +10,15 @@
 <body>
 <nav th:replace="fragments/header.html :: header"></nav>
 <div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/chargeboxes}">Ladeboxen</a></li>
+                <li aria-current="page" class="breadcrumb-item active" th:text="${chargebox.getEvseid()}"></li>
+            </ol>
+        </nav>
+    </div>
     <div class="row">
         <h1>Anschlussdetails von <span th:text="${chargebox.getName()}"></span></h1>
     </div>

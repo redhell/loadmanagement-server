@@ -87,7 +87,7 @@ public class ChargeboxServiceImpl implements ChargeboxService {
             for (ConsumptionPoint loadDatum : loadData) {
                 tmpValues += loadDatum.getConsumption();
             }
-            cb.setIdleConsumption(tmpValues / loadData.size());
+            cb.setIdleConsumption((tmpValues / loadData.size()) * 1.3);
             cb.setCalibrated(true);
             log.debug("Calculated ilde of " + cb.getName() + ": " + new DecimalFormat("#.###").format(cb.getIdleConsumption()) + "A");
         });

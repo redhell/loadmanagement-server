@@ -109,7 +109,7 @@ public class BalancerComponent {
             if (consumption.isPresent()) {
                 chargeBox.setCurrentLoad(consumption.get().getConsumption());
                 // 20% Buffer
-                if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption() * 1.1) {
+                if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption() * 1.2) {
                     if (!chargeBox.isCharging()) {
                         // not charging -> charging
                         log.info("Start charging");

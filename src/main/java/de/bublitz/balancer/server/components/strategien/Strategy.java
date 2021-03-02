@@ -32,6 +32,7 @@ public abstract class Strategy {
         suspended = new LinkedList<>();
         tmpSuspended = new LinkedList<>();
         this.anschluss = anschluss;
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 
     public abstract void optimize();

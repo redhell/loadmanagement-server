@@ -10,6 +10,15 @@
 <body>
 <nav th:replace="fragments/header.html :: header"></nav>
 <div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/anschluss}">Anschl&uuml;sse</a></li>
+                <li aria-current="page" class="breadcrumb-item active" th:text="${anschluss.getName()}"></li>
+            </ol>
+        </nav>
+    </div>
     <div class="row">
         <h1>Anschlussdetails von <span th:text="${anschluss.getName()}"></span></h1>
     </div>

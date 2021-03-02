@@ -10,7 +10,15 @@
 <body>
 <nav th:replace="fragments/header.html :: header"></nav>
 <div class="container">
-    <div><h1>&Uuml;bersicht aller Verbraucher</h1></div>
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li aria-current="page" class="breadcrumb-item active">Verbraucher</li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row"><h1>&Uuml;bersicht aller Verbraucher</h1></div>
     <div class="row">
         <table class="table table-bordered table-hover">
             <thead class="thead-light">
