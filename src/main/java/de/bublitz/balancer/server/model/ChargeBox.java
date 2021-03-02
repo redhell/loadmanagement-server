@@ -16,13 +16,13 @@ import java.util.Objects;
 public class ChargeBox extends AbstractConsumer {
 
     /**
-     * priority = 100 (ganz wichtig) 0 (unwichtig)
+     * priority = true/false
      * chargeboxid = Ladepunktnummer
      * startURL = URL zum starten des LV
      * stopURL = URL zum stoppen
      * emaid = vertragsnummer/tag zum starten bspw.
      */
-    private int priority = 100;
+    private boolean priority;
     @Column(unique = true)
     private String evseid;
     private String startURL;
@@ -50,6 +50,7 @@ public class ChargeBox extends AbstractConsumer {
         charging = false;
         connected = true;
         calibrated = false;
+        priority = false;
         setName("ChargeBox");
     }
 
@@ -75,7 +76,7 @@ public class ChargeBox extends AbstractConsumer {
     public int hashCode() {
         int result = super.hashCode();
         long temp;
-        result = 31 * result + priority;
+        result = 31 * result + (priority ? 1 : 0);
         result = 31 * result + (evseid != null ? evseid.hashCode() : 0);
         result = 31 * result + (startURL != null ? startURL.hashCode() : 0);
         result = 31 * result + (stopURL != null ? stopURL.hashCode() : 0);

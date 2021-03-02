@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Service
+@Transactional
 public class AnschlussServiceImpl implements AnschlussService {
     private final AnschlussRepository anschlussRepository;
     private final ChargeboxRepository chargeboxRepository;
@@ -31,24 +33,24 @@ public class AnschlussServiceImpl implements AnschlussService {
         addAnschluss(new Anschluss());
     }
 
-    @Transactional
+    @Override
     public Anschluss getAnschlussByName(String name) {
         return anschlussRepository.getAnschlussByName(name);
     }
 
-    @Transactional
+    @Override
     public void addAnschluss(Anschluss anschluss) {
         if (!anschlussRepository.existsAnschlussByName(anschluss.getName())) {
             anschlussRepository.save(anschluss);
         }
     }
 
-    @Transactional
-    public Iterable<Anschluss> getAll() {
+    @Override
+    public List<Anschluss> getAll() {
         return anschlussRepository.findAll();
     }
 
-    @Transactional
+    @Override
     public boolean removeAnschluss(String name) {
         Anschluss delAnschluss = anschlussRepository.getAnschlussByName(name);
         if (delAnschluss != null) {
@@ -59,7 +61,7 @@ public class AnschlussServiceImpl implements AnschlussService {
         }
     }
 
-    @Transactional
+    @Override
     public void addChargeboxToAnschluss(String anschlussName, String chargeboxName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
         ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
@@ -68,12 +70,17 @@ public class AnschlussServiceImpl implements AnschlussService {
         anschlussRepository.save(anschluss);
     }
 
-    @Transactional
+    @Override
     public void addConsumerToAnschluss(String anschlussName, String consumerName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
         Consumer consumer = consumerRepository.getConsumerByName(consumerName);
         anschluss.addConsumer(consumer);
 
         anschlussRepository.save(anschluss);
+    }
+
+    @Override
+    public Anschluss getAnschlussById(long id) {
+        return anschlussRepository.getOne(id);
     }
 }

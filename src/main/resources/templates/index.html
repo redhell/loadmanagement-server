@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" rel="stylesheet">
     <title>Lastmangenemnt Server</title>
 </head>
 <body>
-    <h1>Hallo</h1>
+<nav th:replace="fragments/header.html :: header"></nav>
+<div class="container">
+    <div class="row">
+        <h1>Loadmanagement Server</h1>
+    </div>
+    <div class="row">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Aktuelle Last</th>
+                <th scope="col">Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="anschluss : ${anschlusse}">
+                <tr>
+                    <th scope="row" th:text="${anschluss.getId()}"></th>
+                    <td th:text="${anschluss.getName()}"></td>
+                    <td th:text="${anschluss.getCurrentLoad()}+ 'A'"></td>
+                    <td><a th:href="'anschluss?id=' + ${anschluss.getId()}">Anzeigen</a></td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">EVSEID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Aktuelle Last</th>
+                <th scope="col">Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="cb : ${chargeboxes}">
+                <tr>
+                    <th scope="row" th:text="${cb.getEvseid()}"></th>
+                    <td th:text="${cb.getName()}"></td>
+                    <td th:text="${cb.getCurrentLoad()}+ 'A'"></td>
+                    <td><a th:href="'chargebox?evseid=' + ${cb.getEvseid()}">Anzeigen</a></td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+    <div class="row">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Aktuelle Last</th>
+                <th scope="col">Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="consumer : ${consumers}">
+                <tr>
+                    <th scope="row" th:text="${consumer.getId()}"></th>
+                    <td th:text="${consumer.getName()}"></td>
+                    <td th:text="${consumer.getCurrentLoad()}+ 'A'"></td>
+                    <td><a th:href="'consumer?id=' + ${consumer.getConsumerID()}">Anzeigen</a></td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+    <footer th:replace="fragments/footer.html :: footer"></footer>
+</div>
 </body>
 </html>

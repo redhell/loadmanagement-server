@@ -17,7 +17,7 @@ public class Anschluss {
     /**
      * MaxLoad = maximale Last die möglich ist
      */
-    private double maxLoad = 0;
+    private double maxLoad;
     /**
      * softLimit = Ab dem soft Limit kann agiert werden, aber muss nicht zwingend
      */

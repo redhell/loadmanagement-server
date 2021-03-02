@@ -2,13 +2,15 @@ package de.bublitz.balancer.server.service;
 
 import de.bublitz.balancer.server.model.Anschluss;
 
+import java.util.List;
+
 public interface AnschlussService {
 
     Anschluss getAnschlussByName(String name);
 
     void addAnschluss(Anschluss anschluss);
 
-    Iterable<Anschluss> getAll();
+    List<Anschluss> getAll();
 
     boolean removeAnschluss(String name);
 
@@ -16,4 +18,5 @@ public interface AnschlussService {
 
     void addConsumerToAnschluss(String anschlussName, String consumerName);
 
+    Anschluss getAnschlussById(long id);
 }

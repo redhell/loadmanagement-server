@@ -60,6 +60,7 @@ public class BalancerComponent {
 
                     if (duration.toMinutesPart() > 10) {
                         chargeBox.setConnected(false);
+                        chargeBox.setCurrentLoad(0);
                         log.warn(chargeBox.getName() + " is not connected!");
                     } else {
                         log.debug(chargeBox.getName() + " is still connected!");
