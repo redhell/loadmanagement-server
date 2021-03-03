@@ -37,7 +37,7 @@
                     <th scope="row" th:text="${anschluss.getId()}"></th>
                     <td th:text="${anschluss.getName()}"></td>
                     <td th:text="${anschluss.getCurrentLoad()}+ 'A'"></td>
-                    <td><a th:href="@{/anschluss(id=${anschluss.getId()})}">Anzeigen</a></td>
+                    <td><a th:href="@{/anschluss/{id}(id=${anschluss.getId()})}">Anzeigen</a></td>
                 </tr>
             </th:block>
             </tbody>

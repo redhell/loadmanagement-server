@@ -36,7 +36,7 @@
                     <th scope="row" th:text="${anschluss.getId()}"></th>
                     <td th:text="${anschluss.getName()}"></td>
                     <td th:text="${anschluss.getCurrentLoad()}+ 'A'"></td>
-                    <td><a th:href="'anschluss?id=' + ${anschluss.getId()}">Anzeigen</a></td>
+                    <td><a th:href="@{/anschluss/{id}(id=${anschluss.getId()})}">Anzeigen</a></td>
                 </tr>
             </th:block>
             </tbody>
@@ -58,7 +58,7 @@
                     <th scope="row" th:text="${cb.getEvseid()}"></th>
                     <td th:text="${cb.getName()}"></td>
                     <td th:text="${cb.getCurrentLoad()}+ 'A'"></td>
-                    <td><a th:href="'chargebox?evseid=' + ${cb.getEvseid()}">Anzeigen</a></td>
+                    <td><a th:href="@{/chargebox/{evseid}(evseid = ${cb.getEvseid()})}">Anzeigen</a></td>
                 </tr>
             </th:block>
             </tbody>
@@ -77,10 +77,10 @@
             <tbody>
             <th:block th:each="consumer : ${consumers}">
                 <tr>
-                    <th scope="row" th:text="${consumer.getId()}"></th>
+                    <th scope="row" th:text="${consumer.getConsumerID()}"></th>
                     <td th:text="${consumer.getName()}"></td>
                     <td th:text="${consumer.getCurrentLoad()}+ 'A'"></td>
-                    <td><a th:href="'consumer?id=' + ${consumer.getConsumerID()}">Anzeigen</a></td>
+                    <td><a th:href="@{/consumer/{name}(name = ${consumer.getName()})}">Anzeigen</a></td>
                 </tr>
             </th:block>
             </tbody>

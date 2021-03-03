@@ -14,4 +14,6 @@ public interface ConsumerService {
     void putCurrentLoad(String name, double currentLoad);
 
     Consumer getConsumerByName(String name);
+
+    void update(Consumer consumer);
 }

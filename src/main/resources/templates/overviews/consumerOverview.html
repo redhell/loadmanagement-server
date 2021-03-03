@@ -32,10 +32,10 @@
             <tbody>
             <th:block th:each="consumer : ${consumers}">
                 <tr>
-                    <th scope="row" th:text="${consumer.getId()}"></th>
+                    <th scope="row" th:text="${consumer.getConsumerID()}"></th>
                     <td th:text="${consumer.getName()}"></td>
                     <td th:text="${consumer.getCurrentLoad()}+ 'A'"></td>
-                    <td><a th:href="'consumer?id=' + ${consumer.getConsumerID()}">Anzeigen</a></td>
+                    <td><a th:href="@{/consumer/{id}(id=${consumer.getConsumerID()})}">Anzeigen</a></td>
                 </tr>
             </th:block>
             </tbody>

@@ -83,4 +83,13 @@ public class AnschlussServiceImpl implements AnschlussService {
     public Anschluss getAnschlussById(long id) {
         return anschlussRepository.getOne(id);
     }
+
+    @Override
+    public void update(Anschluss anschluss) {
+        Anschluss oldAnschluss = anschlussRepository.getOne(anschluss.getId());
+        oldAnschluss.setName(anschluss.getName());
+        oldAnschluss.setMaxLoad(anschluss.getMaxLoad());
+        oldAnschluss.setHardLimit(anschluss.getHardLimit());
+        oldAnschluss.setSoftLimit(anschluss.getSoftLimit());
+    }
 }

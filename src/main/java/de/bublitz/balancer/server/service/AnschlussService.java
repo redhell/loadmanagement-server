@@ -19,4 +19,6 @@ public interface AnschlussService {
     void addConsumerToAnschluss(String anschlussName, String consumerName);
 
     Anschluss getAnschlussById(long id);
+
+    void update(Anschluss anschluss);
 }

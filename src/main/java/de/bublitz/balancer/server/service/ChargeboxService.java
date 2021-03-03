@@ -20,4 +20,6 @@ public interface ChargeboxService {
     void calibrate();
 
     void setListener(String name);
+
+    void update(ChargeBox chargeBox);
 }

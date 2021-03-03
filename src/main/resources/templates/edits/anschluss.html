@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" rel="stylesheet">
+    <title>Lastmangenemnt Server</title>
+</head>
+<body>
+<nav th:replace="fragments/header.html :: header"></nav>
+<div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/anschlusse}">Anschl&uuml;sse</a></li>
+                <li aria-current="page" class="breadcrumb-item active" th:text="${anschluss.getName()}"></li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <h1>Anschluss bearbeiten (<span th:text="${anschluss.getName()}"></span>)</h1>
+    </div>
+    <form method="post" th:action="@{/anschluss/edit/{id}(id=${anschluss.getId()})}" th:object="${anschluss}">
+        <div class="row p-1">
+            <div class="col-2"><input class="btn btn-primary" th:type="submit"></div>
+            <div class="col-2"><input class="btn btn-danger" th:type="reset"></div>
+        </div>
+        <div class="row">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Attribut</th>
+                    <th scope="col">Wert</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td><input class="form-control" required th:field="*{name}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Maximale Last in A</td>
+                    <td><input class="form-control" required th:field="*{maxLoad}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Softlimit in A</td>
+                    <td><input class="form-control" th:field="*{softLimit}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Hardlimit in A</td>
+                    <td><input class="form-control" required th:field="*{hardLimit}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Optimierungsstrategie</td>
+                    <td>
+                        <select class="form-control" th:field="*{loadStrategy}">
+                            <option th:each="type : ${strategies}"
+                                    th:text="${type}"
+                                    th:value="${type}"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Verbraucher</td>
+                    <td>Zuordnung muss im Verbraucher ge&auml;ndert werden!</td>
+                </tr>
+                <tr>
+                    <td>Ladeboxen</td>
+                    <td>Zuordnung muss in der Ladebox ge&auml;ndert werden!</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <footer th:replace="fragments/footer.html :: footer"></footer>
+</div>
+</body>
+</html>

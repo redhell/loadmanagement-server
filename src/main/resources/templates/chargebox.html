@@ -53,7 +53,7 @@
             </tr>
             <tr>
                 <td>Anschluss</td>
-                <td><a th:href="@{/anschluss(id=${chargebox.getAnschluss().getId()})}"
+                <td><a th:href="@{/anschluss/{id}(id=${chargebox.getAnschluss().getId()})}"
                        th:text="${chargebox.getAnschluss().getName()}"></a></td>
             </tr>
             <tr>

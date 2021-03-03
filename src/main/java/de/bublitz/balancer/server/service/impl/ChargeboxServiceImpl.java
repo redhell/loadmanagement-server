@@ -97,4 +97,19 @@ public class ChargeboxServiceImpl implements ChargeboxService {
     public void setListener(String name) {
         ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(name);
     }
+
+    @Override
+    public void update(ChargeBox chargeBox) {
+        ChargeBox oldChargebox = chargeboxRepository.getChargeBoxByEvseid(chargeBox.getEvseid());
+        oldChargebox.setName(chargeBox.getName());
+        oldChargebox.setIdleConsumption(chargeBox.getIdleConsumption());
+        oldChargebox.setCharging(chargeBox.isCharging());
+        oldChargebox.setConnected(chargeBox.isConnected());
+        oldChargebox.setEmaid(chargeBox.getEmaid());
+        oldChargebox.setCalibrated(chargeBox.isCalibrated());
+        oldChargebox.setPriority(chargeBox.isPriority());
+        oldChargebox.setStartURL(chargeBox.getStartURL());
+        oldChargebox.setStopURL(chargeBox.getStopURL());
+        oldChargebox.setEvseid(chargeBox.getEvseid());
+    }
 }

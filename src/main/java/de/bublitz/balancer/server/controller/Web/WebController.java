@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 @Log4j2
@@ -29,42 +29,22 @@ public class WebController {
         return "index";
     }
 
-    @GetMapping("/anschluss")
-    public String getAnschluss(Model model, @RequestParam long id) {
+    @GetMapping("/anschluss/{id}")
+    public String getAnschluss(Model model, @PathVariable long id) {
         model.addAttribute("anschluss", anschlussService.getAnschlussById(id));
         return "anschluss";
     }
 
-    @GetMapping("/chargebox")
-    public String getChargebox(Model model, @RequestParam String evseid) {
+    @GetMapping("/chargebox/{evseid}")
+    public String getChargebox(Model model, @PathVariable String evseid) {
         model.addAttribute("chargebox", chargeboxService.getChargeBoxByName(evseid));
         return "chargebox";
     }
 
-    @GetMapping("/consumer")
-    public String getConsumer(Model model, @RequestParam String name) {
+    @GetMapping("/consumer/{name}")
+    public String getConsumer(Model model, @PathVariable String name) {
         model.addAttribute("consumer", consumerService.getConsumerByName(name));
         return "consumer";
     }
 
-    @GetMapping("/anschlusse")
-    public String getAnschluss(Model model) {
-        model.addAttribute("anschlusse", anschlussService.getAll());
-        model.addAttribute("seite", "anschlusse");
-        return "overviews/anschlussOverview";
-    }
-
-    @GetMapping("/chargeboxes")
-    public String getChargeboxes(Model model) {
-        model.addAttribute("chargeboxes", chargeboxService.getAllChargeBox());
-        model.addAttribute("seite", "chargeboxes");
-        return "overviews/chargeboxOverview";
-    }
-
-    @GetMapping("/consumers")
-    public String getConsumers(Model model) {
-        model.addAttribute("consumers", consumerService.getAllConsumers());
-        model.addAttribute("seite", "consumers");
-        return "overviews/consumerOverview";
-    }
 }

@@ -22,6 +22,7 @@
     <div class="row">
         <h1>Anschlussdetails von <span th:text="${anschluss.getName()}"></span></h1>
     </div>
+    <div class="row"><a th:href="@{/anschluss/edit/{id}(id=${anschluss.getId()})}">Bearbeiten</a></div>
     <div class="row">
         <table class="table table-bordered table-hover">
             <thead>
@@ -59,8 +60,9 @@
                 <td>Verbraucher</td>
                 <td>
                     <ul>
-                        <th:block th:each="cb : ${anschluss.getConsumerList()}">
-                            <li><a th:href="'consumer?evseid=' + ${cb.getName()}" th:text="${cb.getName()}"></a></li>
+                        <th:block th:each="consumer : ${anschluss.getConsumerList()}">
+                            <li><a th:href="@{/consumer/{name}(name = ${consumer.getName()})}"
+                                   th:text="${cb.getName()}"></a></li>
                         </th:block>
                     </ul>
                 </td>
@@ -70,7 +72,8 @@
                 <td>
                     <ul>
                         <th:block th:each="cb : ${anschluss.getChargeboxList()}">
-                            <li><a th:href="'chargebox?evseid=' + ${cb.getEvseid()}" th:text="${cb.getName()}"></a></li>
+                            <li><a th:href="@{/chargebox/{evseid}(evseid = ${cb.getEvseid()})}"
+                                   th:text="${cb.getName()}"></a></li>
                         </th:block>
                     </ul>
                 </td>

@@ -41,4 +41,12 @@ public class ConsumerSerciceImpl implements ConsumerService {
         return consumerRepository.getConsumerByName(name);
     }
 
+    @Override
+    public void update(Consumer consumer) {
+        Consumer oldConsmer = consumerRepository.getConsumerByName(consumer.getName());
+        oldConsmer.setName(consumer.getName());
+        oldConsmer.setMaxLoad(consumer.getMaxLoad());
+        oldConsmer.setAnschluss(consumer.getAnschluss());
+    }
+
 }
