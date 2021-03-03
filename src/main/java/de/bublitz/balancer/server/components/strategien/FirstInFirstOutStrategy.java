@@ -3,6 +3,7 @@ package de.bublitz.balancer.server.components.strategien;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
+import de.bublitz.balancer.server.model.exception.NotStoppedException;
 
 public class FirstInFirstOutStrategy extends Strategy {
 
@@ -11,19 +12,26 @@ public class FirstInFirstOutStrategy extends Strategy {
     }
 
     @Override
-    public void optimize() {
+    public void optimize() throws NotStoppedException {
         //anschlussLoad = anschluss.getCurrentLoad();
         if (!getSuspended().isEmpty()) {
             ChargeBox u0 = suspended.getFirst();
             suspended.remove(u0);
             addLV(u0);
         } else {
-            while (anschlussLoad > anschluss.getHardLimit()) {
+            int tries = 0;
+            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty() && tries <= 5) {
                 ChargeBox l0 = chargingList.getFirst();
-                chargingList.remove(l0);
-                anschlussLoad -= l0.getCurrentLoad();
-                suspended.add(l0); // Stop later
-                stop(l0);
+                double l0_Load = l0.getCurrentLoad();
+                tries++;
+                if (stop(l0)) {
+                    chargingList.remove(l0);
+                    anschlussLoad -= l0_Load;
+                    suspended.add(l0); // Stop later
+                    tries = 0;
+                }
+                if (tries == 5)
+                    throw new NotStoppedException();
             }
             anschluss.computeLoad();
         }

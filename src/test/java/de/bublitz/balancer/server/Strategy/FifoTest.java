@@ -55,7 +55,7 @@ public class FifoTest {
     }
 
     @Test
-    public void KnapsackTest() throws InterruptedException {
+    public void KnapsackTest() throws Exception {
         chargeBox1.setCurrentLoad(4);
         fifo.addLV(chargeBox1);
         log.info("ChargingList: " + fifo.printChargingList() + " SuspendedList: " + fifo.printSuspendedList()

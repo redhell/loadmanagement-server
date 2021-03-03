@@ -9,7 +9,9 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
-import de.bublitz.balancer.server.repository.AnschlussRepository;
+import de.bublitz.balancer.server.model.exception.NotStoppedException;
+import de.bublitz.balancer.server.service.AnschlussService;
+import de.bublitz.balancer.server.service.ErrorService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,25 +29,28 @@ import java.util.Optional;
 @Transactional
 public class BalancerComponent {
 
-    private final AnschlussRepository anschlussRepository;
+    private final AnschlussService anschlussService;
     private final InfluxController influxController;
     private final Map<Anschluss, Strategy> anschlussStrategyMap;
 
     @Autowired
-    public BalancerComponent(AnschlussRepository anschlussRepository, InfluxController influxController) {
-        this.anschlussRepository = anschlussRepository;
+    private ErrorService errorService;
+
+    @Autowired
+    public BalancerComponent(AnschlussService anschlussService, InfluxController influxController) {
+        this.anschlussService = anschlussService;
         this.influxController = influxController;
         this.anschlussStrategyMap = new LinkedHashMap<>();
     }
 
     @Scheduled(fixedRate = 15000, initialDelay = 2000)
     public void triggerBalance() {
-        anschlussRepository.findAll().forEach(this::balance);
+        anschlussService.getAll().forEach(this::balance);
     }
 
     @Scheduled(fixedRate = 60000, initialDelay = 5000)
     public void triggerCheckConnected() {
-        anschlussRepository.findAll().forEach(this::checkConnected);
+        anschlussService.getAll().forEach(this::checkConnected);
     }
 
     protected void checkConnected(Anschluss anschluss) {
@@ -74,7 +79,12 @@ public class BalancerComponent {
             strategy = anschlussStrategyMap.get(anschluss);
             // Update
             strategy.setAnschluss(anschluss);
-            strategy.optimize();
+            try {
+                strategy.optimize();
+            } catch (NotStoppedException e) {
+                log.error(e.getMessage());
+                errorService.addError(e);
+            }
         } else {
 
             switch (anschluss.getLoadStrategy()) {

@@ -3,11 +3,13 @@ package de.bublitz.balancer.server.components.strategien;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
+import de.bublitz.balancer.server.model.exception.NotStoppedException;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,7 +37,7 @@ public abstract class Strategy {
         anschlussLoad = anschluss.getCurrentLoad();
     }
 
-    public abstract void optimize();
+    public abstract void optimize() throws NotStoppedException;
 
     public abstract void addLV(ChargeBox chargeBox);
 
@@ -150,26 +152,29 @@ public abstract class Strategy {
         return stringBuilder.toString();
     }
 
-    protected void stop(ChargeBox chargeBox) {
+    protected boolean stop(ChargeBox chargeBox) {
         try {
-            queryURL(chargeBox.getStopURL());
+            return queryURL(chargeBox.getStopURL());
         } catch (IOException ex) {
             log.error("Could not stop charging session");
             log.error(ex.getMessage());
         }
+        return false;
     }
 
-    protected void start(ChargeBox chargeBox) {
+    protected boolean start(ChargeBox chargeBox) {
         try {
-            queryURL(chargeBox.getStartURL());
+            return queryURL(chargeBox.getStartURL());
         } catch (IOException ex) {
-            log.error("Could not stop charging session");
+            log.error("Could not start charging session");
             log.error(ex.getMessage());
         }
+        return false;
     }
 
-    private void queryURL(String url) throws IOException {
+    private boolean queryURL(String url) throws IOException {
         HttpClient client = HttpClientBuilder.create().build();
-        client.execute(new HttpGet(url));
+        HttpResponse response = client.execute(new HttpGet(url));
+        return response.getCode() == 200;
     }
 }
