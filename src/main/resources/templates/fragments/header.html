@@ -13,17 +13,18 @@
     <a class="navbar-brand" th:href="@{/}">Loadmanagement Server</a>
     <div class="collapse navbar-collapse" id="navbar">
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item active">
+            <li class="nav-item" th:classappend="${seite == 'index' ? 'active' : ''}">
                 <a class="nav-link" th:href="@{/}">&Uuml;bersicht</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/anschlusse}">Anschl&uuml;sse</a>
+                <a class="nav-link" th:classappend="${seite == 'anschlusse' ? 'active' : ''}" th:href="@{/anschlusse}">Anschl&uuml;sse</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/chargeboxes}">Ladeboxen</a>
+                <a class="nav-link" th:classappend="${seite == 'chargeboxes' ? 'active' : ''}"
+                   th:href="@{/chargeboxes}">Ladeboxen</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/consumers}">Verbraucher</a>
+                <a class="nav-link" th:classappend="${seite == 'consumers' ? 'active' : ''}" th:href="@{/consumers}">Verbraucher</a>
             </li>
         </ul>
     </div>

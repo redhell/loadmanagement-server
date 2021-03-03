@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @Log4j2
@@ -22,13 +21,12 @@ public class WebController {
     private ConsumerService consumerService;
 
     @GetMapping("/")
-    public ModelAndView getIndex() {
-        ModelAndView mav = new ModelAndView("index");
-        mav.addObject("anschlusse", anschlussService.getAll());
-        mav.addObject("chargeboxes", chargeboxService.getAllChargeBox());
-        mav.addObject("consumers", consumerService.getAllConsumers());
-
-        return mav;
+    public String getIndex(Model model) {
+        model.addAttribute("anschlusse", anschlussService.getAll());
+        model.addAttribute("chargeboxes", chargeboxService.getAllChargeBox());
+        model.addAttribute("consumers", consumerService.getAllConsumers());
+        model.addAttribute("seite", "index");
+        return "index";
     }
 
     @GetMapping("/anschluss")
@@ -52,18 +50,21 @@ public class WebController {
     @GetMapping("/anschlusse")
     public String getAnschluss(Model model) {
         model.addAttribute("anschlusse", anschlussService.getAll());
+        model.addAttribute("seite", "anschlusse");
         return "overviews/anschlussOverview";
     }
 
     @GetMapping("/chargeboxes")
     public String getChargeboxes(Model model) {
         model.addAttribute("chargeboxes", chargeboxService.getAllChargeBox());
+        model.addAttribute("seite", "chargeboxes");
         return "overviews/chargeboxOverview";
     }
 
     @GetMapping("/consumers")
     public String getConsumers(Model model) {
         model.addAttribute("consumers", consumerService.getAllConsumers());
+        model.addAttribute("seite", "consumers");
         return "overviews/consumerOverview";
     }
 }
