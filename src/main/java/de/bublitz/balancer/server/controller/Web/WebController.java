@@ -41,9 +41,9 @@ public class WebController {
         return "chargebox";
     }
 
-    @GetMapping("/consumer/{name}")
-    public String getConsumer(Model model, @PathVariable String name) {
-        model.addAttribute("consumer", consumerService.getConsumerByName(name));
+    @GetMapping("/consumer/{id}")
+    public String getConsumer(Model model, @PathVariable long id) {
+        model.addAttribute("consumer", consumerService.getConsumerById(id));
         return "consumer";
     }
 

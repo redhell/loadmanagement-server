@@ -30,7 +30,8 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @PostConstruct
     public void createDefault() {
-        addAnschluss(new Anschluss());
+        if (!anschlussRepository.existsById(1L))
+            addAnschluss(new Anschluss());
     }
 
     @Override
@@ -66,8 +67,6 @@ public class AnschlussServiceImpl implements AnschlussService {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
         ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
         anschluss.addChargeBox(chargeBox);
-
-        anschlussRepository.save(anschluss);
     }
 
     @Override
@@ -75,8 +74,18 @@ public class AnschlussServiceImpl implements AnschlussService {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
         Consumer consumer = consumerRepository.getConsumerByName(consumerName);
         anschluss.addConsumer(consumer);
+    }
 
-        anschlussRepository.save(anschluss);
+    @Override
+    public void addChargeboxToAnschluss(ChargeBox chargeBox) {
+        Anschluss anschluss = anschlussRepository.getOne(1L);
+        anschluss.addChargeBox(chargeBox);
+    }
+
+    @Override
+    public void addConsumerToAnschluss(Consumer consumer) {
+        Anschluss anschluss = anschlussRepository.getOne(1L);
+        anschluss.addConsumer(consumer);
     }
 
     @Override
@@ -91,5 +100,10 @@ public class AnschlussServiceImpl implements AnschlussService {
         oldAnschluss.setMaxLoad(anschluss.getMaxLoad());
         oldAnschluss.setHardLimit(anschluss.getHardLimit());
         oldAnschluss.setSoftLimit(anschluss.getSoftLimit());
+    }
+
+    @Override
+    public void deleteAnschluss(long id) {
+        anschlussRepository.deleteById(id);
     }
 }

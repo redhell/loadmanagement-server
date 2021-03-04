@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Entity
@@ -47,7 +48,7 @@ public class Anschluss {
         maxLoad = 0;
         currentLoad = 0;
         loadStrategy = LoadStrategy.FIFO;
-        name = "Anschluss";
+        name = "Anschluss" + new Random().nextInt(10000);
     }
 
     public void addConsumer(Consumer consumer) {

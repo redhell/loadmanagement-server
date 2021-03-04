@@ -21,8 +21,8 @@ public class ConsumerSerciceImpl implements ConsumerService {
     }
 
     @Override
-    public void deleteConsumer(String name) {
-        consumerRepository.deleteConsumerByName(name);
+    public void deleteConsumer(Long id) {
+        consumerRepository.deleteById(id);
     }
 
     @Override
@@ -47,6 +47,16 @@ public class ConsumerSerciceImpl implements ConsumerService {
         oldConsmer.setName(consumer.getName());
         oldConsmer.setMaxLoad(consumer.getMaxLoad());
         oldConsmer.setAnschluss(consumer.getAnschluss());
+    }
+
+    @Override
+    public Consumer getConsumerById(long id) {
+        return consumerRepository.getOne(id);
+    }
+
+    @Override
+    public void addConsumer(Consumer consumer) {
+        consumerRepository.save(consumer);
     }
 
 }

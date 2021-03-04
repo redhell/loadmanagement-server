@@ -20,11 +20,51 @@
         </nav>
     </div>
     <div class="row">
-        <h1>Loadmanagement Server</h1>
+        <h1>Bearbeiten von <span th:text="${consumer.getName()}"></span></h1>
     </div>
+    <form method="post" th:action="@{/consumer/edit/{name}(name=${consumer.getName()})}" th:object="${consumer}">
+        <div class="row p-1">
+            <div class="col-2"><input class="btn btn-primary" th:type="submit"></div>
+            <div class="col-2"><input class="btn btn-danger" th:type="reset"></div>
+        </div>
+        <div class="row">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Attribut</th>
+                    <th scope="col">Wert</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td><input class="form-control" required th:field="*{name}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Spannung in V</td>
+                    <td>
+                        <select class="form-control" th:field="*{voltage}">
+                            <option th:each="type : ${voltages}"
+                                    th:text="${type}"
+                                    th:value="${type}"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Anschluss</td>
+                    <td>
+                        <select class="form-control" th:field="*{anschluss}">
+                            <option th:each="an : ${anschlusse}"
+                                    th:text="${an.getName()}"
+                                    th:value="${an.getId()}"></option>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <footer th:replace="fragments/footer.html :: footer"></footer>
 </div>
-
-
-<footer th:replace="fragments/footer.html :: footer"></footer>
 </body>
 </html>

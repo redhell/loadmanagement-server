@@ -22,7 +22,38 @@
     <div class="row">
         <h1>Anschlussdetails von <span th:text="${anschluss.getName()}"></span></h1>
     </div>
-    <div class="row"><a th:href="@{/anschluss/edit/{id}(id=${anschluss.getId()})}">Bearbeiten</a></div>
+    <div class="row pb-1">
+        <div class="col-2 p-0"><a class="btn btn-primary" th:href="@{/anschluss/edit/{id}(id=${anschluss.getId()})}">Bearbeiten</a>
+        </div>
+        <th:block th:if="${anschluss.getId()!= 1}">
+            <div class="col p-0">
+                <button class="btn btn-danger" data-target="#dangerModal" data-toggle="modal" type="button">
+                    L&ouml;schen
+                </button>
+            </div>
+            <!-- Modal -->
+            <div aria-hidden="true" aria-labelledby="dangerModalLabel" class="modal fade" data-backdrop="static"
+                 data-keyboard="false" id="dangerModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="dangerModalLabel">Achtung!</h5>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Konfigurierte Ladeboxen und Verbraucher werden mit gel&ouml;scht!
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-dismiss="modal" type="button">Abbrechen</button>
+                            <a class="btn btn-danger" th:href="@{/anschluss/delete/{id}(id=${anschluss.getId()})}">Verstanden</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+    </div>
     <div class="row">
         <table class="table table-bordered table-hover">
             <thead>

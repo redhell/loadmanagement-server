@@ -20,9 +20,10 @@
         </nav>
     </div>
     <div class="row">
-        <h1>Anschlussdetails von <span th:text="${chargebox.getName()}"></span></h1>
+        <h1>Bearbeiten von <span th:text="${chargebox.getName()}"></span></h1>
     </div>
-    <form>
+    <form method="post" th:action="@{/chargebox/edit/{evseid}(evseid=${chargebox.getEvseid()})}"
+          th:object="${chargebox}">
         <div class="row p-1">
             <div class="col-2"><input class="btn btn-primary" th:type="submit"></div>
             <div class="col-2"><input class="btn btn-danger" th:type="reset"></div>
@@ -38,52 +39,65 @@
                 <tbody>
                 <tr>
                     <td>Name</td>
-                    <td th:text="${chargebox.getName()}"></td>
+                    <td><input class="form-control" required th:field="*{name}" th:type="text"/></td>
                 </tr>
                 <tr>
                     <td>EVSEID</td>
-                    <td th:text="${chargebox.getEvseid()}"></td>
+                    <td><input class="form-control" required th:field="*{evseid}" th:type="text"/></td>
                 </tr>
                 <tr>
-                    <td>Aktuelle Last</td>
-                    <td th:text="${chargebox.getCurrentLoad() + 'A'}"></td>
+                    <td>Idle Consumption in A</td>
+                    <td><input class="form-control" required th:field="*{idleConsumption}" th:type="text"/></td>
                 </tr>
                 <tr>
-                    <td>Idle Consumption</td>
-                    <td th:text="${chargebox.getIdleConsumption()} + 'A'"></td>
-                </tr>
-                <tr>
-                    <td>Spannung</td>
-                    <td th:text="${chargebox.getVoltage()} + 'V'"></td>
+                    <td>Spannung in V</td>
+                    <td>
+                        <select class="form-control" th:field="*{voltage}">
+                            <option th:each="type : ${voltages}"
+                                    th:text="${type}"
+                                    th:value="${type}"></option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td>Anschluss</td>
-                    <td><a th:href="@{/anschluss(id=${chargebox.getAnschluss().getId()})}"
-                           th:text="${chargebox.getAnschluss().getName()}"></a></td>
-                </tr>
-                <tr>
-                    <td>Verbunden</td>
-                    <td th:text="${chargebox.isConnected()}"></td>
-                </tr>
-                <tr>
-                    <td>Am laden?</td>
-                    <td th:text="${chargebox.isCharging()}"></td>
+                    <td>
+                        <select class="form-control" th:field="*{anschluss}">
+                            <option th:each="an : ${anschlusse}"
+                                    th:text="${an.getName()}"
+                                    th:value="${an.getId()}"></option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td>EMAID</td>
-                    <td th:text="${chargebox.getEmaid()}"></td>
+                    <td><input class="form-control" th:field="*{emaid}" th:type="text"/></td>
                 </tr>
                 <tr>
                     <td>Start URL</td>
-                    <td th:text="${chargebox.getStartURL()}"></td>
+                    <td><input class="form-control" required th:field="*{startURL}" th:type="text"/></td>
                 </tr>
                 <tr>
                     <td>Stop URL</td>
-                    <td th:text="${chargebox.getStopURL()}"></td>
+                    <td><input class="form-control" required th:field="*{stopURL}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Aktiver Ladevorgag</td>
+                    <td>
+                        <select class="form-control" id="voltage" name="voltage">
+                            <option th:selected="${chargebox.isCharging() == true}" value="true">Ja</option>
+                            <option th:selected="${chargebox.isCharging() == false}" value="false">Nein</option>
+                        </select>
+                    </td>
                 </tr>
                 <tr>
                     <td>Priorisiert</td>
-                    <td th:text="${chargebox.isPriority()}"></td>
+                    <td>
+                        <select class="form-control" id="priority" name="priority">
+                            <option th:selected="${chargebox.isPriority() == true}" value="true">Ja</option>
+                            <option th:selected="${chargebox.isPriority() == false}" value="false">Nein</option>
+                        </select>
+                    </td>
                 </tr>
                 </tbody>
             </table>

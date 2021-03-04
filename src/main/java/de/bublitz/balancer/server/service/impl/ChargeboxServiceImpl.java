@@ -46,14 +46,9 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         return chargeboxRepository.getChargeBoxByEvseid(evseid);
     }
 
-    public boolean deleteChargeBox(String name) {
-        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(name);
-        if (chargeBox != null) {
-            chargeboxRepository.delete(chargeBox);
-            return true;
-        } else {
-            return false;
-        }
+    public void deleteChargeBox(long id) {
+        ChargeBox chargeBox = chargeboxRepository.getOne(id);
+        chargeboxRepository.delete(chargeBox);
     }
 
     public void setCharging(String name, boolean active) {
@@ -111,5 +106,11 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         oldChargebox.setStartURL(chargeBox.getStartURL());
         oldChargebox.setStopURL(chargeBox.getStopURL());
         oldChargebox.setEvseid(chargeBox.getEvseid());
+        oldChargebox.setAnschluss(chargeBox.getAnschluss());
+    }
+
+    @Override
+    public boolean exists(long id) {
+        return chargeboxRepository.existsById(id);
     }
 }

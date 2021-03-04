@@ -22,6 +22,7 @@
     <div class="row">
         <h1>Anschlussdetails von <span th:text="${chargebox.getName()}"></span></h1>
     </div>
+    <div class="row"><a th:href="@{/chargebox/edit/{evseid}(evseid=${chargebox.getEvseid()})}">Bearbeiten</a></div>
     <div class="row">
         <table class="table table-bordered table-hover">
             <thead>

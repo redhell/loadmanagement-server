@@ -36,13 +36,16 @@ public class WebEditController {
     @GetMapping("/chargebox/edit/{evseid}")
     public String getChargebox(Model model, @PathVariable String evseid) {
         model.addAttribute("chargebox", chargeboxService.getChargeBoxByName(evseid));
-        return "chargebox";
+        model.addAttribute("voltages", new int[]{230, 400});
+        model.addAttribute("anschlusse", anschlussService.getAll());
+        return "edits/chargebox";
     }
 
     @GetMapping("/consumer/edit/{name}")
     public String getConsumer(Model model, @PathVariable String name) {
         model.addAttribute("consumer", consumerService.getConsumerByName(name));
-        return "consumer";
+        model.addAttribute("anschlusse", anschlussService.getAll());
+        return "edits/consumer";
     }
 
     // Save settings
@@ -53,14 +56,14 @@ public class WebEditController {
         return mav;
     }
 
-    @PostMapping("/chargebox/edit/{id}")
+    @PostMapping("/chargebox/edit/{evseid}")
     public ModelAndView postChargebox(@ModelAttribute ChargeBox chargeBox, @PathVariable String evseid) {
         ModelAndView mav = new ModelAndView("redirect:/chargebox/" + evseid);
         chargeboxService.update(chargeBox);
         return mav;
     }
 
-    @PostMapping("/consumer/edit/{id}")
+    @PostMapping("/consumer/edit/{name}")
     public ModelAndView postConsumer(@ModelAttribute Consumer consumer, @PathVariable String name) {
         ModelAndView mav = new ModelAndView("redirect:/consumer/" + name);
         consumerService.update(consumer);
