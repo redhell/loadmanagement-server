@@ -5,10 +5,12 @@ import de.bublitz.balancer.server.repository.ConsumerRepository;
 import de.bublitz.balancer.server.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class ConsumerSerciceImpl implements ConsumerService {
     @Autowired
     private ConsumerRepository consumerRepository;
@@ -43,7 +45,7 @@ public class ConsumerSerciceImpl implements ConsumerService {
 
     @Override
     public void update(Consumer consumer) {
-        Consumer oldConsmer = consumerRepository.getConsumerByName(consumer.getName());
+        Consumer oldConsmer = consumerRepository.getOne(consumer.getConsumerID());
         oldConsmer.setName(consumer.getName());
         oldConsmer.setMaxLoad(consumer.getMaxLoad());
         oldConsmer.setAnschluss(consumer.getAnschluss());

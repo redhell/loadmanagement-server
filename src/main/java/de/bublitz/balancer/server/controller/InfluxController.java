@@ -9,7 +9,8 @@ import org.influxdb.dto.*;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -110,15 +111,21 @@ public class InfluxController {
     }
 
     public ConsumptionPoint getLastPoint(String name) {
-        try {
-            String query = "select * from consumption where \"name\" = '" + name + "' order by time desc LIMIT 1";
-            return getData(query).get(0);
-        } catch (Exception ex) {
-            return null;
+        String query = "select * from consumption where \"name\" = '" + name + "' order by time desc LIMIT 1";
+        LinkedList<ConsumptionPoint> cpListe = getData(query);
+        if (!cpListe.isEmpty())
+            return cpListe.getFirst();
+        else {
+            ConsumptionPoint cp = new ConsumptionPoint();
+            cp.setName(name);
+            cp.setConsumption(0.0);
+            cp.setMeasurand("A");
+            cp.setTime(LocalDateTime.now().minusHours(1).atZone(ZoneId.of("Europe/Berlin")).toInstant());
+            return cp;
         }
     }
 
-    private List<ConsumptionPoint> getData(String query) {
+    private LinkedList<ConsumptionPoint> getData(String query) {
         if (pingServer()) {
             // Run the query
             Query queryObject = new Query(query, dbName);
@@ -126,7 +133,7 @@ public class InfluxController {
 
             // Map it
             //InfluxDBResultMapper resultMapper = new InfluxDBResultMapper();
-            List<ConsumptionPoint> returnList = new ArrayList<>();
+            LinkedList<ConsumptionPoint> returnList = new LinkedList<>();
             try {
                 queryResult.getResults()
                         .get(0)
@@ -142,7 +149,7 @@ public class InfluxController {
                                     returnList.add(consumptionPoint);
                                 }));
             } catch (NullPointerException ex) {
-                log.warn("No data found");
+                log.debug("No data found");
             }
             return returnList;
             //return resultMapper.toPOJO(queryResult, ConsumptionPoint.class);

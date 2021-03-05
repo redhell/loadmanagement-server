@@ -92,8 +92,8 @@
                 <td>
                     <ul>
                         <th:block th:each="consumer : ${anschluss.getConsumerList()}">
-                            <li><a th:href="@{/consumer/{name}(name = ${consumer.getName()})}"
-                                   th:text="${cb.getName()}"></a></li>
+                            <li><a th:href="@{/consumer/{id}(id = ${consumer.getConsumerID()})}"
+                                   th:text="${consumer.getName()}"></a></li>
                         </th:block>
                     </ul>
                 </td>

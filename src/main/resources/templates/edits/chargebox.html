@@ -22,11 +22,11 @@
     <div class="row">
         <h1>Bearbeiten von <span th:text="${chargebox.getName()}"></span></h1>
     </div>
-    <form method="post" th:action="@{/chargebox/edit/{evseid}(evseid=${chargebox.getEvseid()})}"
+    <form method="post" th:action="@{/chargebox/edit/{id}(id=${chargebox.getChargeboxId()})}"
           th:object="${chargebox}">
         <div class="row p-1">
-            <div class="col-2"><input class="btn btn-primary" th:type="submit"></div>
-            <div class="col-2"><input class="btn btn-danger" th:type="reset"></div>
+            <div class="col-2"><input class="btn btn-primary" th:type="submit"/></div>
+            <div class="col-2"><input class="btn btn-danger" th:type="reset"/></div>
         </div>
         <div class="row">
             <table class="table table-bordered table-hover">

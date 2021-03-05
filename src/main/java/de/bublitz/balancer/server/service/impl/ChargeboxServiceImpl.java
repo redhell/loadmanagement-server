@@ -42,8 +42,13 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         return chargeboxRepository.getChargeBoxByName(name);
     }
 
-    public ChargeBox getChargeBoxById(String evseid) {
+    public ChargeBox getChargeboxById(String evseid) {
         return chargeboxRepository.getChargeBoxByEvseid(evseid);
+    }
+
+    @Override
+    public ChargeBox getChargeboxById(long id) {
+        return chargeboxRepository.getOne(id);
     }
 
     public void deleteChargeBox(long id) {

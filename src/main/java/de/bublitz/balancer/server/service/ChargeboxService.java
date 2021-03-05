@@ -9,7 +9,9 @@ public interface ChargeboxService {
 
     ChargeBox getChargeBoxByName(String name);
 
-    ChargeBox getChargeBoxById(String evseid);
+    ChargeBox getChargeboxById(String evseid);
+
+    ChargeBox getChargeboxById(long id);
 
     void deleteChargeBox(long id);
 

@@ -45,13 +45,15 @@ public class ChargeBox extends AbstractConsumer {
 
         emaid = "";
         lastLoad = 0;
-        evseid = "";
         idleConsumption = 0;
         charging = false;
         connected = true;
         calibrated = false;
         priority = false;
+        startURL = "";
+        stopURL = "";
         setName("ChargeBox");
+        evseid = getName();
     }
 
     @Override

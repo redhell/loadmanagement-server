@@ -12,6 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Random;
+
 @Controller
 public class WebOverviewController {
     @Autowired
@@ -63,6 +65,7 @@ public class WebOverviewController {
     @GetMapping("/consumers/new")
     public String addConsumer() {
         Consumer consumer = new Consumer();
+        consumer.setName("Vebraucher" + new Random().nextInt(10000));
         consumerService.addConsumer(consumer);
         anschlussService.addConsumerToAnschluss(consumer);
         return "redirect:/consumers";
@@ -71,7 +74,10 @@ public class WebOverviewController {
     // Delete
     @GetMapping("/anschluss/delete/{id}")
     public String deleteAnschluss(@PathVariable long id) {
-        anschlussService.deleteAnschluss(id);
+        // 1 darf nicht gelöscht werden
+        if (id != 1) {
+            anschlussService.deleteAnschluss(id);
+        }
         return "redirect:/anschlusse";
     }
 

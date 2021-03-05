@@ -22,7 +22,7 @@
     <div class="row">
         <h1>Bearbeiten von <span th:text="${consumer.getName()}"></span></h1>
     </div>
-    <form method="post" th:action="@{/consumer/edit/{name}(name=${consumer.getName()})}" th:object="${consumer}">
+    <form method="post" th:action="@{/consumer/edit/{id}(id=${consumer.getConsumerID()})}" th:object="${consumer}">
         <div class="row p-1">
             <div class="col-2"><input class="btn btn-primary" th:type="submit"></div>
             <div class="col-2"><input class="btn btn-danger" th:type="reset"></div>
@@ -39,16 +39,6 @@
                 <tr>
                     <td>Name</td>
                     <td><input class="form-control" required th:field="*{name}" th:type="text"/></td>
-                </tr>
-                <tr>
-                    <td>Spannung in V</td>
-                    <td>
-                        <select class="form-control" th:field="*{voltage}">
-                            <option th:each="type : ${voltages}"
-                                    th:text="${type}"
-                                    th:value="${type}"></option>
-                        </select>
-                    </td>
                 </tr>
                 <tr>
                     <td>Anschluss</td>

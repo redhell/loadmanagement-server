@@ -55,7 +55,7 @@ public class ChargeBoxController {
 
     @GetMapping("/getById")
     public ChargeBox getChargeBoxById(@RequestParam String evseid) {
-        return chargeboxService.getChargeBoxById(evseid);
+        return chargeboxService.getChargeboxById(evseid);
     }
 
     @DeleteMapping("/remove")

@@ -63,7 +63,7 @@ public class BalancerComponent {
                             = influxController.getLastPoint(chargeBox.getName());
                     Duration duration = Duration.between(consumptionPoint.getTime(), Instant.now());
 
-                    if (duration.toMinutesPart() > 10) {
+                    if (duration.toMinutes() > 10) {
                         chargeBox.setConnected(false);
                         chargeBox.setCurrentLoad(0);
                         log.warn(chargeBox.getName() + " is not connected!");

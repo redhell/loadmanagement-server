@@ -89,6 +89,20 @@ public class AnschlussServiceImpl implements AnschlussService {
     }
 
     @Override
+    public void removeChargeboxFromAnschluss(ChargeBox chargeBox) {
+        Anschluss anschluss = anschlussRepository.getOne(chargeBox.getAnschluss().getId());
+        anschluss.removeChargebox(chargeBox);
+        chargeboxRepository.deleteById(chargeBox.getChargeboxId());
+    }
+
+    @Override
+    public void removeConsumerFromAnschluss(Consumer consumer) {
+        Anschluss anschluss = consumer.getAnschluss();
+        anschluss.removeConsumer(consumer);
+        chargeboxRepository.deleteById(consumer.getConsumerID());
+    }
+
+    @Override
     public Anschluss getAnschlussById(long id) {
         return anschlussRepository.getOne(id);
     }

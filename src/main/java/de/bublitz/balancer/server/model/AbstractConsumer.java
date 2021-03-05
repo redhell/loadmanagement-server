@@ -9,6 +9,7 @@ import java.util.Objects;
 @Data
 public abstract class AbstractConsumer {
 
+    @Column(unique = true)
     private String name;
     /**
      * currentLoad in Ampere
@@ -19,7 +20,7 @@ public abstract class AbstractConsumer {
      */
     private double voltage;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_anschluss")
     private Anschluss anschluss;
 

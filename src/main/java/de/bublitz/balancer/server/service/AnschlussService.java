@@ -24,6 +24,10 @@ public interface AnschlussService {
 
     void addConsumerToAnschluss(Consumer consumer);
 
+    void removeChargeboxFromAnschluss(ChargeBox chargeBox);
+
+    void removeConsumerFromAnschluss(Consumer consumer);
+
     Anschluss getAnschlussById(long id);
 
     void update(Anschluss anschluss);

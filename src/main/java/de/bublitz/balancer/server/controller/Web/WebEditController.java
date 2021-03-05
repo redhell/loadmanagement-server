@@ -33,17 +33,17 @@ public class WebEditController {
         return "edits/anschluss";
     }
 
-    @GetMapping("/chargebox/edit/{evseid}")
-    public String getChargebox(Model model, @PathVariable String evseid) {
-        model.addAttribute("chargebox", chargeboxService.getChargeBoxByName(evseid));
+    @GetMapping("/chargebox/edit/{id}")
+    public String getChargebox(Model model, @PathVariable long id) {
+        model.addAttribute("chargebox", chargeboxService.getChargeboxById(id));
         model.addAttribute("voltages", new int[]{230, 400});
         model.addAttribute("anschlusse", anschlussService.getAll());
         return "edits/chargebox";
     }
 
-    @GetMapping("/consumer/edit/{name}")
-    public String getConsumer(Model model, @PathVariable String name) {
-        model.addAttribute("consumer", consumerService.getConsumerByName(name));
+    @GetMapping("/consumer/edit/{id}")
+    public String getConsumer(Model model, @PathVariable long id) {
+        model.addAttribute("consumer", consumerService.getConsumerById(id));
         model.addAttribute("anschlusse", anschlussService.getAll());
         return "edits/consumer";
     }
@@ -56,16 +56,17 @@ public class WebEditController {
         return mav;
     }
 
-    @PostMapping("/chargebox/edit/{evseid}")
-    public ModelAndView postChargebox(@ModelAttribute ChargeBox chargeBox, @PathVariable String evseid) {
-        ModelAndView mav = new ModelAndView("redirect:/chargebox/" + evseid);
+    @PostMapping("/chargebox/edit/{id}")
+    public ModelAndView postChargebox(@ModelAttribute ChargeBox chargeBox, @PathVariable long id) {
+        ModelAndView mav = new ModelAndView("redirect:/chargebox/" + id);
         chargeboxService.update(chargeBox);
         return mav;
     }
 
-    @PostMapping("/consumer/edit/{name}")
-    public ModelAndView postConsumer(@ModelAttribute Consumer consumer, @PathVariable String name) {
-        ModelAndView mav = new ModelAndView("redirect:/consumer/" + name);
+    @PostMapping("/consumer/edit/{id}")
+    public ModelAndView postConsumer(@ModelAttribute Consumer consumer, @PathVariable long id) {
+        ModelAndView mav = new ModelAndView("redirect:/consumer/" + id);
+        consumer.setConsumerID(id);
         consumerService.update(consumer);
         return mav;
     }

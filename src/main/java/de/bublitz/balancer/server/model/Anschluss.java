@@ -28,9 +28,9 @@ public class Anschluss {
      */
     private double hardLimit = 0;
 
-    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Consumer> consumerList;
-    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargeBox> chargeboxList;
     private double currentLoad;
 
@@ -54,6 +54,16 @@ public class Anschluss {
     public void addConsumer(Consumer consumer) {
         consumer.setAnschluss(this);
         consumerList.add(consumer);
+        computeLoad();
+    }
+
+    public void removeConsumer(Consumer consumer) {
+        consumerList.remove(consumer);
+        computeLoad();
+    }
+
+    public void removeChargebox(ChargeBox chargeBox) {
+        chargeboxList.remove(chargeBox);
         computeLoad();
     }
 
