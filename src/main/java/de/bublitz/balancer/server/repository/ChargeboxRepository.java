@@ -15,6 +15,8 @@ public interface ChargeboxRepository extends JpaRepository<ChargeBox, Long> {
 
     boolean existsChargeBoxByName(String name);
 
+    boolean existsByEvseid(String evseid);
+
     List<ChargeBox> findChargeBoxesByCalibratedFalseAndConnectedTrue();
 
 }

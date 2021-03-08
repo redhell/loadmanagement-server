@@ -38,7 +38,7 @@ public class ChargeBoxController {
 
     @PostMapping("/add")
     public boolean addChargeBox(@RequestBody ChargeBox pChargebox) {
-        chargeboxService.addChargeBox(pChargebox);
+        //chargeboxService.addChargeBox(pChargebox);
         anschlussService.addChargeboxToAnschluss(pChargebox);
         return true;
     }

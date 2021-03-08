@@ -40,7 +40,7 @@
                     <th scope="row" th:text="${cb.getEvseid()}"></th>
                     <td th:text="${cb.getName()}"></td>
                     <td th:text="${cb.getCurrentLoad()}+ 'A'"></td>
-                    <td><a th:href="@{/chargebox/{evseid}(evseid = ${cb.getEvseid()})}">Anzeigen</a></td>
+                    <td><a th:href="@{/chargebox/{id}(id = ${cb.getChargeboxId()})}">Anzeigen</a></td>
                 </tr>
             </th:block>
             </tbody>

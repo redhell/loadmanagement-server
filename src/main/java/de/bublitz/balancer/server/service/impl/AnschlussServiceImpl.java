@@ -79,7 +79,9 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public void addChargeboxToAnschluss(ChargeBox chargeBox) {
         Anschluss anschluss = anschlussRepository.getOne(1L);
-        anschluss.addChargeBox(chargeBox);
+        if (!chargeboxRepository.existsByEvseid(chargeBox.getEvseid())) {
+            anschluss.addChargeBox(chargeBox);
+        }
     }
 
     @Override

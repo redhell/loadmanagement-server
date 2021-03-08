@@ -35,9 +35,9 @@ public class WebController {
         return "anschluss";
     }
 
-    @GetMapping("/chargebox/{evseid}")
-    public String getChargebox(Model model, @PathVariable String evseid) {
-        model.addAttribute("chargebox", chargeboxService.getChargeBoxByName(evseid));
+    @GetMapping("/chargebox/{id}")
+    public String getChargebox(Model model, @PathVariable long id) {
+        model.addAttribute("chargebox", chargeboxService.getChargeboxById(id));
         return "chargebox";
     }
 

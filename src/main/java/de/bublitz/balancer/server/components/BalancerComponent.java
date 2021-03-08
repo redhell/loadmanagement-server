@@ -1,6 +1,6 @@
 package de.bublitz.balancer.server.components;
 
-import de.bublitz.balancer.server.components.strategien.FirstComeFirstServerStrategy;
+import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrategy;
 import de.bublitz.balancer.server.components.strategien.FirstInFirstOutStrategy;
 import de.bublitz.balancer.server.components.strategien.PriorityQueueStrategy;
 import de.bublitz.balancer.server.components.strategien.Strategy;
@@ -9,6 +9,7 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
+import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import de.bublitz.balancer.server.model.exception.NotStoppedException;
 import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ErrorService;
@@ -45,7 +46,10 @@ public class BalancerComponent {
 
     @Scheduled(fixedRate = 15000, initialDelay = 2000)
     public void triggerBalance() {
-        anschlussService.getAll().forEach(this::balance);
+        anschlussService.getAll()
+                .stream()
+                .filter(anschluss -> anschluss.getLoadStrategy() != LoadStrategy.NONE)
+                .forEach(this::balance);
     }
 
     @Scheduled(fixedRate = 60000, initialDelay = 5000)
@@ -92,7 +96,7 @@ public class BalancerComponent {
                     strategy = new PriorityQueueStrategy(anschluss);
                     break;
                 case FCFS:
-                    strategy = new FirstComeFirstServerStrategy(anschluss);
+                    strategy = new FirstComeFirstServeStrategy(anschluss);
                     break;
                 case FIFO:
                 default:

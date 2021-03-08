@@ -112,6 +112,7 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         oldChargebox.setStopURL(chargeBox.getStopURL());
         oldChargebox.setEvseid(chargeBox.getEvseid());
         oldChargebox.setAnschluss(chargeBox.getAnschluss());
+        oldChargebox.setVoltage(chargeBox.getVoltage());
     }
 
     @Override

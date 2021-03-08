@@ -1,6 +1,6 @@
 package de.bublitz.balancer.server.Strategy;
 
-import de.bublitz.balancer.server.components.strategien.FirstInFirstOutStrategy;
+import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrategy;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import lombok.extern.log4j.Log4j2;
@@ -12,7 +12,7 @@ import static java.lang.Thread.sleep;
 
 @SpringBootTest
 @Log4j2
-public class FifoTest {
+public class FcfsTest {
     ChargeBox chargeBox1;
     ChargeBox chargeBox2;
     ChargeBox chargeBox3;
@@ -23,7 +23,7 @@ public class FifoTest {
     private int counterCB3 = 0;
     private int counterCB4 = 0;
 
-    private FirstInFirstOutStrategy fifo;
+    private FirstComeFirstServeStrategy fcfs;
 
     @BeforeClass
     public void SetUp() {
@@ -62,46 +62,46 @@ public class FifoTest {
         anschluss.addChargeBox(chargeBox3);
         anschluss.addChargeBox(chargeBox4);
 
-        fifo = new FirstInFirstOutStrategy(anschluss);
+        fcfs = new FirstComeFirstServeStrategy(anschluss);
     }
 
     @Test
     public void KnapsackTest() throws Exception {
         chargeBox1.setCurrentLoad(4);
-        fifo.addLV(chargeBox1);
-        log.info("ChargingList: " + fifo.printChargingList() + " SuspendedList: " + fifo.printSuspendedList()
+        fcfs.addLV(chargeBox1);
+        log.info("ChargingList: " + fcfs.printChargingList() + " SuspendedList: " + fcfs.printSuspendedList()
                 + " Current Load: " + anschluss.getCurrentLoad());
         incCounter();
 
         chargeBox3.setCurrentLoad(10);
-        fifo.addLV(chargeBox3);
-        log.info("ChargingList: " + fifo.printChargingList() + " SuspendedList: " + fifo.printSuspendedList()
+        fcfs.addLV(chargeBox3);
+        log.info("ChargingList: " + fcfs.printChargingList() + " SuspendedList: " + fcfs.printSuspendedList()
                 + " Current Load: " + anschluss.getCurrentLoad());
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
-        fifo.addLV(chargeBox2);
-        log.info("ChargingList: " + fifo.printChargingList() + " SuspendedList: " + fifo.printSuspendedList()
+        fcfs.addLV(chargeBox2);
+        log.info("ChargingList: " + fcfs.printChargingList() + " SuspendedList: " + fcfs.printSuspendedList()
                 + " Current Load: " + anschluss.getCurrentLoad());
         incCounter();
 
         // 1. Balancing
         chargeBox4.setCurrentLoad(10);
-        fifo.addLV(chargeBox4);
-        fifo.getSuspended().get(0).setCurrentLoad(0);
+        fcfs.addLV(chargeBox4);
+        fcfs.getSuspended().get(0).setCurrentLoad(0);
         anschluss.computeLoad();
-        log.info("ChargingList: " + fifo.printChargingList() + " SuspendedList: " + fifo.printSuspendedList()
+        log.info("ChargingList: " + fcfs.printChargingList() + " SuspendedList: " + fcfs.printSuspendedList()
                 + " Current Load: " + anschluss.getCurrentLoad());
         incCounter();
 
-        while (!fifo.getChargingList().isEmpty()) {
-            fifo.optimize();
+        while (!fcfs.getChargingList().isEmpty()) {
+            fcfs.optimize();
 
-            fifo.getSuspended().forEach(chargeBox -> {
+            fcfs.getSuspended().forEach(chargeBox -> {
                 chargeBox.setCurrentLoad(0);
             });
 
-            fifo.getChargingList().forEach(chargeBox -> {
+            fcfs.getChargingList().forEach(chargeBox -> {
                 if (chargeBox.equals(chargeBox1)) {
                     chargeBox1.setCurrentLoad(4);
                 } else if (chargeBox.equals(chargeBox2)) {
@@ -115,24 +115,24 @@ public class FifoTest {
             anschluss.computeLoad();
 
             if (counterCB1 == 8) {
-                fifo.removeLV(chargeBox1);
+                fcfs.removeLV(chargeBox1);
                 chargeBox1.setCurrentLoad(0);
             }
             if (counterCB2 == 5) {
-                fifo.removeLV(chargeBox2);
+                fcfs.removeLV(chargeBox2);
                 chargeBox2.setCurrentLoad(0);
             }
             if (counterCB3 == 6) {
-                fifo.removeLV(chargeBox3);
+                fcfs.removeLV(chargeBox3);
                 chargeBox3.setCurrentLoad(0);
             }
             if (counterCB4 == 4) {
-                fifo.removeLV(chargeBox4);
+                fcfs.removeLV(chargeBox4);
                 chargeBox4.setCurrentLoad(0);
             }
             anschluss.computeLoad();
             incCounter();
-            log.info("ChargingList: " + fifo.printChargingList() + " SuspendedList: " + fifo.printSuspendedList()
+            log.info("ChargingList: " + fcfs.printChargingList() + " SuspendedList: " + fcfs.printSuspendedList()
                     + " Current Load: " + anschluss.getCurrentLoad());
             sleep(1000);
         }
@@ -140,7 +140,7 @@ public class FifoTest {
     }
 
     private void incCounter() {
-        fifo.getChargingList().forEach(chargeBox -> {
+        fcfs.getChargingList().forEach(chargeBox -> {
             if (chargeBox.equals(chargeBox1)) {
                 counterCB1++;
             } else if (chargeBox.equals(chargeBox2)) {
