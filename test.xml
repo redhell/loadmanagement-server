@@ -11,6 +11,7 @@
     <test name="Strategy">
         <classes>
             <class name="de.bublitz.balancer.server.Strategy.FifoTest"/>
+            <class name="de.bublitz.balancer.server.Strategy.FcfsTest"/>
         </classes>
     </test>
 </suite>
