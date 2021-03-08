@@ -87,11 +87,11 @@
             </tr>
             <tr>
                 <td>Verbunden</td>
-                <td th:text="${chargebox.isConnected()}"></td>
+                <td th:text="${chargebox.isConnected()} ? 'Ja' : 'Nein'"></td>
             </tr>
             <tr>
                 <td>Am laden?</td>
-                <td th:text="${chargebox.isCharging()}"></td>
+                <td th:text="${chargebox.isCharging()}? 'Ja' : 'Nein'"></td>
             </tr>
             <tr>
                 <td>EMAID</td>
@@ -107,7 +107,7 @@
             </tr>
             <tr>
                 <td>Priorisiert</td>
-                <td th:text="${chargebox.isPriority()}"></td>
+                <td th:text="${chargebox.isPriority()}? 'Ja' : 'Nein'"></td>
             </tr>
             </tbody>
         </table>
