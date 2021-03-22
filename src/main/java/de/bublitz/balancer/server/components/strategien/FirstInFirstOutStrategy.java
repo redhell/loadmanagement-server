@@ -42,12 +42,6 @@ public class FirstInFirstOutStrategy extends Strategy {
     @Override
     public void addLV(ChargeBox chargeBox) {
         anschlussLoad = anschluss.getCurrentLoad();
-        double cbLoad;
-        if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption()) {
-            cbLoad = chargeBox.getCurrentLoad();
-        } else {
-            cbLoad = chargeBox.getLastLoad();
-        }
         if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
         } else {
