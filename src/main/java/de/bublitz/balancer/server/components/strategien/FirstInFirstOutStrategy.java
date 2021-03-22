@@ -17,7 +17,9 @@ public class FirstInFirstOutStrategy extends Strategy {
         if (!getSuspended().isEmpty()) {
             ChargeBox u0 = suspended.getFirst();
             suspended.remove(u0);
+            u0.setCurrentLoad(u0.getLastLoad());
             addLV(u0);
+            start(u0);
         } else {
             int tries = 0;
             while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty() && tries <= 5) {
@@ -46,28 +48,22 @@ public class FirstInFirstOutStrategy extends Strategy {
         } else {
             cbLoad = chargeBox.getLastLoad();
         }
-        if (anschlussLoad + cbLoad <= anschluss.getHardLimit()) {
+        if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
         } else {
-            while (anschlussLoad + cbLoad > anschluss.getHardLimit()) {
+            while (anschlussLoad > anschluss.getHardLimit()) {
                 ChargeBox l0 = chargingList.getFirst();
                 chargingList.remove(l0);
                 anschlussLoad -= l0.getCurrentLoad();
                 tmpSuspended.add(l0); // Stop later
             }
-            chargingList.add(chargeBox);
-            start(chargeBox);
-            anschlussLoad += cbLoad;
             calculateFitting(anschlussLoad);
-
+            chargingList.add(chargeBox);
+            //start(chargeBox);
+            //anschlussLoad += cbLoad;
         }
+        tmpSuspended.forEach(this::stop);
         suspended.addAll(tmpSuspended);
-        suspended.forEach(cb -> {
-            if (cb.getCurrentLoad() > 0) {
-                cb.setLastLoad(cb.getCurrentLoad());
-            }
-            stop(cb);
-        });
         tmpSuspended.clear();
         anschluss.computeLoad();
     }

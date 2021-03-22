@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Entity
 @Table(name = "anschluss")
@@ -82,19 +81,22 @@ public class Anschluss {
     }
 
     public void computeLoad() {
-        AtomicReference<Double> load = new AtomicReference<>((double) 0);
-        consumerList.forEach(consumer -> load.updateAndGet(v -> v + consumer.getCurrentLoad()));
+        double load = 0;
+        for (Consumer consumer : consumerList) {
+            load += consumer.getCurrentLoad();
+        }
         // Only compute connected load!
-        chargeboxList.stream().filter(ChargeBox::isConnected)
-                .forEach(chargeBox -> load.updateAndGet(v -> v + chargeBox.getCurrentLoad()));
-        currentLoad = load.get();
+        for (ChargeBox chargeBox : chargeboxList) {
+            if (chargeBox.isConnected()) {
+                load += chargeBox.getCurrentLoad();
+            }
+        }
+        currentLoad = load;
     }
 
-    public void sendStopCharging(ChargeBox chargeBox) {
-    }
-
-    public void sendStartCharging(ChargeBox chargeBox) {
-
+    public double getCurrentLoad() {
+        computeLoad();
+        return currentLoad;
     }
 
     @Override

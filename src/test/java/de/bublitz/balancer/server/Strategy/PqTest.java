@@ -1,6 +1,6 @@
 package de.bublitz.balancer.server.Strategy;
 
-import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrategy;
+import de.bublitz.balancer.server.components.strategien.PriorityQueueStrategy;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
@@ -18,7 +18,7 @@ import static java.lang.Thread.sleep;
 @SpringBootTest
 @TestPropertySource("classpath:test.properties")
 @Log4j2
-public class FcfsTest extends AbstractTestNGSpringContextTests {
+public class PqTest extends AbstractTestNGSpringContextTests {
     ChargeBox chargeBox1;
     ChargeBox chargeBox2;
     ChargeBox chargeBox3;
@@ -29,14 +29,14 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
     private int counterCB3 = 0;
     private int counterCB4 = 0;
 
-    private FirstComeFirstServeStrategy fcfs;
+    private PriorityQueueStrategy pq;
 
     @BeforeMethod
     public void SetUp() {
         anschluss = new Anschluss();
         anschluss.setMaxLoad(30);
         anschluss.setHardLimit(30);
-        anschluss.setLoadStrategy(LoadStrategy.FCFS);
+        anschluss.setLoadStrategy(LoadStrategy.FIFO);
 
         // Chargeboxes
         chargeBox1 = new ChargeBox();
@@ -67,13 +67,15 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
         chargeBox3.setConnected(true);
         chargeBox4.setConnected(true);
 
+        chargeBox2.setPriority(true);
+
         // Zum Anschluss
         anschluss.addChargeBox(chargeBox1);
         anschluss.addChargeBox(chargeBox2);
         anschluss.addChargeBox(chargeBox3);
         anschluss.addChargeBox(chargeBox4);
 
-        fcfs = new FirstComeFirstServeStrategy(anschluss);
+        pq = new PriorityQueueStrategy(anschluss);
 
         counterCB1 = 0;
         counterCB2 = 0;
@@ -85,36 +87,36 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
     public void onlyChargeboxesTest() throws Exception {
         log.info("Starting Basic Test!");
         chargeBox1.setCurrentLoad(4);
-        fcfs.addLV(chargeBox1);
+        pq.addLV(chargeBox1);
         log();
         incCounter();
 
         chargeBox3.setCurrentLoad(10);
-        fcfs.addLV(chargeBox3);
+        pq.addLV(chargeBox3);
         log();
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
-        fcfs.addLV(chargeBox2);
+        pq.addLV(chargeBox2);
         log();
         incCounter();
 
         // 1. Balancing
         chargeBox4.setCurrentLoad(10);
-        fcfs.addLV(chargeBox4);
-        fcfs.getSuspended().get(0).setCurrentLoad(0);
+        pq.addLV(chargeBox4);
+        pq.getSuspended().get(0).setCurrentLoad(0);
         anschluss.computeLoad();
         log();
         incCounter();
 
-        while (!fcfs.getChargingList().isEmpty()) {
-            fcfs.optimize();
+        while (!pq.getChargingList().isEmpty()) {
+            pq.optimize();
 
-            fcfs.getSuspended().forEach(chargeBox -> {
+            pq.getSuspended().forEach(chargeBox -> {
                 chargeBox.setCurrentLoad(0);
             });
 
-            fcfs.getChargingList().forEach(chargeBox -> {
+            pq.getChargingList().forEach(chargeBox -> {
                 if (chargeBox.equals(chargeBox1)) {
                     chargeBox1.setCurrentLoad(4);
                 } else if (chargeBox.equals(chargeBox2)) {
@@ -128,19 +130,19 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
             anschluss.computeLoad();
 
             if (counterCB1 == 8) {
-                fcfs.removeLV(chargeBox1);
+                pq.removeLV(chargeBox1);
                 chargeBox1.setCurrentLoad(0);
             }
             if (counterCB2 == 5) {
-                fcfs.removeLV(chargeBox2);
+                pq.removeLV(chargeBox2);
                 chargeBox2.setCurrentLoad(0);
             }
             if (counterCB3 == 6) {
-                fcfs.removeLV(chargeBox3);
+                pq.removeLV(chargeBox3);
                 chargeBox3.setCurrentLoad(0);
             }
             if (counterCB4 == 4) {
-                fcfs.removeLV(chargeBox4);
+                pq.removeLV(chargeBox4);
                 chargeBox4.setCurrentLoad(0);
             }
             anschluss.computeLoad();
@@ -153,9 +155,9 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
     }
 
     private void log() {
-        log.info("ChargingList: " + fcfs.printChargingList()
-                + " SuspendedList: " + fcfs.printSuspendedList()
-                + " Consumers: " + fcfs.printConsumerLoad()
+        log.info("ChargingList: " + pq.printChargingList()
+                + " SuspendedList: " + pq.printSuspendedList()
+                + " Consumers: " + pq.printConsumerLoad()
                 + " Current Load: " + anschluss.getCurrentLoad());
     }
 
@@ -166,23 +168,23 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
         consumer.setCurrentLoad(1.5);
         anschluss.addConsumer(consumer);
         chargeBox1.setCurrentLoad(4);
-        fcfs.addLV(chargeBox1);
+        pq.addLV(chargeBox1);
         log();
         incCounter();
 
         chargeBox3.setCurrentLoad(10);
-        fcfs.addLV(chargeBox3);
+        pq.addLV(chargeBox3);
         log();
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
-        fcfs.addLV(chargeBox2);
+        pq.addLV(chargeBox2);
         log();
         incCounter();
 
         // 1. Balancing
         chargeBox4.setCurrentLoad(10);
-        fcfs.addLV(chargeBox4);
+        pq.addLV(chargeBox4);
         anschluss.computeLoad();
         log();
         incCounter();
@@ -190,34 +192,35 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
         consumer.setCurrentLoad(9.5);
         //anschluss.computeLoad();
 
-        while (!fcfs.getChargingList().isEmpty()) {
-            fcfs.optimize();
+        while (!pq.getChargingList().isEmpty()) {
+            pq.optimize();
 
             if (counterCB1 == 8) {
-                fcfs.removeLV(chargeBox1);
+                pq.removeLV(chargeBox1);
                 chargeBox1.setCurrentLoad(0);
             }
             if (counterCB2 == 5) {
-                fcfs.removeLV(chargeBox2);
+                pq.removeLV(chargeBox2);
                 chargeBox2.setCurrentLoad(0);
             }
             if (counterCB3 == 6) {
-                fcfs.removeLV(chargeBox3);
+                pq.removeLV(chargeBox3);
                 chargeBox3.setCurrentLoad(0);
             }
             if (counterCB4 == 4) {
-                fcfs.removeLV(chargeBox4);
+                pq.removeLV(chargeBox4);
                 chargeBox4.setCurrentLoad(0);
             }
-            Assert.assertTrue(anschluss.getCurrentLoad() < anschluss.getHardLimit());
+            anschluss.computeLoad();
             incCounter();
             log();
+            Assert.assertTrue(anschluss.getCurrentLoad() < anschluss.getHardLimit());
             sleep(200);
         }
     }
 
     private void incCounter() {
-        fcfs.getChargingList().forEach(chargeBox -> {
+        pq.getChargingList().forEach(chargeBox -> {
             if (chargeBox.equals(chargeBox1)) {
                 counterCB1++;
             } else if (chargeBox.equals(chargeBox2)) {

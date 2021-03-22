@@ -67,11 +67,10 @@ public class ChargeBox extends AbstractConsumer {
         if (priority != chargeBox.priority) return false;
         if (connected != chargeBox.connected) return false;
         if (calibrated != chargeBox.calibrated) return false;
-        if (!Objects.equals(evseid, chargeBox.evseid)) return false;
         if (!Objects.equals(startURL, chargeBox.startURL)) return false;
         if (!Objects.equals(stopURL, chargeBox.stopURL)) return false;
         if (!Objects.equals(emaid, chargeBox.emaid)) return false;
-        return Objects.equals(chargeboxId, chargeBox.chargeboxId);
+        return evseid.equals(chargeBox.evseid);
     }
 
     @Override

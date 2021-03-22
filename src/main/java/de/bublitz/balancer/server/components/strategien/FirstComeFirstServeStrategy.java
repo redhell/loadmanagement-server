@@ -8,12 +8,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class FirstComeFirstServeStrategy extends Strategy {
-    private final Map<ChargeBox, Integer> penaltyMap = new ConcurrentHashMap<>();
+    private final Map<String, Integer> penaltyMap = new LinkedHashMap<>();
     @Getter
     @Setter
     private int penalty = 3;
@@ -24,21 +24,23 @@ public class FirstComeFirstServeStrategy extends Strategy {
 
     @Override
     public void optimize() throws NotStoppedException {
-        //anschlussLoad = anschluss.getCurrentLoad();
+        anschlussLoad = anschluss.getCurrentLoad();
         if (!getSuspended().isEmpty()) {
             ChargeBox u0 = suspended.getFirst();
             suspended.remove(u0);
+            u0.setCurrentLoad(u0.getLastLoad());
             addLV(u0);
+            start(u0);
         } else {
             int tries = 0;
             while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty() && tries <= 5) {
-                ChargeBox l0 = chargingList.getFirst();
-                double l0_Load = l0.getCurrentLoad();
+                ChargeBox ln = chargingList.getLast();
+                double ln_Load = ln.getCurrentLoad();
                 tries++;
-                if (stop(l0)) {
-                    chargingList.remove(l0);
-                    anschlussLoad -= l0_Load;
-                    suspended.add(l0); // Stop later
+                if (stop(ln)) {
+                    chargingList.remove(ln);
+                    anschlussLoad -= ln_Load;
+                    suspended.add(ln);
                     tries = 0;
                 }
                 if (tries == 5)
@@ -51,42 +53,32 @@ public class FirstComeFirstServeStrategy extends Strategy {
     @Override
     public void addLV(ChargeBox chargeBox) {
         anschlussLoad = anschluss.getCurrentLoad();
-        double cbLoad;
-        if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption()) {
-            cbLoad = chargeBox.getCurrentLoad();
-        } else {
-            cbLoad = chargeBox.getLastLoad();
-        }
-        if (anschlussLoad + cbLoad <= anschluss.getHardLimit()) {
+        if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
         } else {
             stopWithPenalty();
-            while (anschlussLoad + cbLoad > anschluss.getHardLimit()) {
+            while (anschlussLoad > anschluss.getHardLimit()) {
                 ChargeBox ln = chargingList.getLast();
                 chargingList.remove(ln);
-                anschlussLoad -= ln.getCurrentLoad();
+                anschlussLoad = anschlussLoad - ln.getCurrentLoad();
                 tmpSuspended.add(ln); // Stop later
             }
-            chargingList.add(chargeBox);
-            start(chargeBox);
-            anschlussLoad += cbLoad;
+            //anschlussLoad = anschlussLoad + cbLoad; // Warum?
             calculateFitting(anschlussLoad);
             // Penalty erhöhen
-            penaltyMap.forEach((cb, p) -> penaltyMap.merge(cb, 1, Integer::sum));
+            chargingList.add(chargeBox);
+            penaltyMap.replaceAll((cb, p) -> p + 1);
         }
+        tmpSuspended.forEach(this::stop);
         suspended.addAll(tmpSuspended);
         suspended.forEach(cb -> {
-            if (cb.getCurrentLoad() > 0) {
-                cb.setLastLoad(cb.getCurrentLoad());
-            }
-            stop(cb);
             // Ladevorgang wurde beendet -> Keine Penalty mehr
-            penaltyMap.remove(cb);
+            penaltyMap.remove(cb.getEvseid());
         });
         // Hinzufügen zur penaltyMap
         chargingList.forEach(cb -> {
-            if (!penaltyMap.containsKey(cb)) {
-                penaltyMap.put(cb, 0);
+            if (!penaltyMap.containsKey(cb.getEvseid())) {
+                penaltyMap.put(cb.getEvseid(), 0);
             }
         });
         tmpSuspended.clear();
@@ -99,9 +91,21 @@ public class FirstComeFirstServeStrategy extends Strategy {
                 .stream()
                 .filter(entry -> entry.getValue() >= penalty)
                 .forEach(entry -> {
-                    chargingList.remove(entry.getKey());
-                    tmpSuspended.add(entry.getKey());
-                    anschlussLoad -= entry.getKey().getCurrentLoad();
+                    log.info(entry.getKey() + " can be stopped (Reason: penalty)!");
+                    ChargeBox chargeBox = chargingList.stream().filter(cb -> cb.getEvseid().equals(entry.getKey())).findFirst().get();
+                    chargingList.remove(chargeBox);
+                    tmpSuspended.add(chargeBox);
+                    anschlussLoad -= chargeBox.getCurrentLoad();
                 });
+    }
+
+    @Override
+    public void removeLV(ChargeBox chargeBox) {
+        if (chargingList.contains(chargeBox)) {
+            chargingList.remove(chargeBox);
+        } else {
+            suspended.remove(chargeBox);
+        }
+        penaltyMap.remove(chargeBox.getEvseid());
     }
 }

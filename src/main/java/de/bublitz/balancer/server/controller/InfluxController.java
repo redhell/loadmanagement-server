@@ -34,7 +34,7 @@ public class InfluxController {
 
     private InfluxDB connectDatabase() {
         // Connect to database assumed on localhost with default credentials.
-        return InfluxDBFactory.connect("http://192.168.188.25:32769", "admin", "admin");
+        return InfluxDBFactory.connect("http://192.168.188.25:49153", "admin", "admin");
     }
 
     private void createDatabase() {
