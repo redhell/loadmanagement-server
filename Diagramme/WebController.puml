@@ -1,0 +1,62 @@
+@startuml
+left to right direction
+!include skin.pu
+class WebEditController <<Controller>>{
+- ChargeBoxService chargeBoxService
+- ConsumerService consumerService
+- AnschlussServices anschlussService
++ String getAnschlussEdit(Model,long)
++ String getChargebox(Model,long)
++ String getConsumer(Model,long)
++ ModelAndView postAnschluss(Anschluss,long)
++ ModelAndView postChargebox(ChargeBox,long)
++ ModelAndView postConsumer(Consumer,long)
+}
+class WebController <<Controller>>{
+- ChargeBoxService chargeBoxService
+- ConsumerService consumerService
+- AnschlussServices anschlussService
++ String getIndex(Model)
++ String getAnschluss(Model,long)
++ String getChargebox(Model,long)
++ String getConsumer(Model,long)
+}
+
+class WebOverviewController <<Controller>> {
+- ChargeBoxService chargeBoxService
+- ConsumerService consumerService
+- AnschlussServices anschlussService
++ String getAnschluss(Model)
++ String getChargeboxes(Model)
++ String getConsumers(Model)
++ String addAnschluss(Model)
++ String addChargebox()
++ String addConsumer()
++ String deleteAnschluss(long)
++ String deleteChargebox(long)
++ String deleteConsumer(long)
+}
+
+
+interface ChargeboxService {
+}
+
+interface ConsumerService {
+}
+
+interface AnschlussService {
+}
+
+
+ChargeboxService <-- WebController
+ChargeboxService <-u- WebEditController
+ChargeboxService <--- WebOverviewController
+
+AnschlussService <-- WebController
+AnschlussService <-u- WebEditController
+AnschlussService <--- WebOverviewController
+
+ConsumerService <-- WebController
+ConsumerService <-u- WebEditController
+ConsumerService <--- WebOverviewController
+@enduml

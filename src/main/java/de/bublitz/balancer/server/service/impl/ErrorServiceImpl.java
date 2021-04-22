@@ -1,12 +1,12 @@
 package de.bublitz.balancer.server.service.impl;
 
-import de.bublitz.balancer.server.model.Errors;
+import de.bublitz.balancer.server.model.Error;
 import de.bublitz.balancer.server.repository.ErrorRepository;
 import de.bublitz.balancer.server.service.ErrorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -18,7 +18,7 @@ public class ErrorServiceImpl implements ErrorService {
 
     @Override
     public void addError(Exception ex) {
-        Errors tmpError = new Errors(ex);
+        Error tmpError = new Error(ex);
         errorRepository.save(tmpError);
     }
 
@@ -28,7 +28,7 @@ public class ErrorServiceImpl implements ErrorService {
     }
 
     @Override
-    public List<Errors> getAllErrors() {
+    public List<Error> getAllErrors() {
         return errorRepository.findAll();
     }
 }

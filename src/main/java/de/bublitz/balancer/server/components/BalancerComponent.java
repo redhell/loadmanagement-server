@@ -1,5 +1,6 @@
 package de.bublitz.balancer.server.components;
 
+
 import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrategy;
 import de.bublitz.balancer.server.components.strategien.FirstInFirstOutStrategy;
 import de.bublitz.balancer.server.components.strategien.PriorityQueueStrategy;
@@ -17,8 +18,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;

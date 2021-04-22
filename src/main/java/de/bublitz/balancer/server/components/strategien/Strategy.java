@@ -98,7 +98,7 @@ public abstract class Strategy {
         return knapSack((int) Math.floor(restCapacity), wt, val, n);
     }
 
-
+    // Siehe: https://www.geeksforgeeks.org/printing-items-01-knapsack/
     public List<Boolean> knapSack(int W, int[] wt, int[] val, int n) {
         List<Boolean> booleans = new LinkedList<>();
         if (n <= 0 || W <= 0) {

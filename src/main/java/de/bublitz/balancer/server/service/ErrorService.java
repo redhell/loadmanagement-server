@@ -1,6 +1,6 @@
 package de.bublitz.balancer.server.service;
 
-import de.bublitz.balancer.server.model.Errors;
+import de.bublitz.balancer.server.model.Error;
 
 import java.util.List;
 
@@ -9,5 +9,5 @@ public interface ErrorService {
 
     void deleteAll();
 
-    List<Errors> getAllErrors();
+    List<Error> getAllErrors();
 }

@@ -1,0 +1,335 @@
+@startuml
+!include skin.pu
+class controller.Web.WebController {
+- AnschlussService anschlussService
+- ChargeboxService chargeboxService
+- ConsumerService consumerService
++ String getIndex(Model)
++ String getAnschluss(Model,long)
++ String getChargebox(Model,long)
++ String getConsumer(Model,long)
+}
+class model.Anschluss {
+- double maxLoad
+- double softLimit
+- double hardLimit
+- List<Consumer> consumerList
+- List<ChargeBox> chargeboxList
+- double currentLoad
+- LoadStrategy loadStrategy
+- Long id
+- String name
++ void addConsumer(Consumer)
++ void removeConsumer(Consumer)
++ void removeChargebox(ChargeBox)
++ void addChargeBox(ChargeBox)
++ boolean isSoftlimitReached()
++ boolean isHardlimitReached()
++ void computeLoad()
++ double getCurrentLoad()
++ boolean equals(Object)
++ int hashCode()
+}
+interface repository.AnschlussRepository {
+~ Anschluss getAnschlussByName(String)
+~ Boolean existsAnschlussByName(String)
+}
+interface service.ConsumerService {
+~ void addConsumer(String)
+~ void deleteConsumer(Long)
+~ List<Consumer> getAllConsumers()
+~ void putCurrentLoad(String,double)
+~ Consumer getConsumerByName(String)
+~ void update(Consumer)
+~ Consumer getConsumerById(long)
+~ void addConsumer(Consumer)
+}
+class service.impl.ErrorServiceImpl {
+- ErrorRepository errorRepository
++ void addError(Exception)
++ void deleteAll()
++ List<Errors> getAllErrors()
+}
+class controller.REST.LoadController {
+- InfluxController influxController
+- ChargeboxService chargeboxService
++ List<ConsumptionPoint> getAllPoints()
++ void addPoint(ConsumptionPoint)
++ void addPoints(List<ConsumptionPoint>)
++ void addRawPoints(String,Map<LocalDateTime,String>)
++ List<ConsumptionPoint> getPointsByName(String)
++ void recreateDB()
++ void deleteByName(String)
+}
+class service.impl.ChargeboxServiceImpl {
+- ChargeboxRepository chargeboxRepository
+- InfluxController influxController
++ void addChargeBox(ChargeBox)
++ Iterable<ChargeBox> getAllChargeBox()
++ ChargeBox getChargeBoxByName(String)
++ ChargeBox getChargeboxById(String)
++ ChargeBox getChargeboxById(long)
++ void deleteChargeBox(long)
++ void setCharging(String,boolean)
++ void setConnected(String)
++ void calibrate()
++ void setListener(String)
++ void update(ChargeBox)
++ boolean exists(long)
+}
+abstract class components.strategien.Strategy {
+- LoadStrategy loadStrategy
+# Anschluss anschluss
+# LinkedList<ChargeBox> chargingList
+# LinkedList<ChargeBox> suspended
+# List<ChargeBox> tmpSuspended
+# double anschlussLoad
++ {abstract}void optimize()
++ {abstract}void addLV(ChargeBox)
++ void removeLV(ChargeBox)
++ void calculateFitting(double)
+- double readdChargeBox(List<ChargeBox>,List<Boolean>)
+- List<Boolean> runKnapsack(List<ChargeBox>,double)
++ List<Boolean> knapSack(int,int[],int[],int)
++ String printChargingList()
++ String printSuspendedList()
++ String printConsumerList()
++ String printConsumerLoad()
+- String getString(List<T>)
+# boolean stop(ChargeBox)
+# boolean start(ChargeBox)
+- boolean queryURL(String)
+}
+interface service.ErrorService {
+~ void addError(Exception)
+~ void deleteAll()
+~ List<Errors> getAllErrors()
+}
+abstract class model.AbstractConsumer {
+- String name
+- double currentLoad
+- double voltage
+- Anschluss anschluss
++ boolean equals(Object)
++ int hashCode()
+}
+interface repository.ConsumerRepository {
+~ Consumer getConsumerByName(String)
+~ void deleteConsumerByName(String)
+}
+class model.ConsumptionPoint {
+- Instant time
+- String name
+- Double consumption
+- String measurand
+}
+class controller.Web.WebOverviewController {
+- AnschlussService anschlussService
+- ChargeboxService chargeboxService
+- ConsumerService consumerService
++ String getAnschluss(Model)
++ String getChargeboxes(Model)
++ String getConsumers(Model)
++ String addAnschluss(Model)
++ String addChargebox()
++ String addConsumer()
++ String deleteAnschluss(long)
++ String deleteChargebox(long)
++ String deleteConsumer(long)
+}
+class service.impl.ConsumerSerciceImpl {
+- ConsumerRepository consumerRepository
++ void addConsumer(String)
++ void deleteConsumer(Long)
++ List<Consumer> getAllConsumers()
++ void putCurrentLoad(String,double)
++ Consumer getConsumerByName(String)
++ void update(Consumer)
++ Consumer getConsumerById(long)
++ void addConsumer(Consumer)
+}
+class controller.Web.WebEditController {
+- AnschlussService anschlussService
+- ChargeboxService chargeboxService
+- ConsumerService consumerService
++ String getAnschlussEdit(Model,long)
++ String getChargebox(Model,long)
++ String getConsumer(Model,long)
++ ModelAndView postAnschluss(Anschluss,long)
++ ModelAndView postChargebox(ChargeBox,long)
++ ModelAndView postConsumer(Consumer,long)
+}
+class controller.InfluxController {
+- InfluxDB influxDB
+- String dbName
+- InfluxDB connectDatabase()
+- void createDatabase()
++ void recreateDatabase()
+- boolean pingServer()
++ List<ConsumptionPoint> getAllPoints()
++ void addPoint(ConsumptionPoint)
++ void addPoints(List<ConsumptionPoint>)
++ List<ConsumptionPoint> getPointsByName(String)
++ ConsumptionPoint getLastPoint(String)
+- LinkedList<ConsumptionPoint> getData(String)
++ void delete(String)
+}
+class components.strategien.FirstInFirstOutStrategy {
++ void optimize()
++ void addLV(ChargeBox)
+}
+class model.ChargeBox {
+- boolean priority
+- String evseid
+- String startURL
+- String stopURL
+- double idleConsumption
+- String emaid
+- boolean charging
+- boolean connected
+- boolean calibrated
+- double lastLoad
+- Long chargeboxId
++ boolean equals(Object)
++ int hashCode()
+}
+class model.Consumer {
+- double maxLoad
+- Long consumerID
+}
+class controller.REST.AnschlussController {
+- AnschlussService anschlussService
++ boolean addAnschluss(String,double)
++ boolean addChargeBox(Anschluss)
++ Iterable<Anschluss> getAllChargeBox()
++ Anschluss getChargeBoxByName(String)
++ void deleteAnschluss(String,HttpServletResponse)
++ void addChargeboxToAnschluss(String,String)
++ void addConsumerToAnschluss(String,String)
+}
+class controller.REST.ChargeBoxController {
+- ChargeboxService chargeboxService
+- AnschlussService anschlussService
++ boolean addChargeBox(String,String,String,String)
++ boolean addChargeBox(ChargeBox)
++ Iterable<ChargeBox> getAllChargeBox()
++ ChargeBox getChargeBoxByName(String)
++ ChargeBox getChargeBoxById(String)
++ void deleteChargeBox(long)
++ void startCharging(String)
++ void stopCharging(String)
+}
+class components.strategien.FirstComeFirstServeStrategy {
+- Map<String,Integer> penaltyMap
+- int penalty
++ void optimize()
++ void addLV(ChargeBox)
+- void stopWithPenalty()
++ void removeLV(ChargeBox)
+}
+class service.impl.AnschlussServiceImpl {
+- AnschlussRepository anschlussRepository
+- ChargeboxRepository chargeboxRepository
+- ConsumerRepository consumerRepository
++ void createDefault()
++ Anschluss getAnschlussByName(String)
++ void addAnschluss(Anschluss)
++ List<Anschluss> getAll()
++ boolean removeAnschluss(String)
++ void addChargeboxToAnschluss(String,String)
++ void addConsumerToAnschluss(String,String)
++ void addChargeboxToAnschluss(ChargeBox)
++ void addConsumerToAnschluss(Consumer)
++ void removeChargeboxFromAnschluss(ChargeBox)
++ void removeConsumerFromAnschluss(Consumer)
++ Anschluss getAnschlussById(long)
++ void update(Anschluss)
++ void deleteAnschluss(long)
+}
+interface service.ChargeboxService {
+~ void addChargeBox(ChargeBox)
+~ Iterable<ChargeBox> getAllChargeBox()
+~ ChargeBox getChargeBoxByName(String)
+~ ChargeBox getChargeboxById(String)
+~ ChargeBox getChargeboxById(long)
+~ void deleteChargeBox(long)
+~ void setCharging(String,boolean)
+~ void setConnected(String)
+~ void calibrate()
+~ void setListener(String)
+~ void update(ChargeBox)
+~ boolean exists(long)
+}
+interface repository.ErrorRepository {
+}
+class components.BalancerComponent {
+- AnschlussService anschlussService
+- InfluxController influxController
+- Map<Anschluss,Strategy> anschlussStrategyMap
+- ErrorService errorService
++ void triggerBalance()
++ void triggerCheckConnected()
+# void checkConnected(Anschluss)
+# void balance(Anschluss)
+- void updateConsumer(Consumer)
+- void updateChargeBox(ChargeBox)
+}
+interface service.AnschlussService {
+~ Anschluss getAnschlussByName(String)
+~ void addAnschluss(Anschluss)
+~ List<Anschluss> getAll()
+~ boolean removeAnschluss(String)
+~ void addChargeboxToAnschluss(String,String)
+~ void addConsumerToAnschluss(String,String)
+~ void addChargeboxToAnschluss(ChargeBox)
+~ void addConsumerToAnschluss(Consumer)
+~ void removeChargeboxFromAnschluss(ChargeBox)
+~ void removeConsumerFromAnschluss(Consumer)
+~ Anschluss getAnschlussById(long)
+~ void update(Anschluss)
+~ void deleteAnschluss(long)
+}
+class components.strategien.PriorityQueueStrategy {
++ void optimize()
+- void stopNonPrio()
+- void stopPrio()
+- void stopAndRemove(LinkedList<ChargeBox>)
++ void addLV(ChargeBox)
+}
+class controller.REST.ConsumerController {
+- ConsumerService consumerService
++ boolean addConsumer(String)
++ List<Consumer> getAllConsumers()
++ void deleteConsumer(Long)
++ void putCurrentLoad(String,double)
++ Consumer getConsumerDetails(String)
+}
+
+interface repository.ChargeboxRepository {
+~ ChargeBox getChargeBoxByName(String)
+~ ChargeBox getChargeBoxByEvseid(String)
+~ boolean existsChargeBoxByName(String)
+~ boolean existsByEvseid(String)
+~ List<ChargeBox> findChargeBoxesByCalibratedFalseAndConnectedTrue()
+}
+class model.Errors {
+- Long id
+- String message
+- LocalDateTime timestamp
+- String stacktrace
+- String type
+}
+
+
+
+service.ErrorService <|.. service.impl.ErrorServiceImpl
+service.ChargeboxService <|.. service.impl.ChargeboxServiceImpl
+service.ConsumerService <|.. service.impl.ConsumerSerciceImpl
+components.strategien.Strategy <|-- components.strategien.FirstInFirstOutStrategy
+model.AbstractConsumer <|-- model.ChargeBox
+model.AbstractConsumer <|-- model.Consumer
+components.strategien.Strategy <|-- components.strategien.FirstComeFirstServeStrategy
+service.AnschlussService <|.. service.impl.AnschlussServiceImpl
+components.strategien.Strategy <|-- components.strategien.PriorityQueueStrategy
+
+@enduml

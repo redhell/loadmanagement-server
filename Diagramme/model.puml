@@ -1,0 +1,75 @@
+@startuml
+left to right direction
+!include skin.pu
+class Anschluss {
+- double maxLoad
+- double softLimit
+- double hardLimit
+- List<Consumer> consumerList
+- List<ChargeBox> chargeboxList
+- double currentLoad
+- LoadStrategy loadStrategy
+- Long id
+- String name
++ void addConsumer(Consumer)
++ void removeConsumer(Consumer)
++ void removeChargebox(ChargeBox)
++ void addChargeBox(ChargeBox)
++ boolean isSoftlimitReached()
++ boolean isHardlimitReached()
++ void computeLoad()
++ double getCurrentLoad()
+}
+abstract class AbstractConsumer {
+- String name
+- double currentLoad
+- double voltage
+- Anschluss anschluss
+}
+class ChargeBox {
+- boolean priority
+- String evseid
+- String startURL
+- String stopURL
+- double idleConsumption
+- String emaid
+- boolean charging
+- boolean connected
+- boolean calibrated
+- double lastLoad
+- Long chargeboxId
+}
+class Consumer {
+- double maxLoad
+- Long consumerID
+}
+
+enum LoadStrategy {
+    NONE
+    FCFS
+    FIFO
+    PQ
+}
+
+class ConsumptionPoint {
+    - Instant time
+    - String name
+    - Double consumption
+    - String measurand
+}
+
+class Error extends Exception {
+    - Long id
+    - String message
+    - LocalDateTime timestamp
+    - String stacktrace
+    - String type
+}
+
+AbstractConsumer <|-- ChargeBox
+AbstractConsumer <|-- Consumer
+Anschluss -- LoadStrategy
+Anschluss "1" ---> "*" Consumer
+Anschluss "1" ---> "*" ChargeBox
+Exception -[hidden]r--> ChargeBox
+@enduml
