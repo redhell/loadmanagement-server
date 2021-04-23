@@ -44,7 +44,7 @@ class Consumer {
 - Long consumerID
 }
 
-enum LoadStrategy {
+enum LoadStrategy <<Enum>>{
     NONE
     FCFS
     FIFO
@@ -58,7 +58,7 @@ class ConsumptionPoint {
     - String measurand
 }
 
-class Error extends Exception {
+class Error {
     - Long id
     - String message
     - LocalDateTime timestamp
@@ -69,7 +69,8 @@ class Error extends Exception {
 AbstractConsumer <|-- ChargeBox
 AbstractConsumer <|-- Consumer
 Anschluss -- LoadStrategy
+LoadStrategy -[hidden]- ConsumptionPoint
 Anschluss "1" ---> "*" Consumer
 Anschluss "1" ---> "*" ChargeBox
-Exception -[hidden]r--> ChargeBox
+Anschluss -- AbstractConsumer
 @enduml

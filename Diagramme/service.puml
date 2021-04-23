@@ -1,0 +1,134 @@
+@startuml
+!include skin.pu
+class AnschlussServiceImpl <<Service>>{
+- AnschlussRepository anschlussRepository
+- ChargeboxRepository chargeboxRepository
+- ConsumerRepository consumerRepository
++ void createDefault()
++ Anschluss getAnschlussByName(String)
++ void addAnschluss(Anschluss)
++ List<Anschluss> getAll()
++ boolean removeAnschluss(String)
++ void addChargeboxToAnschluss(String,String)
++ void addConsumerToAnschluss(String,String)
++ void addChargeboxToAnschluss(ChargeBox)
++ void addConsumerToAnschluss(Consumer)
++ void removeChargeboxFromAnschluss(ChargeBox)
++ void removeConsumerFromAnschluss(Consumer)
++ Anschluss getAnschlussById(long)
++ void update(Anschluss)
++ void deleteAnschluss(long)
+}
+interface ChargeboxService {
+~ void addChargeBox(ChargeBox)
+~ Iterable<ChargeBox> getAllChargeBox()
+~ ChargeBox getChargeBoxByName(String)
+~ ChargeBox getChargeboxById(String)
+~ ChargeBox getChargeboxById(long)
+~ void deleteChargeBox(long)
+~ void setCharging(String,boolean)
+~ void setConnected(String)
+~ void calibrate()
+~ void setListener(String)
+~ void update(ChargeBox)
+~ boolean exists(long)
+}
+interface ErrorService {
+~ void addError(Exception)
+~ void deleteAll()
+~ List<Error> getAllErrors()
+}
+interface AnschlussService {
+~ Anschluss getAnschlussByName(String)
+~ void addAnschluss(Anschluss)
+~ List<Anschluss> getAll()
+~ boolean removeAnschluss(String)
+~ void addChargeboxToAnschluss(String,String)
+~ void addConsumerToAnschluss(String,String)
+~ void addChargeboxToAnschluss(ChargeBox)
+~ void addConsumerToAnschluss(Consumer)
+~ void removeChargeboxFromAnschluss(ChargeBox)
+~ void removeConsumerFromAnschluss(Consumer)
+~ Anschluss getAnschlussById(long)
+~ void update(Anschluss)
+~ void deleteAnschluss(long)
+}
+interface ConsumerService {
+~ void addConsumer(String)
+~ void deleteConsumer(Long)
+~ List<Consumer> getAllConsumers()
+~ void putCurrentLoad(String,double)
+~ Consumer getConsumerByName(String)
+~ void update(Consumer)
+~ Consumer getConsumerById(long)
+~ void addConsumer(Consumer)
+}
+class InfluxService <<Service>> {
+- InfluxDB influxDB
+- String dbName
+- InfluxDB connectDatabase()
+- void createDatabase()
++ void recreateDatabase()
+- boolean pingServer()
++ List<ConsumptionPoint> getAllPoints()
++ void addPoint(ConsumptionPoint)
++ void addPoints(List<ConsumptionPoint>)
++ List<ConsumptionPoint> getPointsByName(String)
++ ConsumptionPoint getLastPoint(String)
+- LinkedList<ConsumptionPoint> getData(String)
++ void delete(String)
+}
+class ErrorServiceImpl <<Service>> {
+- ErrorRepository errorRepository
++ void addError(Exception)
++ void deleteAll()
++ List<Error> getAllErrors()
+}
+class ConsumerSerciceImpl <<Service>> {
+- ConsumerRepository consumerRepository
++ void addConsumer(String)
++ void deleteConsumer(Long)
++ List<Consumer> getAllConsumers()
++ void putCurrentLoad(String,double)
++ Consumer getConsumerByName(String)
++ void update(Consumer)
++ Consumer getConsumerById(long)
++ void addConsumer(Consumer)
+}
+class ChargeboxServiceImpl <<Service>>{
+- ChargeboxRepository chargeboxRepository
+- InfluxService influxService
++ void addChargeBox(ChargeBox)
++ Iterable<ChargeBox> getAllChargeBox()
++ ChargeBox getChargeBoxByName(String)
++ ChargeBox getChargeboxById(String)
++ ChargeBox getChargeboxById(long)
++ void deleteChargeBox(long)
++ void setCharging(String,boolean)
++ void setConnected(String)
++ void calibrate()
++ void setListener(String)
++ void update(ChargeBox)
++ boolean exists(long)
+}
+
+interface AnschlussRepository << Repository >>
+interface ChargeboxRepository << Repository >>
+interface ConsumerRepository << Repository >>
+interface ErrorRepository << Repository >>
+
+AnschlussService <|.. AnschlussServiceImpl
+ErrorService <|.. ErrorServiceImpl
+ConsumerService <|.. ConsumerSerciceImpl
+ChargeboxService <|.. ChargeboxServiceImpl
+ChargeboxServiceImpl -r-> InfluxService
+
+ErrorServiceImpl --> ErrorRepository
+
+AnschlussServiceImpl -d-> AnschlussRepository
+AnschlussServiceImpl -d-> ChargeboxRepository
+AnschlussServiceImpl -d-> ConsumerRepository
+
+ChargeboxServiceImpl --> ChargeboxRepository
+ConsumerSerciceImpl --> ConsumerRepository
+@enduml
