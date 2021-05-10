@@ -6,12 +6,12 @@ import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import de.bublitz.balancer.server.model.exception.NotStoppedException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@Slf4j
+@Log4j2
 public class FirstComeFirstServeStrategy extends Strategy {
     private final Map<String, Integer> penaltyMap = new LinkedHashMap<>();
     @Getter

@@ -1,7 +1,7 @@
 package de.bublitz.balancer.server.controller;
 
 import de.bublitz.balancer.server.model.ConsumptionPoint;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.InfluxDBIOException;
@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
+@Log4j2
 @Component
 @SuppressWarnings({"Deprecated", "deprecation"})
 public class InfluxController {
