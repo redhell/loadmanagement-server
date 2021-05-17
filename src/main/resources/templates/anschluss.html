@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" rel="stylesheet">
+    <title>Lastmangenemnt Server</title>
+</head>
+<body>
+<nav th:replace="fragments/header.html :: header"></nav>
+<div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/anschlusse}">Anschl&uuml;sse</a></li>
+                <li aria-current="page" class="breadcrumb-item active" th:text="${anschluss.getName()}"></li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <h1>Anschlussdetails von <span th:text="${anschluss.getName()}"></span></h1>
+    </div>
+    <div class="row pb-1">
+        <div class="col-2 p-0"><a class="btn btn-primary" th:href="@{/anschluss/edit/{id}(id=${anschluss.getId()})}">Bearbeiten</a>
+        </div>
+        <th:block th:if="${anschluss.getId()!= 1}">
+            <div class="col p-0">
+                <button class="btn btn-danger" data-target="#dangerModal" data-toggle="modal" type="button">
+                    L&ouml;schen
+                </button>
+            </div>
+            <!-- Modal -->
+            <div aria-hidden="true" aria-labelledby="dangerModalLabel" class="modal fade" data-backdrop="static"
+                 data-keyboard="false" id="dangerModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="dangerModalLabel">Achtung!</h5>
+                            <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Konfigurierte Ladeboxen und Verbraucher werden mit gel&ouml;scht!
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-dismiss="modal" type="button">Abbrechen</button>
+                            <a class="btn btn-danger" th:href="@{/anschluss/delete/{id}(id=${anschluss.getId()})}">Verstanden</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+    </div>
+    <div class="row">
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Attribut</th>
+                <th scope="col">Wert</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Name</td>
+                <td th:text="${anschluss.getName()}"></td>
+            </tr>
+            <tr>
+                <td>Maximale Last</td>
+                <td th:text="${anschluss.getMaxLoad()} + 'A'"></td>
+            </tr>
+            <tr>
+                <td>Aktuelle Last</td>
+                <td th:text="${anschluss.getCurrentLoad() + 'A'}"></td>
+            </tr>
+            <tr>
+                <td>Softlimit</td>
+                <td th:text="${anschluss.getSoftLimit() + 'A'}"></td>
+            </tr>
+            <tr>
+                <td>Hardlimit</td>
+                <td th:text="${anschluss.getHardLimit()} + 'A'"></td>
+            </tr>
+            <tr>
+                <td>Optimierungsstrategie</td>
+                <td th:text="${anschluss.getLoadStrategy()}"></td>
+            </tr>
+            <tr>
+                <td>Verbraucher</td>
+                <td>
+                    <ul>
+                        <th:block th:each="consumer : ${anschluss.getConsumerList()}">
+                            <li><a th:href="@{/consumer/{id}(id = ${consumer.getConsumerID()})}"
+                                   th:text="${consumer.getName()}"></a></li>
+                        </th:block>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td>Ladeboxen</td>
+                <td>
+                    <ul>
+                        <th:block th:each="cb : ${anschluss.getChargeboxList()}">
+                            <li><a th:href="@{/chargebox/{evseid}(evseid = ${cb.getEvseid()})}"
+                                   th:text="${cb.getName()}"></a></li>
+                        </th:block>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <footer th:replace="fragments/footer.html :: footer"></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" rel="stylesheet">
+    <title>Lastmangenemnt Server</title>
+</head>
+<body>
+<nav th:replace="fragments/header.html :: header"></nav>
+<div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/consumers}">Verbraucher</a></li>
+                <li aria-current="page" class="breadcrumb-item active" th:text="${consumer.getName()}"></li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <h1>Details zu <span th:text="${consumer.getName()}"></span></h1>
+    </div>
+    <div class="row pb-1">
+        <a class="btn btn-primary" th:href="@{/consumer/edit/{id}(id=${consumer.getConsumerID()})}">Bearbeiten</a>
+        <div class="col p-0">
+            <button class="btn btn-danger" data-target="#dangerModal" data-toggle="modal" type="button">
+                L&ouml;schen
+            </button>
+        </div>
+        <!-- Modal -->
+        <div aria-hidden="true" aria-labelledby="dangerModalLabel" class="modal fade" data-backdrop="static"
+             data-keyboard="false" id="dangerModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dangerModalLabel">Achtung!</h5>
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        L&ouml;schen kann nicht r&uuml;ckg&auml;ngig gemacht werden!
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-dismiss="modal" type="button">Abbrechen</button>
+                        <a class="btn btn-danger" th:href="@{/consumer/delete/{id}(id=${consumer.getConsumerID()})}">Verstanden</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Attribut</th>
+                <th scope="col">Wert</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Name</td>
+                <td th:text="${consumer.getName()}"></td>
+            </tr>
+            <tr>
+                <td>Anschluss</td>
+                <td><a th:href="@{/anschluss/{id}(id=${consumer.getAnschluss().getId()})}"
+                       th:text="${consumer.getAnschluss().getName()}"></a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<footer th:replace="fragments/footer.html :: footer"></footer>
+</body>
+</html>

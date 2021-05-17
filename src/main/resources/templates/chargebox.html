@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" rel="stylesheet">
+    <title>Lastmangenemnt Server</title>
+</head>
+<body>
+<nav th:replace="fragments/header.html :: header"></nav>
+<div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/chargeboxes}">Ladeboxen</a></li>
+                <li aria-current="page" class="breadcrumb-item active" th:text="${chargebox.getEvseid()}"></li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <h1>Details zu <span th:text="${chargebox.getName()}"></span></h1>
+    </div>
+    <div class="row pb-1">
+        <a class="btn btn-primary" th:href="@{/chargebox/edit/{id}(id=${chargebox.getChargeboxId()})}">Bearbeiten</a>
+        <div class="col p-0">
+            <button class="btn btn-danger" data-target="#dangerModal" data-toggle="modal" type="button">
+                L&ouml;schen
+            </button>
+        </div>
+        <!-- Modal -->
+        <div aria-hidden="true" aria-labelledby="dangerModalLabel" class="modal fade" data-backdrop="static"
+             data-keyboard="false" id="dangerModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="dangerModalLabel">Achtung!</h5>
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        L&ouml;schen kann nicht r&uuml;ckg&auml;ngig gemacht werden!
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-dismiss="modal" type="button">Abbrechen</button>
+                        <a class="btn btn-danger" th:href="@{/chargebox/delete/{id}(id=${chargebox.getChargeboxId()})}">Verstanden</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Attribut</th>
+                <th scope="col">Wert</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Name</td>
+                <td th:text="${chargebox.getName()}"></td>
+            </tr>
+            <tr>
+                <td>EVSEID</td>
+                <td th:text="${chargebox.getEvseid()}"></td>
+            </tr>
+            <tr>
+                <td>Aktuelle Last</td>
+                <td th:text="${chargebox.getCurrentLoad() + 'A'}"></td>
+            </tr>
+            <tr>
+                <td>Idle Consumption</td>
+                <td th:text="${chargebox.getIdleConsumption()} + 'A'"></td>
+            </tr>
+            <tr>
+                <td>Spannung</td>
+                <td th:text="${chargebox.getVoltage()} + 'V'"></td>
+            </tr>
+            <tr>
+                <td>Anschluss</td>
+                <td><a th:href="@{/anschluss/{id}(id=${chargebox.getAnschluss().getId()})}"
+                       th:text="${chargebox.getAnschluss().getName()}"></a></td>
+            </tr>
+            <tr>
+                <td>Verbunden</td>
+                <td th:text="${chargebox.isConnected()} ? 'Ja' : 'Nein'"></td>
+            </tr>
+            <tr>
+                <td>Am laden?</td>
+                <td th:text="${chargebox.isCharging()}? 'Ja' : 'Nein'"></td>
+            </tr>
+            <tr>
+                <td>EMAID</td>
+                <td th:text="${chargebox.getEmaid()}"></td>
+            </tr>
+            <tr>
+                <td>Start URL</td>
+                <td th:text="${chargebox.getStartURL()}"></td>
+            </tr>
+            <tr>
+                <td>Stop URL</td>
+                <td th:text="${chargebox.getStopURL()}"></td>
+            </tr>
+            <tr>
+                <td>Priorisiert</td>
+                <td th:text="${chargebox.isPriority()}? 'Ja' : 'Nein'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <footer th:replace="fragments/footer.html :: footer"></footer>
+</div>
+</body>
+</html>

@@ -1,6 +1,10 @@
 package de.bublitz.balancer.server.service;
 
 import de.bublitz.balancer.server.model.Anschluss;
+import de.bublitz.balancer.server.model.ChargeBox;
+import de.bublitz.balancer.server.model.Consumer;
+
+import java.util.List;
 
 public interface AnschlussService {
 
@@ -8,7 +12,7 @@ public interface AnschlussService {
 
     void addAnschluss(Anschluss anschluss);
 
-    Iterable<Anschluss> getAll();
+    List<Anschluss> getAll();
 
     boolean removeAnschluss(String name);
 
@@ -16,9 +20,17 @@ public interface AnschlussService {
 
     void addConsumerToAnschluss(String anschlussName, String consumerName);
 
-    void removeChargebox(String anschlussName, String chargeboxName);
+    void addChargeboxToAnschluss(ChargeBox chargeBox);
 
-    void removeConsumer(String anschlussName, String consumerName);
+    void addConsumerToAnschluss(Consumer consumer);
 
-    void updateAnschluss(Anschluss anschluss);
+    void removeChargeboxFromAnschluss(ChargeBox chargeBox);
+
+    void removeConsumerFromAnschluss(Consumer consumer);
+
+    Anschluss getAnschlussById(long id);
+
+    void update(Anschluss anschluss);
+
+    void deleteAnschluss(long id);
 }

@@ -9,9 +9,10 @@ import de.bublitz.balancer.server.repository.ConsumerRepository;
 import de.bublitz.balancer.server.service.AnschlussService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -29,27 +30,28 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @PostConstruct
     public void createDefault() {
-        addAnschluss(new Anschluss());
+        if (!anschlussRepository.existsById(1L))
+            addAnschluss(new Anschluss());
     }
 
-    @Transactional
+    @Override
     public Anschluss getAnschlussByName(String name) {
         return anschlussRepository.getAnschlussByName(name);
     }
 
-    @Transactional
+    @Override
     public void addAnschluss(Anschluss anschluss) {
         if (!anschlussRepository.existsAnschlussByName(anschluss.getName())) {
             anschlussRepository.save(anschluss);
         }
     }
 
-    @Transactional
-    public Iterable<Anschluss> getAll() {
+    @Override
+    public List<Anschluss> getAll() {
         return anschlussRepository.findAll();
     }
 
-    @Transactional
+    @Override
     public boolean removeAnschluss(String name) {
         Anschluss delAnschluss = anschlussRepository.getAnschlussByName(name);
         if (delAnschluss != null) {
@@ -60,13 +62,11 @@ public class AnschlussServiceImpl implements AnschlussService {
         }
     }
 
-    @Transactional
+    @Override
     public void addChargeboxToAnschluss(String anschlussName, String chargeboxName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
         ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
         anschluss.addChargeBox(chargeBox);
-
-        anschlussRepository.save(anschluss);
     }
 
     @Override
@@ -74,8 +74,53 @@ public class AnschlussServiceImpl implements AnschlussService {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
         Consumer consumer = consumerRepository.getConsumerByName(consumerName);
         anschluss.addConsumer(consumer);
+    }
 
-        anschlussRepository.save(anschluss);
+    @Override
+    public void addChargeboxToAnschluss(ChargeBox chargeBox) {
+        Anschluss anschluss = anschlussRepository.getOne(1L);
+        if (!chargeboxRepository.existsByEvseid(chargeBox.getEvseid())) {
+            anschluss.addChargeBox(chargeBox);
+        }
+    }
+
+    @Override
+    public void addConsumerToAnschluss(Consumer consumer) {
+        Anschluss anschluss = anschlussRepository.getOne(1L);
+        anschluss.addConsumer(consumer);
+    }
+
+    @Override
+    public void removeChargeboxFromAnschluss(ChargeBox chargeBox) {
+        Anschluss anschluss = anschlussRepository.getOne(chargeBox.getAnschluss().getId());
+        anschluss.removeChargebox(chargeBox);
+        chargeboxRepository.deleteById(chargeBox.getChargeboxId());
+    }
+
+    @Override
+    public void removeConsumerFromAnschluss(Consumer consumer) {
+        Anschluss anschluss = consumer.getAnschluss();
+        anschluss.removeConsumer(consumer);
+        chargeboxRepository.deleteById(consumer.getConsumerID());
+    }
+
+    @Override
+    public Anschluss getAnschlussById(long id) {
+        return anschlussRepository.getOne(id);
+    }
+
+    @Override
+    public void update(Anschluss anschluss) {
+        Anschluss oldAnschluss = anschlussRepository.getOne(anschluss.getId());
+        oldAnschluss.setName(anschluss.getName());
+        oldAnschluss.setMaxLoad(anschluss.getMaxLoad());
+        oldAnschluss.setHardLimit(anschluss.getHardLimit());
+        oldAnschluss.setSoftLimit(anschluss.getSoftLimit());
+    }
+
+    @Override
+    public void deleteAnschluss(long id) {
+        anschlussRepository.deleteById(id);
     }
 
     @Override

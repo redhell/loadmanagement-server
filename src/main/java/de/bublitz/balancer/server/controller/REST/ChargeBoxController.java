@@ -8,18 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletResponse;
-
-@SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @RestController
 @RequestMapping(value = "/chargebox")
 public class ChargeBoxController {
 
-    @Autowired
-    private ChargeboxService chargeboxService;
+    private final ChargeboxService chargeboxService;
+    private final AnschlussService anschlussService;
 
     @Autowired
-    private AnschlussService anschlussService;
+    public ChargeBoxController(ChargeboxService chargeboxService, AnschlussService anschlussService) {
+        this.chargeboxService = chargeboxService;
+        this.anschlussService = anschlussService;
+    }
 
     @GetMapping("/add")
     public boolean addChargeBox(@RequestParam String name,
@@ -32,14 +32,14 @@ public class ChargeBoxController {
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
         chargeboxService.addChargeBox(chargeBox);
-        anschlussService.addChargeboxToAnschluss("Anschluss", name);
+        anschlussService.addChargeboxToAnschluss(chargeBox);
         return true;
     }
 
     @PostMapping("/add")
     public boolean addChargeBox(@RequestBody ChargeBox pChargebox) {
-        chargeboxService.addChargeBox(pChargebox);
-        anschlussService.addChargeboxToAnschluss("Anschluss", pChargebox.getName());
+        //chargeboxService.addChargeBox(pChargebox);
+        anschlussService.addChargeboxToAnschluss(pChargebox);
         return true;
     }
 
@@ -55,12 +55,13 @@ public class ChargeBoxController {
 
     @GetMapping("/getById")
     public ChargeBox getChargeBoxById(@RequestParam String evseid) {
-        return chargeboxService.getChargeBoxById(evseid);
+        return chargeboxService.getChargeboxById(evseid);
     }
 
     @DeleteMapping("/remove")
-    public void deleteChargeBox(@RequestParam String name, HttpServletResponse response) {
-        if (!chargeboxService.deleteChargeBox(name)) {
+    public void deleteChargeBox(@RequestParam long id) {
+        chargeboxService.deleteChargeBox(id);
+        if (!chargeboxService.exists(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chargebox not found");
         }
     }

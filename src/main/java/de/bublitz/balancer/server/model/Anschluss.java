@@ -6,7 +6,8 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Objects;
+import java.util.Random;
 
 @Entity
 @Table(name = "anschluss")
@@ -16,7 +17,7 @@ public class Anschluss {
     /**
      * MaxLoad = maximale Last die möglich ist
      */
-    private double maxLoad = 0;
+    private double maxLoad;
     /**
      * softLimit = Ab dem soft Limit kann agiert werden, aber muss nicht zwingend
      */
@@ -26,9 +27,9 @@ public class Anschluss {
      */
     private double hardLimit = 0;
 
-    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Consumer> consumerList;
-    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargeBox> chargeboxList;
     private double currentLoad;
 
@@ -46,12 +47,22 @@ public class Anschluss {
         maxLoad = 0;
         currentLoad = 0;
         loadStrategy = LoadStrategy.FIFO;
-        name = "Anschluss";
+        name = "Anschluss" + new Random().nextInt(10000);
     }
 
     public void addConsumer(Consumer consumer) {
         consumer.setAnschluss(this);
         consumerList.add(consumer);
+        computeLoad();
+    }
+
+    public void removeConsumer(Consumer consumer) {
+        consumerList.remove(consumer);
+        computeLoad();
+    }
+
+    public void removeChargebox(ChargeBox chargeBox) {
+        chargeboxList.remove(chargeBox);
         computeLoad();
     }
 
@@ -70,18 +81,50 @@ public class Anschluss {
     }
 
     public void computeLoad() {
-        AtomicReference<Double> load = new AtomicReference<>((double) 0);
-        consumerList.forEach(consumer -> load.updateAndGet(v -> v + consumer.getCurrentLoad()));
+        double load = 0;
+        for (Consumer consumer : consumerList) {
+            load += consumer.getCurrentLoad();
+        }
         // Only compute connected load!
-        chargeboxList.stream().filter(ChargeBox::isConnected)
-                .forEach(chargeBox -> load.updateAndGet(v -> v + chargeBox.getCurrentLoad()));
-        currentLoad = load.get();
+        for (ChargeBox chargeBox : chargeboxList) {
+            if (chargeBox.isConnected()) {
+                load += chargeBox.getCurrentLoad();
+            }
+        }
+        currentLoad = load;
     }
 
-    public void sendStopCharging(ChargeBox chargeBox) {
+    public double getCurrentLoad() {
+        computeLoad();
+        return currentLoad;
     }
 
-    public void sendStartCharging(ChargeBox chargeBox) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Anschluss)) return false;
 
+        Anschluss anschluss = (Anschluss) o;
+
+        if (Double.compare(anschluss.maxLoad, maxLoad) != 0) return false;
+        if (Double.compare(anschluss.softLimit, softLimit) != 0) return false;
+        if (Double.compare(anschluss.hardLimit, hardLimit) != 0) return false;
+        if (loadStrategy != anschluss.loadStrategy) return false;
+        return Objects.equals(name, anschluss.name);
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(maxLoad);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(softLimit);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(hardLimit);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (loadStrategy != null ? loadStrategy.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 }

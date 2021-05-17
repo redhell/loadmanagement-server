@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" rel="stylesheet">
+    <title>Lastmangenemnt Server</title>
+</head>
+<body>
+<nav th:replace="fragments/header.html :: header"></nav>
+<div class="container">
+    <div class="row-cols-1 pt-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/}">&Uuml;bersicht</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/chargeboxes}">Ladeboxen</a></li>
+                <li aria-current="page" class="breadcrumb-item active" th:text="${chargebox.getEvseid()}"></li>
+            </ol>
+        </nav>
+    </div>
+    <div class="row">
+        <h1>Bearbeiten von <span th:text="${chargebox.getName()}"></span></h1>
+    </div>
+    <form method="post" th:action="@{/chargebox/edit/{id}(id=${chargebox.getChargeboxId()})}"
+          th:object="${chargebox}">
+        <div class="row p-1">
+            <div class="col-2"><input class="btn btn-primary" th:type="submit"/></div>
+            <div class="col-2"><input class="btn btn-danger" th:type="reset"/></div>
+        </div>
+        <div class="row">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Attribut</th>
+                    <th scope="col">Wert</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Name</td>
+                    <td><input class="form-control" required th:field="*{name}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>EVSEID</td>
+                    <td><input class="form-control" required th:field="*{evseid}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Idle Consumption in A</td>
+                    <td><input class="form-control" required th:field="*{idleConsumption}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Spannung in V</td>
+                    <td>
+                        <select class="form-control" th:field="*{voltage}">
+                            <option th:each="type : ${voltages}"
+                                    th:text="${type}"
+                                    th:value="${type}"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Anschluss</td>
+                    <td>
+                        <select class="form-control" th:field="*{anschluss}">
+                            <option th:each="an : ${anschlusse}"
+                                    th:text="${an.getName()}"
+                                    th:value="${an.getId()}"></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>EMAID</td>
+                    <td><input class="form-control" th:field="*{emaid}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Start URL</td>
+                    <td><input class="form-control" required th:field="*{startURL}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Stop URL</td>
+                    <td><input class="form-control" required th:field="*{stopURL}" th:type="text"/></td>
+                </tr>
+                <tr>
+                    <td>Aktiver Ladevorgag</td>
+                    <td>
+                        <select class="form-control" id="voltage" name="voltage">
+                            <option th:selected="${chargebox.isCharging() == true}" value="true">Ja</option>
+                            <option th:selected="${chargebox.isCharging() == false}" value="false">Nein</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Priorisiert</td>
+                    <td>
+                        <select class="form-control" id="priority" name="priority">
+                            <option th:selected="${chargebox.isPriority() == true}" value="true">Ja</option>
+                            <option th:selected="${chargebox.isPriority() == false}" value="false">Nein</option>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+    <footer th:replace="fragments/footer.html :: footer"></footer>
+</div>
+</body>
+</html>

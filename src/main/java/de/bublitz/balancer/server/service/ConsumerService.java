@@ -7,7 +7,7 @@ import java.util.List;
 public interface ConsumerService {
     void addConsumer(String name);
 
-    void deleteConsumer(String name);
+    void deleteConsumer(Long id);
 
     List<Consumer> getAllConsumers();
 
@@ -15,5 +15,9 @@ public interface ConsumerService {
 
     Consumer getConsumerByName(String name);
 
-    void updateConsumer(Consumer consumer);
+    void update(Consumer consumer);
+
+    Consumer getConsumerById(long id);
+
+    void addConsumer(Consumer consumer);
 }

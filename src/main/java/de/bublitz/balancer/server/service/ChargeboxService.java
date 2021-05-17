@@ -9,11 +9,21 @@ public interface ChargeboxService {
 
     ChargeBox getChargeBoxByName(String name);
 
-    ChargeBox getChargeBoxById(String evseid);
+    ChargeBox getChargeboxById(String evseid);
 
-    boolean deleteChargeBox(String name);
+    ChargeBox getChargeboxById(long id);
+
+    void deleteChargeBox(long id);
 
     void setCharging(String name, boolean active);
 
     void setConnected(String name);
+
+    void calibrate();
+
+    void setListener(String name);
+
+    void update(ChargeBox chargeBox);
+
+    boolean exists(long id);
 }

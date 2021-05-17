@@ -1,11 +1,19 @@
 package de.bublitz.balancer.server.components.strategien;
 
+import de.bublitz.balancer.server.model.AbstractConsumer;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
+import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
+import de.bublitz.balancer.server.model.exception.NotStoppedException;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpResponse;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,9 +36,10 @@ public abstract class Strategy {
         suspended = new LinkedList<>();
         tmpSuspended = new LinkedList<>();
         this.anschluss = anschluss;
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 
-    public abstract void optimize();
+    public abstract void optimize() throws NotStoppedException;
 
     public abstract void addLV(ChargeBox chargeBox);
 
@@ -43,29 +52,31 @@ public abstract class Strategy {
     }
 
     public void calculateFitting(double tmpLoad) {
-        List<Integer> wtList = new LinkedList<>();
-        double restCapacity = anschluss.getMaxLoad() - tmpLoad;
+        double restCapacity = anschluss.getHardLimit() - tmpLoad;
 
         // check tmpSuspended first
         List<Boolean> result = runKnapsack(tmpSuspended, restCapacity);
-        restCapacity += readdChargeBox(tmpSuspended, result);
+        restCapacity -= readdChargeBox(tmpSuspended, result);
 
         // check already suspended
         result = runKnapsack(suspended, restCapacity);
-        restCapacity += readdChargeBox(suspended, result);
+        restCapacity -= readdChargeBox(suspended, result);
     }
 
     private double readdChargeBox(List<ChargeBox> chargeBoxList, List<Boolean> results) {
         double tmpCapacity = 0;
+        List<ChargeBox> tmpCbList = new LinkedList<>();
         for (int i = 0; i < results.size(); i++) {
             if (results.get(i)) {
                 ChargeBox tmpSuspendedBox = chargeBoxList.get(i);
-                log.info("Readding " + tmpSuspendedBox.getName());
-                chargeBoxList.remove(tmpSuspendedBox);
+                log.debug("Readding " + tmpSuspendedBox.getName());
+                tmpCbList.add(tmpSuspendedBox);
                 chargingList.add(tmpSuspendedBox);
                 tmpCapacity += tmpSuspendedBox.getCurrentLoad();
             }
         }
+
+        chargeBoxList.removeAll(tmpCbList);
         return tmpCapacity;
     }
 
@@ -87,7 +98,7 @@ public abstract class Strategy {
         return knapSack((int) Math.floor(restCapacity), wt, val, n);
     }
 
-
+    // Siehe: https://www.geeksforgeeks.org/printing-items-01-knapsack/
     public List<Boolean> knapSack(int W, int[] wt, int[] val, int n) {
         List<Boolean> booleans = new LinkedList<>();
         if (n <= 0 || W <= 0) {
@@ -110,19 +121,15 @@ public abstract class Strategy {
 
         int ind = n;
         int weight = W;
-        String s = "";
         while (ind > 0) {
             if (K[ind][weight] != K[ind - 1][weight]) {
-                s = "1," + s;
                 booleans.add(true);
                 weight -= wt[ind - 1];
             } else {
                 booleans.add(false);
-                s = "0," + s;
             }
             ind -= 1;
         }
-        s = s.substring(0, s.length() - 1);
         return booleans;
         //return K[n][W];
     }
@@ -135,7 +142,26 @@ public abstract class Strategy {
         return getString(suspended);
     }
 
-    private String getString(List<ChargeBox> chargeBoxList) {
+    public String printConsumerList() {
+        return getString(anschluss.getConsumerList());
+    }
+
+    public String printConsumerLoad() {
+        List<Consumer> consumerList = anschluss.getConsumerList();
+        if (consumerList.isEmpty()) {
+            return "{}";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{");
+        consumerList.forEach(consumer -> {
+            stringBuilder.append(consumer.getCurrentLoad()).append("A, ");
+        });
+        stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "}");
+        return stringBuilder.toString();
+    }
+
+    private <T extends AbstractConsumer> String getString(List<T> chargeBoxList) {
         if (chargeBoxList.size() == 0) {
             return "{}";
         }
@@ -147,5 +173,42 @@ public abstract class Strategy {
         });
         stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "}");
         return stringBuilder.toString();
+    }
+
+    protected boolean stop(ChargeBox chargeBox) {
+        chargeBox.setLastLoad(chargeBox.getCurrentLoad());
+        // Test?
+        if (chargeBox.getStopURL().contains("testStop")) {
+            chargeBox.setCurrentLoad(0);
+            return true;
+        }
+        try {
+            return queryURL(chargeBox.getStopURL());
+        } catch (IOException ex) {
+            log.error("Could not stop charging session");
+            log.error(ex.getMessage());
+        }
+        return false;
+    }
+
+    protected boolean start(ChargeBox chargeBox) {
+        if (chargeBox.getStartURL().contains("testStart")) {
+            if (chargeBox.getLastLoad() > 0)
+                chargeBox.setCurrentLoad(chargeBox.getLastLoad());
+            return true;
+        }
+        try {
+            return queryURL(chargeBox.getStartURL());
+        } catch (IOException ex) {
+            log.error("Could not start charging session");
+            log.error(ex.getMessage());
+        }
+        return false;
+    }
+
+    private boolean queryURL(String url) throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpResponse response = client.execute(new HttpGet(url));
+        return response.getCode() == 200;
     }
 }
