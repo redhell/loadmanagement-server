@@ -4,7 +4,7 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import de.bublitz.balancer.server.model.exception.NotStoppedException;
-
+// Round robin
 public class FirstInFirstOutStrategy extends Strategy {
 
     public FirstInFirstOutStrategy(Anschluss anschluss) {

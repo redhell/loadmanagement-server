@@ -5,7 +5,6 @@ import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrat
 import de.bublitz.balancer.server.components.strategien.FirstInFirstOutStrategy;
 import de.bublitz.balancer.server.components.strategien.PriorityQueueStrategy;
 import de.bublitz.balancer.server.components.strategien.Strategy;
-import de.bublitz.balancer.server.controller.InfluxController;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
@@ -14,6 +13,7 @@ import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import de.bublitz.balancer.server.model.exception.NotStoppedException;
 import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ErrorService;
+import de.bublitz.balancer.server.service.InfluxService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,16 +32,16 @@ import java.util.Optional;
 public class BalancerComponent {
 
     private final AnschlussService anschlussService;
-    private final InfluxController influxController;
+    private final InfluxService influxService;
     private final Map<Anschluss, Strategy> anschlussStrategyMap;
 
     @Autowired
     private ErrorService errorService;
 
     @Autowired
-    public BalancerComponent(AnschlussService anschlussService, InfluxController influxController) {
+    public BalancerComponent(AnschlussService anschlussService, InfluxService influxService) {
         this.anschlussService = anschlussService;
-        this.influxController = influxController;
+        this.influxService = influxService;
         this.anschlussStrategyMap = new LinkedHashMap<>();
     }
 
@@ -58,14 +58,14 @@ public class BalancerComponent {
         anschlussService.getAll().forEach(this::checkConnected);
     }
 
-    protected void checkConnected(Anschluss anschluss) {
+    private void checkConnected(Anschluss anschluss) {
         anschluss
                 .getChargeboxList()
                 .stream()
                 .filter(ChargeBox::isConnected)
                 .forEach(chargeBox -> {
                     ConsumptionPoint consumptionPoint
-                            = influxController.getLastPoint(chargeBox.getName());
+                            = influxService.getLastPoint(chargeBox.getName());
                     Duration duration = Duration.between(consumptionPoint.getTime(), Instant.now());
 
                     if (duration.toMinutes() > 10) {
@@ -78,7 +78,7 @@ public class BalancerComponent {
                 });
     }
 
-    protected void balance(Anschluss anschluss) {
+    private void balance(Anschluss anschluss) {
         Strategy strategy;
         if (anschlussStrategyMap.containsKey(anschluss)) {
             strategy = anschlussStrategyMap.get(anschluss);
@@ -113,14 +113,14 @@ public class BalancerComponent {
     }
 
     private void updateConsumer(Consumer consumer) {
-        consumer.setCurrentLoad(influxController.getLastPoint(consumer.getName()).getConsumption());
+        consumer.setCurrentLoad(influxService.getLastPoint(consumer.getName()).getConsumption());
     }
 
     private void updateChargeBox(ChargeBox chargeBox) {
         Strategy strategy = anschlussStrategyMap.get(chargeBox.getAnschluss());
         if (chargeBox.isConnected()) {
             Optional<ConsumptionPoint> consumption =
-                    Optional.ofNullable(influxController.getLastPoint(chargeBox.getName()));
+                    Optional.ofNullable(influxService.getLastPoint(chargeBox.getName()));
             if (consumption.isPresent()) {
                 chargeBox.setCurrentLoad(consumption.get().getConsumption());
                 // 20% Buffer

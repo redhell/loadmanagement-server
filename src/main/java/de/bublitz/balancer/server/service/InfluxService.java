@@ -1,4 +1,4 @@
-package de.bublitz.balancer.server.controller;
+package de.bublitz.balancer.server.service;
 
 import de.bublitz.balancer.server.model.ConsumptionPoint;
 import lombok.extern.log4j.Log4j2;
@@ -6,7 +6,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.InfluxDBIOException;
 import org.influxdb.dto.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
-@Component
+@Service
 @SuppressWarnings({"Deprecated", "deprecation"})
-public class InfluxController {
+public class InfluxService {
 
     private final InfluxDB influxDB;
     private final String dbName = "loaddata";
 
-    public InfluxController()  {
+    public InfluxService() {
         influxDB = connectDatabase();
-        if(!influxDB.databaseExists(dbName)) {
+        if (!influxDB.databaseExists(dbName)) {
             createDatabase();
         }
         influxDB.setDatabase(dbName);

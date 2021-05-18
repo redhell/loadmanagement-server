@@ -3,9 +3,9 @@ package de.bublitz.balancer.server.controller.REST;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bublitz.balancer.server.controller.InfluxController;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
 import de.bublitz.balancer.server.service.ChargeboxService;
+import de.bublitz.balancer.server.service.InfluxService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,24 +22,24 @@ import java.util.Map;
 @RequestMapping("/load")
 public class LoadController {
     @Autowired
-    private InfluxController influxController;
+    private InfluxService influxService;
 
     @Autowired
     private ChargeboxService chargeboxService;
 
     @GetMapping("/getAll")
     public List<ConsumptionPoint> getAllPoints() {
-        return influxController.getAllPoints();
+        return influxService.getAllPoints();
     }
 
     @PostMapping(value = "/addPoint", consumes = "application/json")
     public void addPoint(@RequestBody ConsumptionPoint consumptionPoint) {
-        influxController.addPoint(consumptionPoint);
+        influxService.addPoint(consumptionPoint);
     }
 
     @PostMapping(value = "/addPoints", consumes = "application/json")
     public void addPoints(@RequestBody List<ConsumptionPoint> consumptionPoints) {
-        influxController.addPoints(consumptionPoints);
+        influxService.addPoints(consumptionPoints);
     }
 
     @PostMapping("/{name}/rawPoints")
@@ -63,7 +63,7 @@ public class LoadController {
                 e.printStackTrace();
             }
         });
-        influxController.addPoints(tmpList);
+        influxService.addPoints(tmpList);
 
         // Noch nicht kalibriert für Idle!
         chargeboxService.calibrate();
@@ -71,16 +71,16 @@ public class LoadController {
 
     @GetMapping("/getByName")
     public List<ConsumptionPoint> getPointsByName(@RequestParam String name) {
-        return influxController.getPointsByName(name);
+        return influxService.getPointsByName(name);
     }
 
     @GetMapping("/recreateDB")
     public void recreateDB() {
-        influxController.recreateDatabase();
+        influxService.recreateDatabase();
     }
 
     @DeleteMapping("/delete")
     public void deleteByName(@RequestParam String name) {
-        influxController.delete(name);
+        influxService.delete(name);
     }
 }

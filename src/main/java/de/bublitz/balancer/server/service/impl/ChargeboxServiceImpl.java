@@ -1,11 +1,11 @@
 package de.bublitz.balancer.server.service.impl;
 
 import de.bublitz.balancer.server.components.BalancerComponent;
-import de.bublitz.balancer.server.controller.InfluxController;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
 import de.bublitz.balancer.server.repository.ChargeboxRepository;
 import de.bublitz.balancer.server.service.ChargeboxService;
+import de.bublitz.balancer.server.service.InfluxService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,12 @@ import java.util.List;
 public class ChargeboxServiceImpl implements ChargeboxService {
 
     private final ChargeboxRepository chargeboxRepository;
-    private final InfluxController influxController;
+    private final InfluxService influxService;
 
     @Autowired
-    public ChargeboxServiceImpl(ChargeboxRepository chargeboxRepository, InfluxController influxController, BalancerComponent balancerComponent) {
+    public ChargeboxServiceImpl(ChargeboxRepository chargeboxRepository, InfluxService influxService, BalancerComponent balancerComponent) {
         this.chargeboxRepository = chargeboxRepository;
-        this.influxController = influxController;
+        this.influxService = influxService;
     }
 
     public void addChargeBox(ChargeBox chargeBox) {
@@ -82,7 +82,7 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         // 0.0 is default -> uncalibrated
         List<ChargeBox> chargeBoxes = chargeboxRepository.findChargeBoxesByCalibratedFalseAndConnectedTrue();
         chargeBoxes.forEach(cb -> {
-            List<ConsumptionPoint> loadData = influxController.getPointsByName(cb.getName());
+            List<ConsumptionPoint> loadData = influxService.getPointsByName(cb.getName());
             double tmpValues = 0.0;
             for (ConsumptionPoint loadDatum : loadData) {
                 tmpValues += loadDatum.getConsumption();
