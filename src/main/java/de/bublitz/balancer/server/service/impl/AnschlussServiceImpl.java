@@ -122,4 +122,25 @@ public class AnschlussServiceImpl implements AnschlussService {
     public void deleteAnschluss(long id) {
         anschlussRepository.deleteById(id);
     }
+
+    @Override
+    public void removeChargebox(String anschlussName, String chargeboxName) {
+        Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
+        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
+        anschluss.getChargeboxList().remove(chargeBox);
+        chargeboxRepository.delete(chargeBox);
+    }
+
+    @Override
+    public void removeConsumer(String anschlussName, String consumerName) {
+        Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
+        Consumer consumer = consumerRepository.getConsumerByName(consumerName);
+        anschluss.getConsumerList().remove(consumer);
+        consumerRepository.delete(consumer);
+    }
+
+    @Override
+    public void updateAnschluss(Anschluss anschluss) {
+        anschlussRepository.save(anschluss);
+    }
 }

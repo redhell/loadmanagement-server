@@ -1,0 +1,18 @@
+@startuml
+!include skin.pu
+start
+if (anschluss in der Anschlussmap?) then (true)
+  :Strategie auslesen;
+else (false)
+    :Anschluss auslesen;
+    :Strategie in der Anschlussmap\n\t\t speichern;
+endif
+:strategy.optimize();
+if (Fehler aufgetreten?) then (NotStoppedExcepiton)
+    :Fehler loggen;
+endif
+:Consumer aktualisieren;
+:ChargeBoxen aktualisieren;
+:anschluss.computeLoad;
+stop
+@enduml

@@ -84,14 +84,7 @@ public class BalancerComponent {
             strategy = anschlussStrategyMap.get(anschluss);
             // Update
             strategy.setAnschluss(anschluss);
-            try {
-                strategy.optimize();
-            } catch (NotStoppedException e) {
-                log.error(e.getMessage());
-                errorService.addError(e);
-            }
         } else {
-
             switch (anschluss.getLoadStrategy()) {
                 case PQ:
                     strategy = new PriorityQueueStrategy(anschluss);
@@ -104,6 +97,12 @@ public class BalancerComponent {
                     strategy = new FirstInFirstOutStrategy(anschluss);
             }
             anschlussStrategyMap.put(anschluss, strategy);
+        }
+        try {
+            strategy.optimize();
+        } catch (NotStoppedException e) {
+            log.error(e.getMessage());
+            errorService.addError(e);
         }
         // Calculate load
         anschluss.getChargeboxList().forEach(this::updateChargeBox);

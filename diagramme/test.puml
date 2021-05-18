@@ -1,0 +1,69 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+abstract class AbstractConsumer {
+    -name : String
+    -voltage : double
+    -currentLoad : double
+}
+
+class Anschluss {
+    -loadStrategy : LoadStrategy
+    -softLimit : double
+    -hardLimit : double
+    -chargeboxList : List
+    -consumerList : List
+    -maxLoad : double
+    -currentLoad : double
+    -id : long
+    -name : String
+}
+
+class Consumer {
+   -maxLoad : double
+}
+
+class ChargeBox {
+    -priority : int
+    -evseid : String
+    -startURL : URL
+    -stopURL : URL
+    -idleConsumption : double
+    -emaid : String
+    -charging : boolean
+    -isConnected : boolean
+}
+
+class ConsumptionPoint {
+    -time : Instant
+    -name : String
+    -consumption : double
+    -measurand : String
+}
+
+abstract class Strategy <<Abstract>> {
+    -loadStrategy : LoadStrategy
+    -anschluss : Anschluss
+    +{abstract} balance()
+}
+
+class FirstInFirstOutStrategy
+class LastInFirtOutStrategy
+
+AbstractConsumer <|-- Consumer
+AbstractConsumer <|-- ChargeBox
+Anschluss -- LoadStrategy
+Anschluss "1" -- Consumer  : hat >
+Anschluss "1" -- ChargeBox  : hat >
+
+Strategy <|-- FirstInFirstOutStrategy
+Strategy <|-- LastInFirtOutStrategy
+
+enum LoadStrategy << Enum >> {
+    NONE
+    LIFO
+    FIFO
+    SIMPLE
+}
+
+@enduml
