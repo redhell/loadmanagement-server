@@ -41,7 +41,7 @@ public abstract class Strategy {
 
     public abstract void optimize() throws NotStoppedException;
 
-    public abstract void addLV(ChargeBox chargeBox);
+    public abstract void addLV(ChargeBox chargeBox) throws NotStoppedException;
 
     public void removeLV(ChargeBox chargeBox) {
         if (chargingList.contains(chargeBox)) {
@@ -178,7 +178,7 @@ public abstract class Strategy {
         return stringBuilder.toString();
     }
 
-    protected boolean stop(ChargeBox chargeBox) {
+    protected boolean stop(ChargeBox chargeBox) throws NotStoppedException {
         chargeBox.setLastLoad(chargeBox.getCurrentLoad());
         // Test?
         if (chargeBox.getStopURL().contains("testStop")) {
@@ -186,10 +186,19 @@ public abstract class Strategy {
             return true;
         }
         try {
-            return queryURL(chargeBox.getStopURL());
+            int tries = 0;
+            while (tries <= 5) {
+                boolean result = queryURL(chargeBox.getStopURL());
+                if (result) {
+                    return true;
+                } else {
+                    tries++;
+                }
+            }
         } catch (IOException ex) {
             log.error("Could not stop charging session");
             log.error(ex.getMessage());
+            throw new NotStoppedException();
         }
         return false;
     }

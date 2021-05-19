@@ -32,27 +32,28 @@ public class FirstComeFirstServeStrategy extends Strategy {
             addLV(u0);
             start(u0);
         } else {
-            int tries = 0;
-            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty() && tries <= 5) {
+            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
+                // Anschlusslast verringern!
                 ChargeBox ln = chargingList.getLast();
-                double ln_Load = ln.getCurrentLoad();
-                tries++;
-                if (stop(ln)) {
-                    chargingList.remove(ln);
-                    anschlussLoad -= ln_Load;
-                    suspendedList.add(ln);
-                    tries = 0;
-                }
-                if (tries == 5)
-                    throw new NotStoppedException();
+                chargingList.remove(ln);
+                anschlussLoad -= ln.getCurrentLoad();
+                tmpSuspendedList.add(ln); // Stop later
+
+                calculateFitting(anschlussLoad);
             }
+            for (ChargeBox chargeBox : tmpSuspendedList) {
+                stop(chargeBox);
+            }
+            suspendedList.addAll(tmpSuspendedList);
+            tmpSuspendedList.clear();
             anschluss.computeLoad();
+            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
             calculateFitting(anschlussLoad);
         }
     }
 
     @Override
-    public void addLV(ChargeBox chargeBox) {
+    public void addLV(ChargeBox chargeBox) throws NotStoppedException {
         anschlussLoad = anschluss.getCurrentLoad();
         if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
@@ -70,7 +71,9 @@ public class FirstComeFirstServeStrategy extends Strategy {
             chargingList.add(chargeBox);
             penaltyMap.replaceAll((cb, p) -> p + 1);
         }
-        tmpSuspendedList.forEach(this::stop);
+        for (ChargeBox box : tmpSuspendedList) {
+            stop(box);
+        }
         suspendedList.addAll(tmpSuspendedList);
         suspendedList.forEach(cb -> {
             // Ladevorgang wurde beendet -> Keine Penalty mehr
