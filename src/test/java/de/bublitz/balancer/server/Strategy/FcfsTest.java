@@ -102,7 +102,7 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
         // 1. Balancing
         chargeBox4.setCurrentLoad(10);
         fcfs.addLV(chargeBox4);
-        fcfs.getSuspended().get(0).setCurrentLoad(0);
+        fcfs.getSuspendedList().get(0).setCurrentLoad(0);
         anschluss.computeLoad();
         log();
         incCounter();
@@ -110,7 +110,7 @@ public class FcfsTest extends AbstractTestNGSpringContextTests {
         while (!fcfs.getChargingList().isEmpty()) {
             fcfs.optimize();
 
-            fcfs.getSuspended().forEach(chargeBox -> {
+            fcfs.getSuspendedList().forEach(chargeBox -> {
                 chargeBox.setCurrentLoad(0);
             });
 

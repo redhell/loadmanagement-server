@@ -1,0 +1,51 @@
+@startuml
+!include skin.pu
+
+class FirstComeFirstServeStrategy {
+- Map<String,Integer> penaltyMap
+- int penalty
++ void optimize()
++ void addLV(ChargeBox)
+- void stopWithPenalty()
++ void removeLV(ChargeBox)
+}
+abstract class Strategy {
+- LoadStrategy loadStrategy
+# Anschluss anschluss
+# LinkedList<ChargeBox> chargingList
+# LinkedList<ChargeBox> suspended
+# List<ChargeBox> tmpSuspended
+# double anschlussLoad
++ {abstract}void optimize()
++ {abstract}void addLV(ChargeBox)
++ void removeLV(ChargeBox)
++ void calculateFitting(double)
+- double readdChargeBox(List<ChargeBox>,List<Boolean>)
+- List<Boolean> runKnapsack(List<ChargeBox>,double)
++ List<Boolean> knapSack(int,int[],int[],int)
++ String printChargingList()
++ String printSuspendedList()
++ String printConsumerList()
++ String printConsumerLoad()
+- String getString(List<T>)
+# boolean stop(ChargeBox)
+# boolean start(ChargeBox)
+- boolean queryURL(String)
+}
+class FirstInFirstOutStrategy {
++ void optimize()
++ void addLV(ChargeBox)
+}
+class PriorityQueueStrategy {
++ void optimize()
+- void stopNonPrio()
+- void stopPrio()
+- void stopAndRemove(LinkedList<ChargeBox>)
++ void addLV(ChargeBox)
+}
+
+
+Strategy <|-- FirstComeFirstServeStrategy
+Strategy <|-- FirstInFirstOutStrategy
+Strategy <|-- PriorityQueueStrategy
+@enduml

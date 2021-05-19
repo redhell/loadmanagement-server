@@ -104,7 +104,7 @@ public class PqTest extends AbstractTestNGSpringContextTests {
         // 1. Balancing
         chargeBox4.setCurrentLoad(10);
         pq.addLV(chargeBox4);
-        pq.getSuspended().get(0).setCurrentLoad(0);
+        pq.getSuspendedList().get(0).setCurrentLoad(0);
         anschluss.computeLoad();
         log();
         incCounter();
@@ -112,7 +112,7 @@ public class PqTest extends AbstractTestNGSpringContextTests {
         while (!pq.getChargingList().isEmpty()) {
             pq.optimize();
 
-            pq.getSuspended().forEach(chargeBox -> {
+            pq.getSuspendedList().forEach(chargeBox -> {
                 chargeBox.setCurrentLoad(0);
             });
 

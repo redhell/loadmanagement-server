@@ -26,15 +26,15 @@ public abstract class Strategy {
 
     protected Anschluss anschluss;
     protected LinkedList<ChargeBox> chargingList;
-    protected LinkedList<ChargeBox> suspended;
-    protected List<ChargeBox> tmpSuspended;
+    protected LinkedList<ChargeBox> suspendedList;
+    protected List<ChargeBox> tmpSuspendedList;
     protected double anschlussLoad;
 
     public Strategy(Anschluss anschluss, LoadStrategy loadStrategy) {
         this.loadStrategy = loadStrategy;
         chargingList = new LinkedList<>();
-        suspended = new LinkedList<>();
-        tmpSuspended = new LinkedList<>();
+        suspendedList = new LinkedList<>();
+        tmpSuspendedList = new LinkedList<>();
         this.anschluss = anschluss;
         anschlussLoad = anschluss.getCurrentLoad();
     }
@@ -47,7 +47,7 @@ public abstract class Strategy {
         if (chargingList.contains(chargeBox)) {
             chargingList.remove(chargeBox);
         } else {
-            suspended.remove(chargeBox);
+            suspendedList.remove(chargeBox);
         }
     }
 
@@ -55,15 +55,15 @@ public abstract class Strategy {
         double restCapacity = anschluss.getHardLimit() - tmpLoad;
 
         // check tmpSuspended first
-        List<Boolean> result = runKnapsack(tmpSuspended, restCapacity);
-        restCapacity -= readdChargeBox(tmpSuspended, result);
+        List<Boolean> result = runKnapsack(tmpSuspendedList, restCapacity);
+        restCapacity -= readdChargeBox(tmpSuspendedList, result, false);
 
         // check already suspended
-        result = runKnapsack(suspended, restCapacity);
-        restCapacity -= readdChargeBox(suspended, result);
+        result = runKnapsack(suspendedList, restCapacity);
+        restCapacity -= readdChargeBox(suspendedList, result, true);
     }
 
-    private double readdChargeBox(List<ChargeBox> chargeBoxList, List<Boolean> results) {
+    private double readdChargeBox(List<ChargeBox> chargeBoxList, List<Boolean> results, boolean startCharging) {
         double tmpCapacity = 0;
         List<ChargeBox> tmpCbList = new LinkedList<>();
         for (int i = 0; i < results.size(); i++) {
@@ -73,6 +73,9 @@ public abstract class Strategy {
                 tmpCbList.add(tmpSuspendedBox);
                 chargingList.add(tmpSuspendedBox);
                 tmpCapacity += tmpSuspendedBox.getCurrentLoad();
+                if (startCharging) {
+                    start(tmpSuspendedBox);
+                }
             }
         }
 
@@ -139,7 +142,7 @@ public abstract class Strategy {
     }
 
     public String printSuspendedList() {
-        return getString(suspended);
+        return getString(suspendedList);
     }
 
     public String printConsumerList() {

@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/state-diagram
+!include skin.pu
+hide empty description
+
+[*] --> ChargingList : neuer Ladevorgang
+ChargingList --> tmpSuspended : Ladevorgang zum \nunterbrechen vormerken
+
+tmpSuspended -up-> ChargingList : Ladevorgang \n fortsetzen
+tmpSuspended -right-> suspended : Ladevorgang \n unterbrechen
+
+suspended -up-> ChargingList : Ladevorgang \n starten
+
+ChargingList -right-> [*] : Ladevorgang \n beendet
+suspended -right-> [*] : Ladevorgang \n abgebrochen
+
+@enduml

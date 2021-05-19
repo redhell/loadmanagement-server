@@ -135,7 +135,7 @@ public class BalancerComponent {
                         chargeBox.setCharging(false);
                         strategy.removeLV(chargeBox);
                         log.info("Stop charging");
-                    } else if (strategy.getSuspended().isEmpty()) {
+                    } else if (strategy.getSuspendedList().isEmpty()) {
                         chargeBox.setCharging(false);
                     }
                 }

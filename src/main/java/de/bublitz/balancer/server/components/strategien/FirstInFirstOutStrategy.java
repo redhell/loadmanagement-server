@@ -13,12 +13,15 @@ public class FirstInFirstOutStrategy extends Strategy {
 
     @Override
     public void optimize() throws NotStoppedException {
-        //anschlussLoad = anschluss.getCurrentLoad();
-        if (!getSuspended().isEmpty()) {
-            ChargeBox u0 = suspended.getFirst();
-            suspended.remove(u0);
+        if (!suspendedList.isEmpty()) {
+            // Es gibt unterbrochene Ladevorgänge
+            ChargeBox u0 = suspendedList.getFirst();
+            suspendedList.remove(u0);
+            // Entferne u0 von der suspendedList
             u0.setCurrentLoad(u0.getLastLoad());
+            // Füge u0 in den Schedule ein mit der alten Last
             addLV(u0);
+            // starte den LV
             start(u0);
         } else {
             int tries = 0;
@@ -29,13 +32,14 @@ public class FirstInFirstOutStrategy extends Strategy {
                 if (stop(l0)) {
                     chargingList.remove(l0);
                     anschlussLoad -= l0_Load;
-                    suspended.add(l0); // Stop later
+                    suspendedList.add(l0);
                     tries = 0;
                 }
                 if (tries == 5)
                     throw new NotStoppedException();
             }
             anschluss.computeLoad();
+            calculateFitting(anschlussLoad);
         }
     }
 
@@ -49,16 +53,16 @@ public class FirstInFirstOutStrategy extends Strategy {
                 ChargeBox l0 = chargingList.getFirst();
                 chargingList.remove(l0);
                 anschlussLoad -= l0.getCurrentLoad();
-                tmpSuspended.add(l0); // Stop later
+                tmpSuspendedList.add(l0); // Stop later
             }
             calculateFitting(anschlussLoad);
             chargingList.add(chargeBox);
             //start(chargeBox);
             //anschlussLoad += cbLoad;
         }
-        tmpSuspended.forEach(this::stop);
-        suspended.addAll(tmpSuspended);
-        tmpSuspended.clear();
+        tmpSuspendedList.forEach(this::stop);
+        suspendedList.addAll(tmpSuspendedList);
+        tmpSuspendedList.clear();
         anschluss.computeLoad();
     }
 }

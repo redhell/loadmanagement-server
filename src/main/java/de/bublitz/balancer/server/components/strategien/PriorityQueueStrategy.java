@@ -22,12 +22,12 @@ public class PriorityQueueStrategy extends Strategy {
     @Override
     public void optimize() throws NotStoppedException {
         //anschlussLoad = anschluss.getCurrentLoad();
-        if (!suspended.isEmpty()) {
+        if (!suspendedList.isEmpty()) {
             ChargeBox u0;
             // Priority Box in der Warteschlange?
-            Optional<ChargeBox> priorityBox = suspended.stream().filter(ChargeBox::isPriority).findFirst();
-            u0 = priorityBox.orElseGet(() -> suspended.getFirst());
-            suspended.remove(u0);
+            Optional<ChargeBox> priorityBox = suspendedList.stream().filter(ChargeBox::isPriority).findFirst();
+            u0 = priorityBox.orElseGet(() -> suspendedList.getFirst());
+            suspendedList.remove(u0);
             u0.setCurrentLoad(u0.getLastLoad());
             addLV(u0);
             start(u0);
@@ -35,6 +35,7 @@ public class PriorityQueueStrategy extends Strategy {
             stopNonPrio();
             stopPrio();
             anschluss.computeLoad();
+            calculateFitting(anschlussLoad);
         }
     }
 
@@ -58,7 +59,7 @@ public class PriorityQueueStrategy extends Strategy {
                 chargingList.remove(l0);
                 tmpChargingList.remove(l0);
                 anschlussLoad -= l0_Load;
-                suspended.add(l0);
+                suspendedList.add(l0);
                 tries = 0;
             }
             if (tries == 5)
@@ -79,7 +80,7 @@ public class PriorityQueueStrategy extends Strategy {
                 if (!l0.isPriority()) {
                     chargingList.remove(l0);
                     anschlussLoad -= l0.getCurrentLoad();
-                    tmpSuspended.add(l0); // Stop later
+                    tmpSuspendedList.add(l0); // Stop later
                     i = 0;
                 } else {
                     i++;
@@ -88,9 +89,9 @@ public class PriorityQueueStrategy extends Strategy {
             calculateFitting(anschlussLoad);
             chargingList.add(chargeBox);
         }
-        tmpSuspended.forEach(this::stop);
-        suspended.addAll(tmpSuspended);
-        tmpSuspended.clear();
+        tmpSuspendedList.forEach(this::stop);
+        suspendedList.addAll(tmpSuspendedList);
+        tmpSuspendedList.clear();
         anschluss.computeLoad();
     }
 }

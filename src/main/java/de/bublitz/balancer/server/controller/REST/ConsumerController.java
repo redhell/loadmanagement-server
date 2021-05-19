@@ -43,6 +43,6 @@ public class ConsumerController {
 
     @GetMapping("/updateConsumer")
     public void updateConsumer(@RequestBody Consumer consumer) {
-        consumerService.updateConsumer(consumer);
+        consumerService.update(consumer);
     }
 }

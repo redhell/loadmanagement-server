@@ -33,4 +33,10 @@ public interface AnschlussService {
     void update(Anschluss anschluss);
 
     void deleteAnschluss(long id);
+
+    void removeChargebox(String anschlussName, String chargeboxName);
+
+    void removeConsumer(String anschlussName, String consumerName);
+
+    void updateAnschluss(Anschluss anschluss);
 }
