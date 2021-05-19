@@ -102,30 +102,12 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
         // 1. Balancing
         chargeBox4.setCurrentLoad(10);
         fifo.addLV(chargeBox4);
-        fifo.getSuspendedList().get(0).setCurrentLoad(0);
         anschluss.computeLoad();
         log();
         incCounter();
 
         while (!fifo.getChargingList().isEmpty()) {
             fifo.optimize();
-
-            fifo.getSuspendedList().forEach(chargeBox -> {
-                chargeBox.setCurrentLoad(0);
-            });
-
-            fifo.getChargingList().forEach(chargeBox -> {
-                if (chargeBox.equals(chargeBox1)) {
-                    chargeBox1.setCurrentLoad(4);
-                } else if (chargeBox.equals(chargeBox2)) {
-                    chargeBox2.setCurrentLoad(7);
-                } else if (chargeBox.equals(chargeBox3)) {
-                    chargeBox3.setCurrentLoad(10);
-                } else if (chargeBox.equals(chargeBox4)) {
-                    chargeBox4.setCurrentLoad(10);
-                }
-            });
-            anschluss.computeLoad();
 
             if (counterCB1 == 8) {
                 fifo.removeLV(chargeBox1);
@@ -147,7 +129,7 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
             incCounter();
             log();
             Assert.assertTrue(anschluss.getCurrentLoad() < anschluss.getHardLimit());
-            sleep(200);
+            sleep(100);
         }
 
     }
@@ -212,7 +194,7 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
             anschluss.computeLoad();
             incCounter();
             log();
-            sleep(200);
+            sleep(100);
             Assert.assertTrue(anschluss.getCurrentLoad() < anschluss.getHardLimit());
         }
     }
@@ -230,7 +212,7 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
         log();
         incCounter();
 
-        chargeBox2.setCurrentLoad(10);
+        chargeBox2.setCurrentLoad(11);
         fifo.addLV(chargeBox2);
         log();
         incCounter();
@@ -238,30 +220,13 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
         // 1. Balancing
         chargeBox4.setCurrentLoad(7);
         fifo.addLV(chargeBox4);
-        fifo.getSuspendedList().get(0).setCurrentLoad(0);
+
         anschluss.computeLoad();
         log();
         incCounter();
 
         while (!fifo.getChargingList().isEmpty()) {
             fifo.optimize();
-
-            fifo.getSuspendedList().forEach(chargeBox -> {
-                chargeBox.setCurrentLoad(0);
-            });
-
-            fifo.getChargingList().forEach(chargeBox -> {
-                if (chargeBox.equals(chargeBox1)) {
-                    chargeBox1.setCurrentLoad(10);
-                } else if (chargeBox.equals(chargeBox2)) {
-                    chargeBox2.setCurrentLoad(10);
-                } else if (chargeBox.equals(chargeBox3)) {
-                    chargeBox3.setCurrentLoad(10);
-                } else if (chargeBox.equals(chargeBox4)) {
-                    chargeBox4.setCurrentLoad(7);
-                }
-            });
-            anschluss.computeLoad();
 
             if (counterCB1 == 8) {
                 fifo.removeLV(chargeBox1);
@@ -283,7 +248,7 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
             incCounter();
             log();
             Assert.assertTrue(anschluss.getCurrentLoad() <= anschluss.getHardLimit());
-            sleep(200);
+            sleep(100);
         }
 
     }

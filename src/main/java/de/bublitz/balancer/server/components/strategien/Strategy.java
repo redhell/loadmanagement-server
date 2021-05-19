@@ -15,6 +15,7 @@ import org.apache.hc.core5.http.HttpResponse;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -98,7 +99,9 @@ public abstract class Strategy {
         int[] wt = wtList.stream().mapToInt(Integer::intValue).toArray();
         int[] val = new int[n];
         Arrays.fill(val, 1);
-        return knapSack((int) Math.floor(restCapacity), wt, val, n);
+        List<Boolean> returnList = knapSack((int) Math.floor(restCapacity), wt, val, n);
+        Collections.reverse(returnList);
+        return returnList;
     }
 
     // Siehe: https://www.geeksforgeeks.org/printing-items-01-knapsack/
@@ -182,6 +185,7 @@ public abstract class Strategy {
         chargeBox.setLastLoad(chargeBox.getCurrentLoad());
         // Test?
         if (chargeBox.getStopURL().contains("testStop")) {
+            chargeBox.setLastLoad(chargeBox.getCurrentLoad());
             chargeBox.setCurrentLoad(0);
             return true;
         }

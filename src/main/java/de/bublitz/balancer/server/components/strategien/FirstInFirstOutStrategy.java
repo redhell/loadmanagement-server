@@ -30,8 +30,6 @@ public class FirstInFirstOutStrategy extends Strategy {
                 chargingList.remove(l0);
                 anschlussLoad -= l0.getCurrentLoad();
                 tmpSuspendedList.add(l0); // Stop later
-
-                calculateFitting(anschlussLoad);
             }
             for (ChargeBox chargeBox : tmpSuspendedList) {
                 stop(chargeBox);
