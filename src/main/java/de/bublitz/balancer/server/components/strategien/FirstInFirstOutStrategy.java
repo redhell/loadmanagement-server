@@ -31,14 +31,15 @@ public class FirstInFirstOutStrategy extends Strategy {
                 anschlussLoad -= l0.getCurrentLoad();
                 tmpSuspendedList.add(l0); // Stop later
             }
+            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
+            calculateFitting(anschlussLoad);
+
             for (ChargeBox chargeBox : tmpSuspendedList) {
                 stop(chargeBox);
             }
             suspendedList.addAll(tmpSuspendedList);
             tmpSuspendedList.clear();
             anschluss.computeLoad();
-            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
-            calculateFitting(anschlussLoad);
         }
     }
 

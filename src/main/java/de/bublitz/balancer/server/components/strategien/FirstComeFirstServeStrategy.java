@@ -38,17 +38,15 @@ public class FirstComeFirstServeStrategy extends Strategy {
                 chargingList.remove(ln);
                 anschlussLoad -= ln.getCurrentLoad();
                 tmpSuspendedList.add(ln); // Stop later
-
-                calculateFitting(anschlussLoad);
             }
+            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
+            calculateFitting(anschlussLoad);
             for (ChargeBox chargeBox : tmpSuspendedList) {
                 stop(chargeBox);
             }
             suspendedList.addAll(tmpSuspendedList);
             tmpSuspendedList.clear();
             anschluss.computeLoad();
-            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
-            calculateFitting(anschlussLoad);
         }
     }
 
@@ -104,12 +102,13 @@ public class FirstComeFirstServeStrategy extends Strategy {
     }
 
     @Override
-    public void removeLV(ChargeBox chargeBox) {
+    public void removeLV(ChargeBox chargeBox) throws NotStoppedException {
         if (chargingList.contains(chargeBox)) {
             chargingList.remove(chargeBox);
         } else {
             suspendedList.remove(chargeBox);
         }
         penaltyMap.remove(chargeBox.getEvseid());
+        optimize();
     }
 }

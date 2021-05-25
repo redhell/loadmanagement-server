@@ -44,12 +44,13 @@ public abstract class Strategy {
 
     public abstract void addLV(ChargeBox chargeBox) throws NotStoppedException;
 
-    public void removeLV(ChargeBox chargeBox) {
+    public void removeLV(ChargeBox chargeBox) throws NotStoppedException {
         if (chargingList.contains(chargeBox)) {
             chargingList.remove(chargeBox);
         } else {
             suspendedList.remove(chargeBox);
         }
+        optimize();
     }
 
     public void calculateFitting(double tmpLoad) {

@@ -23,7 +23,11 @@
         <h1>Anschlussdetails von <span th:text="${anschluss.getName()}"></span></h1>
     </div>
     <div class="row pb-1">
-        <div class="col-2 p-0"><a class="btn btn-primary" th:href="@{/anschluss/edit/{id}(id=${anschluss.getId()})}">Bearbeiten</a>
+        <div class="col-2 p-0">
+            <a class="btn btn-primary" th:href="@{/anschluss/edit/{id}(id=${anschluss.getId()})}">Bearbeiten</a>
+        </div>
+        <div class="col-2 p-0">
+            <a class="btn btn-success" th:href="@{/anschluss/{id}(id=${anschluss.getId()})/optimize}">Optimieren</a>
         </div>
         <th:block th:if="${anschluss.getId()!= 1}">
             <div class="col p-0">

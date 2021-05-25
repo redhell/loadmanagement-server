@@ -140,7 +140,12 @@ public class BalancerComponent {
                     // Nicht mehr am laden
                     if (strategy.getChargingList().contains(chargeBox)) {
                         chargeBox.setCharging(false);
-                        strategy.removeLV(chargeBox);
+                        try {
+                            strategy.removeLV(chargeBox);
+                        } catch (NotStoppedException e) {
+                            log.error(e.getMessage());
+                            errorService.addError(e);
+                        }
                         log.info("Stop charging");
                     } else if (strategy.getSuspendedList().isEmpty()) {
                         chargeBox.setCharging(false);
