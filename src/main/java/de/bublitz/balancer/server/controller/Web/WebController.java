@@ -1,5 +1,7 @@
 package de.bublitz.balancer.server.controller.Web;
 
+import de.bublitz.balancer.server.components.BalancerComponent;
+import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ChargeboxService;
 import de.bublitz.balancer.server.service.ConsumerService;
@@ -19,6 +21,8 @@ public class WebController {
     private ChargeboxService chargeboxService;
     @Autowired
     private ConsumerService consumerService;
+    @Autowired
+    private BalancerComponent balancerComponent;
 
     @GetMapping("/")
     public String getIndex(Model model) {
@@ -32,6 +36,15 @@ public class WebController {
     @GetMapping("/anschluss/{id}")
     public String getAnschluss(Model model, @PathVariable long id) {
         model.addAttribute("anschluss", anschlussService.getAnschlussById(id));
+        return "anschluss";
+    }
+
+    @GetMapping("/anschluss/{id}/optimize")
+    public String triggerOptimize(Model model, @PathVariable long id) {
+        Anschluss anschluss = anschlussService.getAnschlussById(id);
+        balancerComponent.triggerBalance(anschluss);
+        model.addAttribute("anschluss", anschluss);
+        model.addAttribute("optimized", true);
         return "anschluss";
     }
 

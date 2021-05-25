@@ -9,6 +9,8 @@ skinparam activity {
 	BackgroundColor White
 	BorderColor Black
 	BorderThickness 1
+	DiamondBackgroundColor White
+	DiamondBorderColor Black
 }
 
 skinparam actor {

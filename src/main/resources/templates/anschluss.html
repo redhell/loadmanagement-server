@@ -19,6 +19,14 @@
             </ol>
         </nav>
     </div>
+    <th:block th:if="${optimized}">
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            Der Schedule wurde neu berechnet!
+            <button aria-label="Close" class="close" data-dismiss="alert" type="button">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </th:block>
     <div class="row">
         <h1>Anschlussdetails von <span th:text="${anschluss.getName()}"></span></h1>
     </div>
@@ -27,7 +35,7 @@
             <a class="btn btn-primary" th:href="@{/anschluss/edit/{id}(id=${anschluss.getId()})}">Bearbeiten</a>
         </div>
         <div class="col-2 p-0">
-            <a class="btn btn-success" th:href="@{/anschluss/{id}(id=${anschluss.getId()})/optimize}">Optimieren</a>
+            <a class="btn btn-success" th:href="@{/anschluss/{id}/optimize(id=${anschluss.getId()})}">Optimieren</a>
         </div>
         <th:block th:if="${anschluss.getId()!= 1}">
             <div class="col p-0">

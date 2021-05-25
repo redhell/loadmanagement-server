@@ -53,6 +53,10 @@ public class BalancerComponent {
                 .forEach(this::balance);
     }
 
+    public void triggerBalance(Anschluss anschluss) {
+        balance(anschluss);
+    }
+
     @Scheduled(fixedRate = 60000, initialDelay = 5000)
     public void triggerCheckConnected() {
         anschlussService.getAll().forEach(this::checkConnected);

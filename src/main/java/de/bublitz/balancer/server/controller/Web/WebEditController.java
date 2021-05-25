@@ -25,13 +25,6 @@ public class WebEditController {
     @Autowired
     private ConsumerService consumerService;
 
-    @GetMapping("/anschluss/{id}/optimize")
-    public String triggerOptimize(Model model, @PathVariable long id) {
-        model.addAttribute("anschluss", anschlussService.getAnschlussById(id));
-        model.addAttribute("strategies", LoadStrategy.values());
-        return "edits/anschluss";
-    }
-
     // Get Editpage
     @GetMapping("/anschluss/edit/{id}")
     public String getAnschlussEdit(Model model, @PathVariable long id) {
