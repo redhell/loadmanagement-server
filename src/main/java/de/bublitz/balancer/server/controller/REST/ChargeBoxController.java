@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/chargebox")
 public class ChargeBoxController {
@@ -25,12 +27,14 @@ public class ChargeBoxController {
     public boolean addChargeBox(@RequestParam String name,
                                 @RequestParam String evseid,
                                 @RequestParam String startURL,
-                                @RequestParam String stopURL) {
+                                @RequestParam String stopURL,
+                                @RequestParam String emaid) {
         ChargeBox chargeBox = new ChargeBox();
         chargeBox.setName(name);
         chargeBox.setStartURL(startURL);
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
+        chargeBox.setEmaid(emaid);
         chargeboxService.addChargeBox(chargeBox);
         anschlussService.addChargeboxToAnschluss(chargeBox);
         return true;
@@ -44,7 +48,7 @@ public class ChargeBoxController {
     }
 
     @GetMapping("/getAll")
-    public Iterable<ChargeBox> getAllChargeBox() {
+    public List<ChargeBox> getAllChargeBox() {
         return chargeboxService.getAllChargeBox();
     }
 

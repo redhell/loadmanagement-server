@@ -34,7 +34,7 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         }
     }
 
-    public Iterable<ChargeBox> getAllChargeBox() {
+    public List<ChargeBox> getAllChargeBox() {
         return chargeboxRepository.findAll();
     }
 
