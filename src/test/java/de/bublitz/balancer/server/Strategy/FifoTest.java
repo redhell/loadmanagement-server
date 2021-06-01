@@ -100,22 +100,26 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
     public void onlyChargeboxesTest() throws Exception {
         log.info("Starting Basic Test!");
         chargeBox1.setCurrentLoad(4);
+        chargeBox1.setCharging(true);
         fifo.addLV(chargeBox1);
         log();
         incCounter();
 
         chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
         fifo.addLV(chargeBox3);
         log();
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
+        chargeBox2.setCharging(true);
         fifo.addLV(chargeBox2);
         log();
         incCounter();
 
         // 1. Balancing
         chargeBox4.setCurrentLoad(11);
+        chargeBox4.setCharging(true);
         fifo.addLV(chargeBox4);
         anschluss.computeLoad();
         log();
@@ -123,6 +127,7 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
 
         // 2. Balancing
         chargeBox5.setCurrentLoad(22);
+        chargeBox5.setCharging(true);
         fifo.addLV(chargeBox5);
         anschluss.computeLoad();
         log();
@@ -149,22 +154,26 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
         consumer.setCurrentLoad(1.5);
         anschluss.addConsumer(consumer);
         chargeBox1.setCurrentLoad(4);
+        chargeBox1.setCharging(true);
         fifo.addLV(chargeBox1);
         log();
         incCounter();
 
         chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
         fifo.addLV(chargeBox3);
         log();
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
+        chargeBox2.setCharging(true);
         fifo.addLV(chargeBox2);
         log();
         incCounter();
 
         // 1. Balancing
         chargeBox4.setCurrentLoad(11);
+        chargeBox4.setCharging(true);
         fifo.addLV(chargeBox4);
         anschluss.computeLoad();
         log();
@@ -172,6 +181,7 @@ public class FifoTest extends AbstractTestNGSpringContextTests {
 
         // 2. Balancing
         chargeBox5.setCurrentLoad(22);
+        chargeBox5.setCharging(true);
         fifo.addLV(chargeBox5);
         anschluss.computeLoad();
         log();

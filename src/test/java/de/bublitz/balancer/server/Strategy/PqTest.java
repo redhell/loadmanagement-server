@@ -104,22 +104,26 @@ public class PqTest extends AbstractTestNGSpringContextTests {
     public void onlyChargeboxesTest() throws Exception {
         log.info("Starting Basic Test!");
         chargeBox1.setCurrentLoad(4);
+        chargeBox1.setCharging(true);
         pq.addLV(chargeBox1);
         log();
         incCounter();
 
         chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
         pq.addLV(chargeBox3);
         log();
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
+        chargeBox2.setCharging(true);
         pq.addLV(chargeBox2);
         log();
         incCounter();
 
         // 1. Balancing
         chargeBox4.setCurrentLoad(11);
+        chargeBox4.setCharging(true);
         pq.addLV(chargeBox4);
         anschluss.computeLoad();
         log();
@@ -127,6 +131,7 @@ public class PqTest extends AbstractTestNGSpringContextTests {
 
         // 2. Balancing
         chargeBox5.setCurrentLoad(22);
+        chargeBox5.setCharging(true);
         pq.addLV(chargeBox5);
         anschluss.computeLoad();
         log();
