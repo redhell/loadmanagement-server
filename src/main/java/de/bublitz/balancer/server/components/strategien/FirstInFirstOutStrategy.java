@@ -22,7 +22,9 @@ public class FirstInFirstOutStrategy extends Strategy {
             // Füge u0 in den Schedule ein mit der alten Last
             addLV(u0);
             // starte den LV
-            start(u0);
+            if (chargingList.contains(u0)) {
+                start(u0);
+            }
         } else {
             while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 // Anschlusslast verringern!
@@ -31,6 +33,7 @@ public class FirstInFirstOutStrategy extends Strategy {
                 anschlussLoad -= l0.getCurrentLoad();
                 tmpSuspendedList.add(l0); // Stop later
             }
+
             // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
             calculateFitting(anschlussLoad);
 
@@ -49,7 +52,7 @@ public class FirstInFirstOutStrategy extends Strategy {
         if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
         } else {
-            while (anschlussLoad > anschluss.getHardLimit()) {
+            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 ChargeBox l0 = chargingList.getFirst();
                 chargingList.remove(l0);
                 anschlussLoad -= l0.getCurrentLoad();
@@ -57,6 +60,15 @@ public class FirstInFirstOutStrategy extends Strategy {
             }
             calculateFitting(anschlussLoad);
             chargingList.add(chargeBox);
+            // Chargingbox hat verbraucht zu viel
+            if (anschlussLoad > anschluss.getHardLimit()) {
+                chargeBox.setCurrentLoad(0);
+                suspendedList.add(chargeBox);
+                chargingList.remove(chargeBox);
+                chargingList.addAll(tmpSuspendedList);
+                tmpSuspendedList.clear();
+            }
+
             //start(chargeBox);
             //anschlussLoad += cbLoad;
         }

@@ -25,12 +25,15 @@ public class FirstComeFirstServeStrategy extends Strategy {
     @Override
     public void optimize() throws NotStoppedException {
         anschlussLoad = anschluss.getCurrentLoad();
-        if (!getSuspendedList().isEmpty()) {
+        if (!suspendedList.isEmpty()) {
             ChargeBox u0 = suspendedList.getFirst();
             suspendedList.remove(u0);
             u0.setCurrentLoad(u0.getLastLoad());
             addLV(u0);
-            start(u0);
+            // starte den LV
+            if (chargingList.contains(u0)) {
+                start(u0);
+            }
         } else {
             while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 // Anschlusslast verringern!
@@ -57,16 +60,23 @@ public class FirstComeFirstServeStrategy extends Strategy {
             chargingList.add(chargeBox);
         } else {
             stopWithPenalty();
-            while (anschlussLoad > anschluss.getHardLimit()) {
+            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 ChargeBox ln = chargingList.getLast();
                 chargingList.remove(ln);
                 anschlussLoad = anschlussLoad - ln.getCurrentLoad();
                 tmpSuspendedList.add(ln); // Stop later
             }
-            //anschlussLoad = anschlussLoad + cbLoad; // Warum?
             calculateFitting(anschlussLoad);
             // Penalty erhöhen
             chargingList.add(chargeBox);
+            // Chargingbox hat verbraucht zu viel
+            if (anschlussLoad > anschluss.getHardLimit()) {
+                chargeBox.setCurrentLoad(0);
+                suspendedList.add(chargeBox);
+                chargingList.remove(chargeBox);
+                chargingList.addAll(tmpSuspendedList);
+                tmpSuspendedList.clear();
+            }
             penaltyMap.replaceAll((cb, p) -> p + 1);
         }
         for (ChargeBox box : tmpSuspendedList) {
@@ -80,7 +90,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
         // Hinzufügen zur penaltyMap
         chargingList.forEach(cb -> {
             if (!penaltyMap.containsKey(cb.getEvseid())) {
-                penaltyMap.put(cb.getEvseid(), 0);
+                penaltyMap.put(cb.getEvseid(), 1);
             }
         });
         tmpSuspendedList.clear();

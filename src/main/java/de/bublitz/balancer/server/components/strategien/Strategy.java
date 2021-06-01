@@ -73,7 +73,7 @@ public abstract class Strategy {
                 ChargeBox tmpSuspendedBox = chargeBoxList.get(i);
                 log.debug("Readding " + tmpSuspendedBox.getName());
                 tmpCbList.add(tmpSuspendedBox);
-                chargingList.add(tmpSuspendedBox);
+                add(tmpSuspendedBox);
                 tmpCapacity += tmpSuspendedBox.getCurrentLoad();
                 if (startCharging) {
                     start(tmpSuspendedBox);
@@ -162,13 +162,13 @@ public abstract class Strategy {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{");
         consumerList.forEach(consumer -> {
-            stringBuilder.append(consumer.getCurrentLoad()).append("A, ");
+            stringBuilder.append(consumer.getCurrentLoad()).append(", ");
         });
         stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "}");
         return stringBuilder.toString();
     }
 
-    private <T extends AbstractConsumer> String getString(List<T> chargeBoxList) {
+    protected <T extends AbstractConsumer> String getString(List<T> chargeBoxList) {
         if (chargeBoxList.size() == 0) {
             return "{}";
         }
@@ -188,6 +188,7 @@ public abstract class Strategy {
         if (chargeBox.getStopURL().contains("testStop")) {
             chargeBox.setLastLoad(chargeBox.getCurrentLoad());
             chargeBox.setCurrentLoad(0);
+            chargeBox.setCharging(false);
             return true;
         }
         try {
@@ -212,6 +213,7 @@ public abstract class Strategy {
         if (chargeBox.getStartURL().contains("testStart")) {
             if (chargeBox.getLastLoad() > 0)
                 chargeBox.setCurrentLoad(chargeBox.getLastLoad());
+            chargeBox.setCharging(true);
             return true;
         }
         try {
@@ -228,4 +230,14 @@ public abstract class Strategy {
         HttpResponse response = client.execute(new HttpGet(url));
         return response.getCode() == 200;
     }
+
+    public boolean add(ChargeBox chargeBox) {
+        return chargingList.add(chargeBox);
+    }
+
+    public boolean remove(ChargeBox chargeBox) {
+        return chargingList.remove(chargeBox);
+    }
+
+
 }
