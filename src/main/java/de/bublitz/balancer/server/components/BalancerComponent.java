@@ -1,10 +1,7 @@
 package de.bublitz.balancer.server.components;
 
 
-import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrategy;
-import de.bublitz.balancer.server.components.strategien.FirstInFirstOutStrategy;
-import de.bublitz.balancer.server.components.strategien.PriorityQueueStrategy;
-import de.bublitz.balancer.server.components.strategien.Strategy;
+import de.bublitz.balancer.server.components.strategien.*;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
@@ -97,8 +94,9 @@ public class BalancerComponent {
                     strategy = new FirstComeFirstServeStrategy(anschluss);
                     break;
                 case FIFO:
-                default:
                     strategy = new FirstInFirstOutStrategy(anschluss);
+                default:
+                    strategy = new NoneStrategy(anschluss);
             }
             anschlussStrategyMap.put(anschluss, strategy);
         }
