@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * Eine Chargebox ist ein besonderer Verbraucher, welcher angesteuert werden kann
@@ -52,8 +53,8 @@ public class ChargeBox extends AbstractConsumer {
         priority = false;
         startURL = "";
         stopURL = "";
-        setName("ChargeBox");
-        evseid = getName();
+        name = "ChargeBox";
+        evseid = name + "_" + new Random().nextInt(9999);
     }
 
     @Override

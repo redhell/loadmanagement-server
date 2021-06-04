@@ -78,7 +78,7 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @Override
     public void addChargeboxToAnschluss(ChargeBox chargeBox) {
-        Anschluss anschluss = anschlussRepository.getOne(1L);
+        Anschluss anschluss = anschlussRepository.getById(1L);
         if (!chargeboxRepository.existsByEvseid(chargeBox.getEvseid())) {
             anschluss.addChargeBox(chargeBox);
         }
@@ -86,13 +86,13 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @Override
     public void addConsumerToAnschluss(Consumer consumer) {
-        Anschluss anschluss = anschlussRepository.getOne(1L);
+        Anschluss anschluss = anschlussRepository.getById(1L);
         anschluss.addConsumer(consumer);
     }
 
     @Override
     public void removeChargeboxFromAnschluss(ChargeBox chargeBox) {
-        Anschluss anschluss = anschlussRepository.getOne(chargeBox.getAnschluss().getId());
+        Anschluss anschluss = anschlussRepository.getById(chargeBox.getAnschluss().getId());
         anschluss.removeChargebox(chargeBox);
         chargeboxRepository.deleteById(chargeBox.getChargeboxId());
     }
@@ -106,7 +106,7 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @Override
     public Anschluss getAnschlussById(long id) {
-        return anschlussRepository.getOne(id);
+        return anschlussRepository.getById(id);
     }
 
     @Override

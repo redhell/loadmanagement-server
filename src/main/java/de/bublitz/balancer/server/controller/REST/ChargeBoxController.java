@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/chargebox")
 public class ChargeBoxController {
@@ -44,7 +46,7 @@ public class ChargeBoxController {
     }
 
     @GetMapping("/getAll")
-    public Iterable<ChargeBox> getAllChargeBox() {
+    public List<ChargeBox> getAllChargeBox() {
         return chargeboxService.getAllChargeBox();
     }
 

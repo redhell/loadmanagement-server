@@ -16,10 +16,17 @@ public class ConsumerController {
     private ConsumerService consumerService;
 
     @PostMapping("/add")
-    public boolean addConsumer(@RequestParam String name) {
+    public boolean addConsumerPost(@RequestBody Consumer consumer) {
+        consumerService.addConsumer(consumer);
+        return true;
+    }
+
+    @GetMapping("/add")
+    public boolean addConsumerGet(@RequestParam String name) {
         consumerService.addConsumer(name);
         return true;
     }
+
 
     @GetMapping("/getAll")
     public List<Consumer> getAllConsumers() {

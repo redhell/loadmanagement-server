@@ -2,10 +2,12 @@ package de.bublitz.balancer.server.service;
 
 import de.bublitz.balancer.server.model.ChargeBox;
 
+import java.util.List;
+
 public interface ChargeboxService {
     void addChargeBox(ChargeBox chargeBox);
 
-    Iterable<ChargeBox> getAllChargeBox();
+    List<ChargeBox> getAllChargeBox();
 
     ChargeBox getChargeBoxByName(String name);
 

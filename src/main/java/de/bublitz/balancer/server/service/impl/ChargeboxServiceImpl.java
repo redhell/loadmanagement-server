@@ -34,25 +34,27 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         }
     }
 
-    public Iterable<ChargeBox> getAllChargeBox() {
+    public List<ChargeBox> getAllChargeBox() {
         return chargeboxRepository.findAll();
     }
 
+    @Override
     public ChargeBox getChargeBoxByName(String name) {
         return chargeboxRepository.getChargeBoxByName(name);
     }
 
+    @Override
     public ChargeBox getChargeboxById(String evseid) {
         return chargeboxRepository.getChargeBoxByEvseid(evseid);
     }
 
     @Override
     public ChargeBox getChargeboxById(long id) {
-        return chargeboxRepository.getOne(id);
+        return chargeboxRepository.getById(id);
     }
 
     public void deleteChargeBox(long id) {
-        ChargeBox chargeBox = chargeboxRepository.getOne(id);
+        ChargeBox chargeBox = chargeboxRepository.getById(id);
         chargeboxRepository.delete(chargeBox);
     }
 

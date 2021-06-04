@@ -10,7 +10,7 @@ import java.util.Objects;
 public abstract class AbstractConsumer {
 
     @Column(unique = true)
-    private String name;
+    protected String name;
     /**
      * currentLoad in Ampere
      */

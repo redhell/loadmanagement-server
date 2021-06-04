@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 
 @RestController
@@ -34,7 +35,7 @@ public class AnschlussController {
     }
 
     @GetMapping("/getAll")
-    public Iterable<Anschluss> getAllChargeBox() {
+    public List<Anschluss> getAllChargeBox() {
         return anschlussService.getAll();
     }
 
@@ -46,7 +47,7 @@ public class AnschlussController {
     @DeleteMapping("/remove")
     public void deleteAnschluss(@RequestParam String name, HttpServletResponse response) {
         if (!anschlussService.removeAnschluss(name)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Consumer not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Anschluss not found");
         }
     }
 
