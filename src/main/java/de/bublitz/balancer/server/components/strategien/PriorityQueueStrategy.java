@@ -36,39 +36,17 @@ public class PriorityQueueStrategy extends Strategy {
                 start(u0);
             }
         } else {
-            stopAndRemove();
-            anschluss.computeLoad();
-            //calculateFitting(anschlussLoad);
+            decreaseLoad();
         }
     }
 
-    private void stopAndRemove() throws NotStoppedException {
-        while (anschlussLoad > anschluss.getHardLimit()) {
-            // Keine non-Prio LV mehr, entferne Prio
-            if (chargingList.isEmpty()) {
-                ChargeBox l0 = priorityQueue.removeFirst();
-                anschlussLoad -= l0.getCurrentLoad();
-                tmpSuspendedList.add(l0);
-            } else {
-                ChargeBox ln = chargingList.removeLast();
-                anschlussLoad -= ln.getCurrentLoad();
-                tmpSuspendedList.add(ln);
-            }
-        }
-        calculateFitting(anschlussLoad);
-        for (ChargeBox chargeBox : tmpSuspendedList) {
-            stop(chargeBox);
-        }
-        suspendedList.addAll(tmpSuspendedList);
-        tmpSuspendedList.clear();
-        anschluss.computeLoad();
-    }
 
     @Override
     public void addLV(ChargeBox chargeBox) throws NotStoppedException {
         anschlussLoad = anschluss.getCurrentLoad();
         if (anschlussLoad <= anschluss.getHardLimit()) {
             add(chargeBox);
+            calculateFitting(anschlussLoad);
         } else {
             while (anschlussLoad > anschluss.getHardLimit()) {
                 // Keine non-Prio LV mehr, entferne Prio
@@ -77,7 +55,7 @@ public class PriorityQueueStrategy extends Strategy {
                     anschlussLoad -= l0.getCurrentLoad();
                     tmpSuspendedList.add(l0);
                 } else if (!chargingList.isEmpty()) {
-                    ChargeBox ln = chargingList.removeLast();
+                    ChargeBox ln = chargingList.removeFirst();
                     anschlussLoad -= ln.getCurrentLoad();
                     tmpSuspendedList.add(ln);
                 }
@@ -85,28 +63,11 @@ public class PriorityQueueStrategy extends Strategy {
                     break;
                 }
             }
-            calculateFitting(anschlussLoad);
             add(chargeBox);
             // Chargingbox hat verbraucht zu viel
-            if (anschlussLoad > anschluss.getHardLimit()) {
-                if (chargeBox.isCharging()) {
-                    stop(chargeBox);
-                } else {
-                    chargeBox.setLastLoad(chargeBox.getCurrentLoad());
-                    chargeBox.setCurrentLoad(0);
-                }
-                suspendedList.add(chargeBox);
-                remove(chargeBox);
-                tmpSuspendedList.forEach(this::add);
-                tmpSuspendedList.clear();
-            }
+            revertStartingIfNeeded(chargeBox);
+            decreaseLoad();
         }
-        for (ChargeBox box : tmpSuspendedList) {
-            stop(box);
-        }
-        suspendedList.addAll(tmpSuspendedList);
-        tmpSuspendedList.clear();
-        anschluss.computeLoad();
     }
 
     @Override
@@ -135,5 +96,27 @@ public class PriorityQueueStrategy extends Strategy {
 
     public String printPrioryList() {
         return getString(priorityQueue);
+    }
+
+    private void decreaseLoad() throws NotStoppedException {
+        while (anschlussLoad > anschluss.getHardLimit()) {
+            // Keine non-Prio LV mehr, entferne Prio
+            if (chargingList.isEmpty()) {
+                ChargeBox l0 = priorityQueue.removeFirst();
+                anschlussLoad -= l0.getCurrentLoad();
+                tmpSuspendedList.add(l0);
+            } else {
+                ChargeBox ln = chargingList.removeFirst();
+                anschlussLoad -= ln.getCurrentLoad();
+                tmpSuspendedList.add(ln);
+            }
+        }
+        calculateFitting(anschlussLoad);
+        for (ChargeBox chargeBox : tmpSuspendedList) {
+            stop(chargeBox);
+        }
+        suspendedList.addAll(tmpSuspendedList);
+        tmpSuspendedList.clear();
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 }

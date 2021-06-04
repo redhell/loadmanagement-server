@@ -1,6 +1,6 @@
 package de.bublitz.balancer.server.Strategy;
 
-import de.bublitz.balancer.server.components.strategien.FirstInFirstOutStrategy;
+import de.bublitz.balancer.server.components.strategien.NoneStrategy;
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import lombok.extern.log4j.Log4j2;
@@ -13,15 +13,13 @@ import org.testng.annotations.Test;
 @SpringBootTest
 @TestPropertySource("classpath:test.properties")
 @Log4j2
-public class FifoTest extends GeneralTest {
+public class NoneTest extends GeneralTest {
 
     @BeforeMethod
     public void SetUp() {
         prepare();
-        anschluss.setLoadStrategy(LoadStrategy.FIFO);
-
-        strategy = new FirstInFirstOutStrategy(anschluss);
-
+        anschluss.setLoadStrategy(LoadStrategy.NONE);
+        strategy = new NoneStrategy(anschluss);
     }
 
     @Test
@@ -61,7 +59,7 @@ public class FifoTest extends GeneralTest {
         log();
         incCounter();
 
-        while (!strategy.getChargingList().isEmpty()) {
+        while (!strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
             charge();
         }
         Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
@@ -117,4 +115,6 @@ public class FifoTest extends GeneralTest {
         }
         Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
+
+
 }

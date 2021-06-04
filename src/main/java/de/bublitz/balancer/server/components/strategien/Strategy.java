@@ -50,7 +50,7 @@ public abstract class Strategy {
         } else {
             suspendedList.remove(chargeBox);
         }
-        optimize();
+        //optimize();
     }
 
     public void calculateFitting(double tmpLoad) {
@@ -71,13 +71,17 @@ public abstract class Strategy {
         for (int i = 0; i < results.size(); i++) {
             if (results.get(i)) {
                 ChargeBox tmpSuspendedBox = chargeBoxList.get(i);
-                log.debug("Readding " + tmpSuspendedBox.getName());
+
                 tmpCbList.add(tmpSuspendedBox);
                 add(tmpSuspendedBox);
                 tmpCapacity += tmpSuspendedBox.getCurrentLoad();
                 if (startCharging) {
                     start(tmpSuspendedBox);
+                    log.debug("Using rest capacity for " + tmpSuspendedBox.getName());
+                } else {
+                    log.debug("Readding " + tmpSuspendedBox.getName());
                 }
+
             }
         }
 
@@ -237,6 +241,26 @@ public abstract class Strategy {
 
     public boolean remove(ChargeBox chargeBox) {
         return chargingList.remove(chargeBox);
+    }
+
+    protected boolean revertStartingIfNeeded(ChargeBox chargeBox) throws NotStoppedException {
+        if (anschlussLoad > anschluss.getHardLimit()) {
+            anschlussLoad -= chargeBox.getCurrentLoad();
+            if (chargeBox.isCharging()) {
+                stop(chargeBox);
+            } else {
+                chargeBox.setLastLoad(chargeBox.getCurrentLoad());
+                chargeBox.setCurrentLoad(0);
+            }
+            suspendedList.add(chargeBox);
+            remove(chargeBox);
+            tmpSuspendedList.forEach(cb -> anschlussLoad += cb.getCurrentLoad());
+            tmpSuspendedList.forEach(this::add);
+            tmpSuspendedList.clear();
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

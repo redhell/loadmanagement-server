@@ -35,21 +35,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
                 start(u0);
             }
         } else {
-            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
-                // Anschlusslast verringern!
-                ChargeBox ln = chargingList.getLast();
-                chargingList.remove(ln);
-                anschlussLoad -= ln.getCurrentLoad();
-                tmpSuspendedList.add(ln); // Stop later
-            }
-            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
-            calculateFitting(anschlussLoad);
-            for (ChargeBox chargeBox : tmpSuspendedList) {
-                stop(chargeBox);
-            }
-            suspendedList.addAll(tmpSuspendedList);
-            tmpSuspendedList.clear();
-            anschluss.computeLoad();
+            decreaseLoad();
         }
     }
 
@@ -58,31 +44,22 @@ public class FirstComeFirstServeStrategy extends Strategy {
         anschlussLoad = anschluss.getCurrentLoad();
         if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
+            calculateFitting(anschlussLoad);
         } else {
             stopWithPenalty();
             while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 ChargeBox ln = chargingList.getLast();
                 chargingList.remove(ln);
-                anschlussLoad = anschlussLoad - ln.getCurrentLoad();
+                anschlussLoad -= ln.getCurrentLoad();
                 tmpSuspendedList.add(ln); // Stop later
             }
-            calculateFitting(anschlussLoad);
             // Penalty erhöhen
             chargingList.add(chargeBox);
             // Chargingbox hat verbraucht zu viel
-            if (anschlussLoad > anschluss.getHardLimit()) {
-                chargeBox.setCurrentLoad(0);
-                suspendedList.add(chargeBox);
-                chargingList.remove(chargeBox);
-                chargingList.addAll(tmpSuspendedList);
-                tmpSuspendedList.clear();
-            }
+            revertStartingIfNeeded(chargeBox);
+            decreaseLoad();
             penaltyMap.replaceAll((cb, p) -> p + 1);
         }
-        for (ChargeBox box : tmpSuspendedList) {
-            stop(box);
-        }
-        suspendedList.addAll(tmpSuspendedList);
         suspendedList.forEach(cb -> {
             // Ladevorgang wurde beendet -> Keine Penalty mehr
             penaltyMap.remove(cb.getEvseid());
@@ -93,8 +70,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
                 penaltyMap.put(cb.getEvseid(), 1);
             }
         });
-        tmpSuspendedList.clear();
-        anschluss.computeLoad();
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 
     private void stopWithPenalty() {
@@ -103,22 +79,44 @@ public class FirstComeFirstServeStrategy extends Strategy {
                 .stream()
                 .filter(entry -> entry.getValue() >= penalty)
                 .forEach(entry -> {
-                    log.info(entry.getKey() + " can be stopped (Reason: penalty)!");
+                    log.info(entry.getKey() + " will be stopped (Reason: penalty)!");
                     ChargeBox chargeBox = chargingList.stream().filter(cb -> cb.getEvseid().equals(entry.getKey())).findFirst().get();
                     chargingList.remove(chargeBox);
-                    tmpSuspendedList.add(chargeBox);
+                    suspendedList.add(chargeBox);
+                    try {
+                        stop(chargeBox);
+                    } catch (NotStoppedException e) {
+                        log.error(e.getMessage());
+                    }
                     anschlussLoad -= chargeBox.getCurrentLoad();
                 });
     }
 
     @Override
-    public void removeLV(ChargeBox chargeBox) throws NotStoppedException {
+    public void removeLV(ChargeBox chargeBox) {
         if (chargingList.contains(chargeBox)) {
             chargingList.remove(chargeBox);
         } else {
             suspendedList.remove(chargeBox);
         }
         penaltyMap.remove(chargeBox.getEvseid());
-        optimize();
+    }
+
+    private void decreaseLoad() throws NotStoppedException {
+        while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
+            // Anschlusslast verringern!
+            ChargeBox ln = chargingList.getLast();
+            chargingList.remove(ln);
+            anschlussLoad -= ln.getCurrentLoad();
+            tmpSuspendedList.add(ln); // Stop later
+        }
+        // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
+        calculateFitting(anschlussLoad);
+        for (ChargeBox chargeBox : tmpSuspendedList) {
+            stop(chargeBox);
+        }
+        suspendedList.addAll(tmpSuspendedList);
+        tmpSuspendedList.clear();
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 }
