@@ -60,11 +60,21 @@ public class ChargeBoxController {
         return chargeboxService.getChargeboxById(evseid);
     }
 
-    @DeleteMapping("/remove")
-    public void deleteChargeBox(@RequestParam long id) {
-        chargeboxService.deleteChargeBox(id);
+    @DeleteMapping("/remove/id/{id}")
+    public void deleteChargeBox(@PathVariable long id) {
         if (!chargeboxService.exists(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chargebox not found");
+        } else {
+            chargeboxService.deleteChargeBox(id);
+        }
+    }
+
+    @DeleteMapping("/remove/evseid/{evseid}")
+    public void deleteChargeBoxByEvseid(@PathVariable String evseid) {
+        if (!chargeboxService.exists(evseid)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chargebox not found");
+        } else {
+            chargeboxService.deleteChargeBox(evseid);
         }
     }
 

@@ -58,6 +58,12 @@ public class ChargeboxServiceImpl implements ChargeboxService {
         chargeboxRepository.delete(chargeBox);
     }
 
+    @Override
+    public void deleteChargeBox(String evseid) {
+        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByEvseid(evseid);
+        chargeboxRepository.delete(chargeBox);
+    }
+
     public void setCharging(String name, boolean active) {
         ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(name);
         chargeBox.setCharging(active);
@@ -120,5 +126,10 @@ public class ChargeboxServiceImpl implements ChargeboxService {
     @Override
     public boolean exists(long id) {
         return chargeboxRepository.existsById(id);
+    }
+
+    @Override
+    public boolean exists(String evseid) {
+        return chargeboxRepository.existsByEvseid(evseid);
     }
 }

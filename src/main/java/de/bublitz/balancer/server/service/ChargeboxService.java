@@ -17,6 +17,8 @@ public interface ChargeboxService {
 
     void deleteChargeBox(long id);
 
+    void deleteChargeBox(String evseid);
+
     void setCharging(String name, boolean active);
 
     void setConnected(String name);
@@ -28,4 +30,6 @@ public interface ChargeboxService {
     void update(ChargeBox chargeBox);
 
     boolean exists(long id);
+
+    boolean exists(String evseid);
 }

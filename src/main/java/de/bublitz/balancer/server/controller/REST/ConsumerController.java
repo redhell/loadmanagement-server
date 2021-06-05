@@ -33,9 +33,14 @@ public class ConsumerController {
         return consumerService.getAllConsumers();
     }
 
-    @GetMapping("/remove")
-    public void deleteConsumer(@RequestParam Long id) {
+    @DeleteMapping("/remove/id/{id}")
+    public void deleteConsumer(@PathVariable Long id) {
         consumerService.deleteConsumer(id);
+    }
+
+    @DeleteMapping("/remove/name/{name}")
+    public void deleteConsumerByName(@PathVariable String name) {
+        consumerService.deleteConsumer(name);
     }
 
     @PutMapping("/{name}/putCurrentLoad")

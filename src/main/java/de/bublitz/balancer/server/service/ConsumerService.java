@@ -9,6 +9,8 @@ public interface ConsumerService {
 
     void deleteConsumer(Long id);
 
+    void deleteConsumer(String name);
+
     List<Consumer> getAllConsumers();
 
     void putCurrentLoad(String name, double currentLoad);
@@ -20,4 +22,5 @@ public interface ConsumerService {
     Consumer getConsumerById(long id);
 
     void addConsumer(Consumer consumer);
+
 }

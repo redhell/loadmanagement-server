@@ -28,6 +28,11 @@ public class ConsumerSerciceImpl implements ConsumerService {
     }
 
     @Override
+    public void deleteConsumer(String name) {
+        consumerRepository.deleteConsumerByName(name);
+    }
+
+    @Override
     public List<Consumer> getAllConsumers() {
         return consumerRepository.findAll();
     }

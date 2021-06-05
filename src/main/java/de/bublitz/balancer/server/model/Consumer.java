@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.util.Random;
 
 /**
  * Consumer ist ein statischer Verbraucher, welcher nicht gesteuert werden kann.
@@ -23,7 +24,7 @@ public class Consumer extends AbstractConsumer {
     public Consumer() {
         super();
         maxLoad = 0;
-        setName("Consumer");
+        name = "Consumer_" + new Random().nextInt(9999);
     }
 
 }
