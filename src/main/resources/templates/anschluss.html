@@ -115,7 +115,7 @@
                 <td>
                     <ul>
                         <th:block th:each="cb : ${anschluss.getChargeboxList()}">
-                            <li><a th:href="@{/chargebox/{evseid}(evseid = ${cb.getEvseid()})}"
+                            <li><a th:href="@{/chargebox/{id}(id = ${cb.getChargeboxId()})}"
                                    th:text="${cb.getName()}"></a></li>
                         </th:block>
                     </ul>

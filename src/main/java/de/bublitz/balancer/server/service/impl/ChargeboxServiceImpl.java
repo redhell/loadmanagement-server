@@ -102,11 +102,6 @@ public class ChargeboxServiceImpl implements ChargeboxService {
     }
 
     @Override
-    public void setListener(String name) {
-        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(name);
-    }
-
-    @Override
     public void update(ChargeBox chargeBox) {
         ChargeBox oldChargebox = chargeboxRepository.getChargeBoxByEvseid(chargeBox.getEvseid());
         oldChargebox.setName(chargeBox.getName());

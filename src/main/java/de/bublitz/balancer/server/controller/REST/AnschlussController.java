@@ -21,11 +21,14 @@ public class AnschlussController {
 
     @GetMapping("/add")
     public boolean addAnschluss(@RequestParam String name, @RequestParam double maxLoad) {
+        if (anschlussService.exists(name)) {
+            return false;
+        }
         Anschluss anschluss = new Anschluss();
         anschluss.setName(name);
         anschluss.setMaxLoad(maxLoad);
         anschlussService.addAnschluss(anschluss);
-        return true;
+        return anschlussService.exists(anschluss.getName());
     }
 
     @PostMapping("/add")
@@ -39,8 +42,8 @@ public class AnschlussController {
         return anschlussService.getAll();
     }
 
-    @GetMapping("/getByName")
-    public Anschluss getChargeBoxByName(@RequestParam String name) {
+    @GetMapping("/get")
+    public Anschluss getAnschluss(@RequestParam String name) {
         return anschlussService.getAnschlussByName(name);
     }
 

@@ -45,7 +45,6 @@ public class LoadController {
     @PostMapping("/{name}/rawPoints")
     public void addRawPoints(@PathVariable String name, @RequestBody Map<LocalDateTime, String> pointMap) {
         chargeboxService.setConnected(name);
-        chargeboxService.setListener(name);
         List<ConsumptionPoint> tmpList = new LinkedList<>();
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<LinkedHashMap<String, String>> typeRef = new TypeReference<>() {

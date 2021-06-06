@@ -54,7 +54,7 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public boolean removeAnschluss(String name) {
         Anschluss delAnschluss = anschlussRepository.getAnschlussByName(name);
-        if (delAnschluss != null) {
+        if (delAnschluss != null && delAnschluss.getId() != 1L) {
             anschlussRepository.delete(delAnschluss);
             return true;
         } else {
@@ -77,17 +77,25 @@ public class AnschlussServiceImpl implements AnschlussService {
     }
 
     @Override
-    public void addChargeboxToAnschluss(ChargeBox chargeBox) {
+    public boolean addChargeboxToAnschluss(ChargeBox chargeBox) {
         Anschluss anschluss = anschlussRepository.getById(1L);
-        if (!chargeboxRepository.existsByEvseid(chargeBox.getEvseid())) {
+        if (chargeboxRepository.existsByEvseid(chargeBox.getEvseid())) {
             anschluss.addChargeBox(chargeBox);
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
-    public void addConsumerToAnschluss(Consumer consumer) {
+    public boolean addConsumerToAnschluss(Consumer consumer) {
         Anschluss anschluss = anschlussRepository.getById(1L);
-        anschluss.addConsumer(consumer);
+        if (consumerRepository.existsByName(consumer.getName())) {
+            anschluss.addConsumer(consumer);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -142,5 +150,10 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public void updateAnschluss(Anschluss anschluss) {
         anschlussRepository.save(anschluss);
+    }
+
+    @Override
+    public boolean exists(String name) {
+        return anschlussRepository.existsAnschlussByName(name);
     }
 }

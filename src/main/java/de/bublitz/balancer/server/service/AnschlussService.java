@@ -20,9 +20,9 @@ public interface AnschlussService {
 
     void addConsumerToAnschluss(String anschlussName, String consumerName);
 
-    void addChargeboxToAnschluss(ChargeBox chargeBox);
+    boolean addChargeboxToAnschluss(ChargeBox chargeBox);
 
-    void addConsumerToAnschluss(Consumer consumer);
+    boolean addConsumerToAnschluss(Consumer consumer);
 
     void removeChargeboxFromAnschluss(ChargeBox chargeBox);
 
@@ -39,4 +39,6 @@ public interface AnschlussService {
     void removeConsumer(String anschlussName, String consumerName);
 
     void updateAnschluss(Anschluss anschluss);
+
+    boolean exists(String name);
 }

@@ -19,10 +19,11 @@ public class ConsumerSerciceImpl implements ConsumerService {
     private AnschlussService anschlussService;
 
     @Override
-    public void addConsumer(String name) {
+    public boolean addConsumer(String name) {
         Consumer consumer = new Consumer();
         consumer.setName(name);
-        anschlussService.addConsumerToAnschluss(consumer);
+        consumerRepository.save(consumer);
+        return anschlussService.addConsumerToAnschluss(consumer);
         //consumerRepository.save(consumer);
     }
 
@@ -68,8 +69,9 @@ public class ConsumerSerciceImpl implements ConsumerService {
     }
 
     @Override
-    public void addConsumer(Consumer consumer) {
+    public boolean addConsumer(Consumer consumer) {
         consumerRepository.save(consumer);
+        return anschlussService.addConsumerToAnschluss(consumer);
     }
 
 }

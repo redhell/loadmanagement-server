@@ -19,14 +19,12 @@ public class ConsumerController {
 
     @PostMapping("/add")
     public boolean addConsumerPost(@RequestBody Consumer consumer) {
-        consumerService.addConsumer(consumer);
-        return true;
+        return consumerService.addConsumer(consumer);
     }
 
     @GetMapping("/add")
     public boolean addConsumerGet(@RequestParam String name) {
-        consumerService.addConsumer(name);
-        return true;
+        return consumerService.addConsumer(name);
     }
 
 

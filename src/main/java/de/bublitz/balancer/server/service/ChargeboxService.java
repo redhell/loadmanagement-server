@@ -25,8 +25,6 @@ public interface ChargeboxService {
 
     void calibrate();
 
-    void setListener(String name);
-
     void update(ChargeBox chargeBox);
 
     boolean exists(long id);

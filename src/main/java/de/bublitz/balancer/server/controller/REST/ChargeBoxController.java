@@ -34,15 +34,13 @@ public class ChargeBoxController {
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
         chargeboxService.addChargeBox(chargeBox);
-        anschlussService.addChargeboxToAnschluss(chargeBox);
-        return true;
+        return anschlussService.addChargeboxToAnschluss(chargeBox);
     }
 
     @PostMapping("/add")
     public boolean addChargeBox(@RequestBody ChargeBox pChargebox) {
         //chargeboxService.addChargeBox(pChargebox);
-        anschlussService.addChargeboxToAnschluss(pChargebox);
-        return true;
+        return anschlussService.addChargeboxToAnschluss(pChargebox);
     }
 
     @GetMapping("/getAll")
@@ -55,7 +53,7 @@ public class ChargeBoxController {
         return chargeboxService.getChargeBoxByName(name);
     }
 
-    @GetMapping("/getById")
+    @GetMapping("/getByEvseId")
     public ChargeBox getChargeBoxById(@RequestParam String evseid) {
         return chargeboxService.getChargeboxById(evseid);
     }
@@ -86,5 +84,10 @@ public class ChargeBoxController {
     @GetMapping("/stopCharging")
     public void stopCharging(@RequestParam String name) {
         chargeboxService.setCharging(name, false);
+    }
+
+    @PostMapping("/update")
+    public void updateChargebox(@RequestBody ChargeBox chargeBox) {
+        chargeboxService.update(chargeBox);
     }
 }

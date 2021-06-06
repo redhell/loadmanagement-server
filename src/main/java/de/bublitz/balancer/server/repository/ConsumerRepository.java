@@ -10,4 +10,6 @@ public interface ConsumerRepository extends JpaRepository<Consumer, Long> {
     Consumer getConsumerByName(String name);
 
     void deleteConsumerByName(String name);
+
+    boolean existsByName(String name);
 }

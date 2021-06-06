@@ -42,6 +42,7 @@ public class Anschluss {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(unique = true)
     private String name;
 
     public Anschluss() {
@@ -73,14 +74,6 @@ public class Anschluss {
         chargeBox.setAnschluss(this);
         chargeboxList.add(chargeBox);
         computeLoad();
-    }
-
-    public boolean isSoftlimitReached() {
-        return currentLoad >= softLimit;
-    }
-
-    public boolean isHardlimitReached() {
-        return currentLoad >= hardLimit;
     }
 
     public void computeLoad() {
