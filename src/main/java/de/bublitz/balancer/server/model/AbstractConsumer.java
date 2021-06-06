@@ -1,5 +1,6 @@
 package de.bublitz.balancer.server.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -22,6 +23,7 @@ public abstract class AbstractConsumer {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_anschluss")
+    @JsonBackReference
     private Anschluss anschluss;
 
     public AbstractConsumer() {

@@ -1,5 +1,6 @@
 package de.bublitz.balancer.server.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import lombok.Data;
 
@@ -28,7 +29,9 @@ public class Anschluss {
     private double hardLimit = 0;
 
     @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Consumer> consumerList;
+    @JsonManagedReference
     @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargeBox> chargeboxList;
     private double currentLoad;

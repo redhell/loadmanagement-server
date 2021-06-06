@@ -3,9 +3,11 @@ package de.bublitz.balancer.server.controller.REST;
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("SpringJavaAutowiredFieldsWarningInspection")
 @RestController
@@ -43,9 +45,9 @@ public class ConsumerController {
         consumerService.deleteConsumer(name);
     }
 
-    @PutMapping("/{name}/putCurrentLoad")
-    public void putCurrentLoad(@PathVariable String name, @RequestBody double currentLoad) {
-        consumerService.putCurrentLoad(name, currentLoad);
+    @PutMapping(value = "/{name}/putCurrentLoad", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void putCurrentLoad(@PathVariable String name, @RequestBody Map<String, Double> params) {
+        consumerService.putCurrentLoad(name, params.get("currentLoad"));
     }
 
     @GetMapping("/{name}/details")
@@ -53,7 +55,7 @@ public class ConsumerController {
         return consumerService.getConsumerByName(name);
     }
 
-    @GetMapping("/updateConsumer")
+    @PostMapping("/updateConsumer")
     public void updateConsumer(@RequestBody Consumer consumer) {
         consumerService.update(consumer);
     }

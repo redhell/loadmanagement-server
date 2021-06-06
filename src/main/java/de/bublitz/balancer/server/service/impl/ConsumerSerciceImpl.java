@@ -2,6 +2,7 @@ package de.bublitz.balancer.server.service.impl;
 
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.repository.ConsumerRepository;
+import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,15 @@ import java.util.List;
 public class ConsumerSerciceImpl implements ConsumerService {
     @Autowired
     private ConsumerRepository consumerRepository;
+    @Autowired
+    private AnschlussService anschlussService;
 
     @Override
     public void addConsumer(String name) {
         Consumer consumer = new Consumer();
         consumer.setName(name);
-        consumerRepository.save(consumer);
+        anschlussService.addConsumerToAnschluss(consumer);
+        //consumerRepository.save(consumer);
     }
 
     @Override
