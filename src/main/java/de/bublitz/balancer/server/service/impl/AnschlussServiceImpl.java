@@ -75,7 +75,7 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public void addConsumerToAnschluss(String anschlussName, String consumerName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
-        Consumer consumer = new Consumer(anschlussName);
+        Consumer consumer = new Consumer(consumerName);
         if (consumerRepository.existsByName(consumerName)) {
             consumerRepository.getConsumerByName(consumerName);
         }

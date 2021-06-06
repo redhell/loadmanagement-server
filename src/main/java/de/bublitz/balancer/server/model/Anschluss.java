@@ -50,7 +50,7 @@ public class Anschluss {
         chargeboxList = new ArrayList<>();
         maxLoad = 0;
         currentLoad = 0;
-        loadStrategy = LoadStrategy.FIFO;
+        loadStrategy = LoadStrategy.NONE;
         name = "Anschluss" + new Random().nextInt(10000);
     }
 
