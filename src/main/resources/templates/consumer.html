@@ -69,6 +69,10 @@
                 <td><a th:href="@{/anschluss/{id}(id=${consumer.getAnschluss().getId()})}"
                        th:text="${consumer.getAnschluss().getName()}"></a></td>
             </tr>
+            <tr>
+                <td>Verbrauch in A</td>
+                <td th:text="${consumer.getCurrentLoad()}"></td>
+            </tr>
             </tbody>
         </table>
     </div>
