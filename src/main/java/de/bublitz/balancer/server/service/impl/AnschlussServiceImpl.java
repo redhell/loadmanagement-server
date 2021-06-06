@@ -65,14 +65,20 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public void addChargeboxToAnschluss(String anschlussName, String chargeboxName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
-        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
+        ChargeBox chargeBox = new ChargeBox(chargeboxName);
+        if (chargeboxRepository.existsChargeBoxByName(chargeboxName)) {
+            chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
+        }
         anschluss.addChargeBox(chargeBox);
     }
 
     @Override
     public void addConsumerToAnschluss(String anschlussName, String consumerName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
-        Consumer consumer = consumerRepository.getConsumerByName(consumerName);
+        Consumer consumer = new Consumer(anschlussName);
+        if (consumerRepository.existsByName(consumerName)) {
+            consumerRepository.getConsumerByName(consumerName);
+        }
         anschluss.addConsumer(consumer);
     }
 

@@ -57,6 +57,12 @@ public class ChargeBox extends AbstractConsumer {
         evseid = name + "_" + new Random().nextInt(9999);
     }
 
+    public ChargeBox(String name) {
+        this();
+        this.name = name;
+        this.evseid = name + "_" + new Random().nextInt(9999);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
