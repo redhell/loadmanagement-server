@@ -15,25 +15,29 @@ public class ConsumptionPoint {
         time = Instant.now();
     }
 
-    public ConsumptionPoint(String name, double consumption) {
-        this.time = Instant.now();
-        this.consumption = consumption;
-        this.name = name;
-    }
-
-    public ConsumptionPoint(String name, double consumption, Instant time, String measurand) {
-        this.time = time;
-        this.consumption = consumption;
-        this.name = name;
-        this.measurand = measurand;
-    }
+    @Column(name = "cbName", tag = true)
+    private String cbName;
+    @Column(name = "name")
+    private String name;
 
     @TimeColumn
     @Column(name = "time")
     private Instant time;
 
-    @Column(name = "name", tag = true)
-    private String name;
+    public ConsumptionPoint(String cbName, double consumption) {
+        this.time = Instant.now();
+        this.consumption = consumption;
+        this.cbName = cbName;
+        this.name = cbName;
+    }
+
+    public ConsumptionPoint(String cbName, double consumption, Instant time, String measurand) {
+        this.time = time;
+        this.consumption = consumption;
+        this.cbName = cbName;
+        this.measurand = measurand;
+        this.name = cbName;
+    }
 
     @Column(name = "consumption")
     private Double consumption;

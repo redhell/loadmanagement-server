@@ -77,12 +77,14 @@ public class InfluxService {
 
     public void addPoint(ConsumptionPoint consumptionPoint) {
         Point point = Point.measurement("consumption")
+                .tag("cbName", consumptionPoint.getCbName())
                 .time(System.currentTimeMillis() - 100, TimeUnit.MILLISECONDS)
                 .addField("name", consumptionPoint.getName())
                 .addField("consumption", consumptionPoint.getConsumption())
                 .addField("measurand", consumptionPoint.getMeasurand())
                 .build();
         influxDB.write(point);
+        influxDB.flush();
     }
 
     public void addPoints(List<ConsumptionPoint> consumptionPoints) {
@@ -93,6 +95,7 @@ public class InfluxService {
         consumptionPoints.forEach(consumptionPoint -> {
             Point point = Point.measurement("consumption")
                     .time(consumptionPoint.getTime().toEpochMilli(), TimeUnit.MILLISECONDS)
+                    .tag("cbName", consumptionPoint.getCbName())
                     .addField("name", consumptionPoint.getName())
                     .addField("consumption", consumptionPoint.getConsumption())
                     .addField("measurand", consumptionPoint.getMeasurand())
@@ -117,7 +120,7 @@ public class InfluxService {
             return cpListe.getFirst();
         else {
             ConsumptionPoint cp = new ConsumptionPoint();
-            cp.setName(name);
+            cp.setCbName(name);
             cp.setConsumption(0.0);
             cp.setMeasurand("A");
             cp.setTime(LocalDateTime.now().minusHours(1).atZone(ZoneId.of("Europe/Berlin")).toInstant());
@@ -143,9 +146,10 @@ public class InfluxService {
                                 .forEach(point -> {
                                     ConsumptionPoint consumptionPoint = new ConsumptionPoint();
                                     consumptionPoint.setTime(Instant.parse((String) point.get(0)));
-                                    consumptionPoint.setConsumption((double) point.get(1));
-                                    consumptionPoint.setMeasurand((String) point.get(2));
-                                    consumptionPoint.setName((String) point.get(3));
+                                    consumptionPoint.setName((String) point.get(1));
+                                    consumptionPoint.setConsumption((double) point.get(2));
+                                    consumptionPoint.setMeasurand((String) point.get(3));
+                                    consumptionPoint.setCbName((String) point.get(4));
                                     returnList.add(consumptionPoint);
                                 }));
             } catch (NullPointerException ex) {
@@ -163,6 +167,14 @@ public class InfluxService {
      * @param name Name der Entität
      */
     public void delete(String name) {
-        influxDB.query(new Query("DROP SERIES FROM \"consumption\" WHERE \"name\" = '" + name + "'"));
+        //Query q1 = new Query("SELECT * INTO consumption_clean FROM consumption WHERE \"name\" !=\"" + name + "\" GROUP BY *");
+        //Query q2 = new Query("DROP measurement consumption");
+        //Query q3 = new Query("SELECT * INTO consumption FROM consumption_clean GROUP BY *");
+        QueryResult queryResult = influxDB.query(new Query("DROP SERIES FROM \"consumption\" WHERE \"cbName\" = '" + name + "'"));
+        influxDB.flush();
+        //QueryResult queryResult = influxDB.query(q1);
+        //queryResult = influxDB.query(q2);
+        //queryResult = influxDB.query(q3);
+        log.debug(queryResult.getResults().size());
     }
 }
