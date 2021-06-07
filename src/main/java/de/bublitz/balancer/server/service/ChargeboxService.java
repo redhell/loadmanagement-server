@@ -5,7 +5,7 @@ import de.bublitz.balancer.server.model.ChargeBox;
 import java.util.List;
 
 public interface ChargeboxService {
-    void addChargeBox(ChargeBox chargeBox);
+    boolean addChargeBox(ChargeBox chargeBox);
 
     List<ChargeBox> getAllChargeBox();
 

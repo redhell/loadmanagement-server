@@ -20,10 +20,13 @@ public class ConsumerSerciceImpl implements ConsumerService {
 
     @Override
     public boolean addConsumer(String name) {
-        Consumer consumer = new Consumer();
-        consumer.setName(name);
-        consumerRepository.save(consumer);
-        return anschlussService.addConsumerToAnschluss(consumer);
+        if (!consumerRepository.existsByName(name)) {
+            Consumer consumer = new Consumer();
+            consumer.setName(name);
+            consumerRepository.save(consumer);
+            return anschlussService.addConsumerToAnschluss(consumer);
+        }
+        return false;
         //consumerRepository.save(consumer);
     }
 
@@ -58,6 +61,7 @@ public class ConsumerSerciceImpl implements ConsumerService {
         Consumer oldConsmer = consumerRepository.getById(consumer.getConsumerID());
         oldConsmer.setName(consumer.getName());
         oldConsmer.setMaxLoad(consumer.getMaxLoad());
+        oldConsmer.setCurrentLoad(consumer.getCurrentLoad());
         if (consumer.getAnschluss() != null) {
             oldConsmer.setAnschluss(consumer.getAnschluss());
         }

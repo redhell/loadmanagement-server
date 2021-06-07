@@ -72,6 +72,7 @@ public class BalancerComponent {
                     if (duration.toMinutes() > 10) {
                         chargeBox.setConnected(false);
                         chargeBox.setCurrentLoad(0);
+                        chargeBox.setCharging(false);
                         log.warn(chargeBox.getName() + " is not connected!");
                     } else {
                         log.debug(chargeBox.getName() + " is still connected!");
@@ -128,7 +129,7 @@ public class BalancerComponent {
                 if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption() * 1.2) {
                     if (!chargeBox.isCharging()) {
                         // not charging -> charging
-                        log.info("Start charging");
+                        log.info("Start charging (" + chargeBox.getName() + ")");
                         try {
                             strategy.addLV(chargeBox);
                         } catch (NotStoppedException e) {
@@ -148,7 +149,7 @@ public class BalancerComponent {
                             log.error(e.getMessage());
                             errorService.addError(e);
                         }
-                        log.info("Stop charging");
+                        log.info("Stop charging (" + chargeBox.getName() + ")");
                     } else if (strategy.getSuspendedList().isEmpty()) {
                         chargeBox.setCharging(false);
                     }

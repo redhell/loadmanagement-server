@@ -33,8 +33,7 @@ public class ChargeBoxController {
         chargeBox.setStartURL(startURL);
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
-        chargeboxService.addChargeBox(chargeBox);
-        return anschlussService.addChargeboxToAnschluss(chargeBox);
+        return chargeboxService.addChargeBox(chargeBox);
     }
 
     @PostMapping("/add")

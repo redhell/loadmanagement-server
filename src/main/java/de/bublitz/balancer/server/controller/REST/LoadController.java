@@ -42,9 +42,19 @@ public class LoadController {
         influxService.addPoints(consumptionPoints);
     }
 
-    @PostMapping("/{name}/rawPoints")
-    public void addRawPoints(@PathVariable String name, @RequestBody Map<LocalDateTime, String> pointMap) {
-        chargeboxService.setConnected(name);
+    @PostMapping("/{type}/{name}/rawPoints")
+    public void addRawPoints(@PathVariable String type, @PathVariable String name, @RequestBody Map<LocalDateTime, String> pointMap) {
+        if (type.equals("chargebox")) {
+            chargeboxService.setConnected(name);
+            processPoints(name, pointMap);
+            // Noch nicht kalibriert für Idle!
+            chargeboxService.calibrate();
+        } else {
+            processPoints(name, pointMap);
+        }
+    }
+
+    private void processPoints(String name, Map<LocalDateTime, String> pointMap) {
         List<ConsumptionPoint> tmpList = new LinkedList<>();
         ObjectMapper mapper = new ObjectMapper();
         TypeReference<LinkedHashMap<String, String>> typeRef = new TypeReference<>() {
@@ -63,9 +73,6 @@ public class LoadController {
             }
         });
         influxService.addPoints(tmpList);
-
-        // Noch nicht kalibriert für Idle!
-        chargeboxService.calibrate();
     }
 
     @GetMapping("/getByName")
