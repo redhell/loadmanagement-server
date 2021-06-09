@@ -1,5 +1,6 @@
 package de.bublitz.balancer.server.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import lombok.Data;
 
@@ -28,7 +29,9 @@ public class Anschluss {
     private double hardLimit = 0;
 
     @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Consumer> consumerList;
+    @JsonManagedReference
     @OneToMany(mappedBy = "anschluss", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargeBox> chargeboxList;
     private double currentLoad;
@@ -39,6 +42,7 @@ public class Anschluss {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(unique = true)
     private String name;
 
     public Anschluss() {
@@ -46,7 +50,7 @@ public class Anschluss {
         chargeboxList = new ArrayList<>();
         maxLoad = 0;
         currentLoad = 0;
-        loadStrategy = LoadStrategy.FIFO;
+        loadStrategy = LoadStrategy.NONE;
         name = "Anschluss" + new Random().nextInt(10000);
     }
 
@@ -70,14 +74,6 @@ public class Anschluss {
         chargeBox.setAnschluss(this);
         chargeboxList.add(chargeBox);
         computeLoad();
-    }
-
-    public boolean isSoftlimitReached() {
-        return currentLoad >= softLimit;
-    }
-
-    public boolean isHardlimitReached() {
-        return currentLoad >= hardLimit;
     }
 
     public void computeLoad() {

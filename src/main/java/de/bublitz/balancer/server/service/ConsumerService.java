@@ -5,9 +5,11 @@ import de.bublitz.balancer.server.model.Consumer;
 import java.util.List;
 
 public interface ConsumerService {
-    void addConsumer(String name);
+    boolean addConsumer(String name);
 
     void deleteConsumer(Long id);
+
+    void deleteConsumer(String name);
 
     List<Consumer> getAllConsumers();
 
@@ -19,5 +21,6 @@ public interface ConsumerService {
 
     Consumer getConsumerById(long id);
 
-    void addConsumer(Consumer consumer);
+    boolean addConsumer(Consumer consumer);
+
 }

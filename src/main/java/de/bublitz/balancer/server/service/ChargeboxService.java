@@ -5,7 +5,7 @@ import de.bublitz.balancer.server.model.ChargeBox;
 import java.util.List;
 
 public interface ChargeboxService {
-    void addChargeBox(ChargeBox chargeBox);
+    boolean addChargeBox(ChargeBox chargeBox);
 
     List<ChargeBox> getAllChargeBox();
 
@@ -17,15 +17,17 @@ public interface ChargeboxService {
 
     void deleteChargeBox(long id);
 
+    void deleteChargeBox(String evseid);
+
     void setCharging(String name, boolean active);
 
     void setConnected(String name);
 
     void calibrate();
 
-    void setListener(String name);
-
     void update(ChargeBox chargeBox);
 
     boolean exists(long id);
+
+    boolean exists(String evseid);
 }

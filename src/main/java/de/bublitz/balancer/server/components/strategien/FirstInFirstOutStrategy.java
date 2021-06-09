@@ -22,24 +22,11 @@ public class FirstInFirstOutStrategy extends Strategy {
             // Füge u0 in den Schedule ein mit der alten Last
             addLV(u0);
             // starte den LV
-            start(u0);
+            if (chargingList.contains(u0)) {
+                start(u0);
+            }
         } else {
-            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
-                // Anschlusslast verringern!
-                ChargeBox l0 = chargingList.getFirst();
-                chargingList.remove(l0);
-                anschlussLoad -= l0.getCurrentLoad();
-                tmpSuspendedList.add(l0); // Stop later
-            }
-            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
-            calculateFitting(anschlussLoad);
-
-            for (ChargeBox chargeBox : tmpSuspendedList) {
-                stop(chargeBox);
-            }
-            suspendedList.addAll(tmpSuspendedList);
-            tmpSuspendedList.clear();
-            anschluss.computeLoad();
+            decreaseLoad();
         }
     }
 
@@ -48,23 +35,42 @@ public class FirstInFirstOutStrategy extends Strategy {
         anschlussLoad = anschluss.getCurrentLoad();
         if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
+            calculateFitting(anschlussLoad);
         } else {
-            while (anschlussLoad > anschluss.getHardLimit()) {
+            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 ChargeBox l0 = chargingList.getFirst();
                 chargingList.remove(l0);
                 anschlussLoad -= l0.getCurrentLoad();
                 tmpSuspendedList.add(l0); // Stop later
             }
-            calculateFitting(anschlussLoad);
+
             chargingList.add(chargeBox);
-            //start(chargeBox);
-            //anschlussLoad += cbLoad;
+            // Chargingbox hat verbraucht zu viel
+            revertStartingIfNeeded(chargeBox);
+
+            // Falls Last immer noch zu hoch
+            decreaseLoad();
         }
-        for (ChargeBox cb : tmpSuspendedList) {
-            stop(cb);
+    }
+
+
+    private void decreaseLoad() throws NotStoppedException {
+        while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
+            // Anschlusslast verringern!
+            ChargeBox l0 = chargingList.getFirst();
+            chargingList.remove(l0);
+            anschlussLoad -= l0.getCurrentLoad();
+            tmpSuspendedList.add(l0); // Stop later
+        }
+
+        // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
+        calculateFitting(anschlussLoad);
+
+        for (ChargeBox chargeBox : tmpSuspendedList) {
+            stop(chargeBox);
         }
         suspendedList.addAll(tmpSuspendedList);
         tmpSuspendedList.clear();
-        anschluss.computeLoad();
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 }

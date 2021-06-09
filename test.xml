@@ -13,6 +13,7 @@
             <class name="de.bublitz.balancer.server.Strategy.FifoTest"/>
             <class name="de.bublitz.balancer.server.Strategy.FcfsTest"/>
             <class name="de.bublitz.balancer.server.Strategy.PqTest"/>
+            <class name="de.bublitz.balancer.server.Strategy.NoneTest"/>
         </classes>
     </test>
 </suite>

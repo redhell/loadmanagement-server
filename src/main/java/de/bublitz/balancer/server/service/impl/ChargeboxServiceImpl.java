@@ -1,9 +1,9 @@
 package de.bublitz.balancer.server.service.impl;
 
-import de.bublitz.balancer.server.components.BalancerComponent;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
 import de.bublitz.balancer.server.repository.ChargeboxRepository;
+import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ChargeboxService;
 import de.bublitz.balancer.server.service.InfluxService;
 import lombok.extern.log4j.Log4j2;
@@ -21,38 +21,51 @@ public class ChargeboxServiceImpl implements ChargeboxService {
 
     private final ChargeboxRepository chargeboxRepository;
     private final InfluxService influxService;
+    private final AnschlussService anschlussService;
 
     @Autowired
-    public ChargeboxServiceImpl(ChargeboxRepository chargeboxRepository, InfluxService influxService, BalancerComponent balancerComponent) {
+    public ChargeboxServiceImpl(ChargeboxRepository chargeboxRepository, InfluxService influxService, AnschlussService anschlussService) {
         this.chargeboxRepository = chargeboxRepository;
         this.influxService = influxService;
+        this.anschlussService = anschlussService;
     }
 
-    public void addChargeBox(ChargeBox chargeBox) {
+    public boolean addChargeBox(ChargeBox chargeBox) {
         if (!chargeboxRepository.existsChargeBoxByName(chargeBox.getName())) {
             chargeboxRepository.save(chargeBox);
+            anschlussService.addChargeboxToAnschluss(chargeBox);
+            return true;
         }
+        return false;
     }
 
     public List<ChargeBox> getAllChargeBox() {
         return chargeboxRepository.findAll();
     }
 
+    @Override
     public ChargeBox getChargeBoxByName(String name) {
         return chargeboxRepository.getChargeBoxByName(name);
     }
 
+    @Override
     public ChargeBox getChargeboxById(String evseid) {
         return chargeboxRepository.getChargeBoxByEvseid(evseid);
     }
 
     @Override
     public ChargeBox getChargeboxById(long id) {
-        return chargeboxRepository.getOne(id);
+        return chargeboxRepository.getById(id);
     }
 
     public void deleteChargeBox(long id) {
-        ChargeBox chargeBox = chargeboxRepository.getOne(id);
+        ChargeBox chargeBox = chargeboxRepository.getById(id);
+        chargeboxRepository.delete(chargeBox);
+    }
+
+    @Override
+    public void deleteChargeBox(String evseid) {
+        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByEvseid(evseid);
         chargeboxRepository.delete(chargeBox);
     }
 
@@ -94,11 +107,6 @@ public class ChargeboxServiceImpl implements ChargeboxService {
     }
 
     @Override
-    public void setListener(String name) {
-        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(name);
-    }
-
-    @Override
     public void update(ChargeBox chargeBox) {
         ChargeBox oldChargebox = chargeboxRepository.getChargeBoxByEvseid(chargeBox.getEvseid());
         oldChargebox.setName(chargeBox.getName());
@@ -118,5 +126,10 @@ public class ChargeboxServiceImpl implements ChargeboxService {
     @Override
     public boolean exists(long id) {
         return chargeboxRepository.existsById(id);
+    }
+
+    @Override
+    public boolean exists(String evseid) {
+        return chargeboxRepository.existsByEvseid(evseid);
     }
 }

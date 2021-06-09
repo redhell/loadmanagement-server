@@ -1,235 +1,232 @@
 package de.bublitz.balancer.server.Strategy;
 
 import de.bublitz.balancer.server.components.strategien.PriorityQueueStrategy;
-import de.bublitz.balancer.server.model.Anschluss;
-import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static java.lang.Thread.sleep;
-
 @SpringBootTest
 @TestPropertySource("classpath:test.properties")
 @Log4j2
-public class PqTest extends AbstractTestNGSpringContextTests {
-    ChargeBox chargeBox1;
-    ChargeBox chargeBox2;
-    ChargeBox chargeBox3;
-    ChargeBox chargeBox4;
-    private Anschluss anschluss;
-    private int counterCB1 = 0;
-    private int counterCB2 = 0;
-    private int counterCB3 = 0;
-    private int counterCB4 = 0;
-
-    private PriorityQueueStrategy pq;
+public class PqTest extends GeneralTest {
 
     @BeforeMethod
     public void SetUp() {
-        anschluss = new Anschluss();
-        anschluss.setMaxLoad(30);
-        anschluss.setHardLimit(30);
-        anschluss.setLoadStrategy(LoadStrategy.FIFO);
-
-        // Chargeboxes
-        chargeBox1 = new ChargeBox();
-        chargeBox1.setName("CB1");
-        chargeBox1.setEvseid("CB1");
-        chargeBox2 = new ChargeBox();
-        chargeBox2.setName("CB2");
-        chargeBox2.setEvseid("CB2");
-        chargeBox3 = new ChargeBox();
-        chargeBox3.setName("CB3");
-        chargeBox3.setEvseid("CB3");
-        chargeBox4 = new ChargeBox();
-        chargeBox4.setName("CB4");
-        chargeBox4.setEvseid("CB4");
-
-        chargeBox1.setStartURL("testStart");
-        chargeBox2.setStartURL("testStart");
-        chargeBox3.setStartURL("testStart");
-        chargeBox4.setStartURL("testStart");
-
-        chargeBox1.setStopURL("testStop");
-        chargeBox2.setStopURL("testStop");
-        chargeBox3.setStopURL("testStop");
-        chargeBox4.setStopURL("testStop");
-
-        chargeBox1.setConnected(true);
-        chargeBox2.setConnected(true);
-        chargeBox3.setConnected(true);
-        chargeBox4.setConnected(true);
+        prepare();
+        anschluss.setLoadStrategy(LoadStrategy.PQ);
+        strategy = new PriorityQueueStrategy(anschluss);
 
         chargeBox2.setPriority(true);
-
-        // Zum Anschluss
-        anschluss.addChargeBox(chargeBox1);
-        anschluss.addChargeBox(chargeBox2);
-        anschluss.addChargeBox(chargeBox3);
-        anschluss.addChargeBox(chargeBox4);
-
-        pq = new PriorityQueueStrategy(anschluss);
-
-        counterCB1 = 0;
-        counterCB2 = 0;
-        counterCB3 = 0;
-        counterCB4 = 0;
     }
 
     @Test
     public void onlyChargeboxesTest() throws Exception {
         log.info("Starting Basic Test!");
         chargeBox1.setCurrentLoad(4);
-        pq.addLV(chargeBox1);
+        chargeBox1.setCharging(true);
+        strategy.addLV(chargeBox1);
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(10);
-        pq.addLV(chargeBox3);
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
-        pq.addLV(chargeBox2);
+        chargeBox2.setCharging(true);
+        strategy.addLV(chargeBox2);
         log();
         incCounter();
 
         // 1. Balancing
-        chargeBox4.setCurrentLoad(10);
-        pq.addLV(chargeBox4);
-        pq.getSuspendedList().get(0).setCurrentLoad(0);
+        chargeBox4.setCurrentLoad(11);
+        chargeBox4.setCharging(true);
+        strategy.addLV(chargeBox4);
         anschluss.computeLoad();
         log();
         incCounter();
 
-        while (!pq.getChargingList().isEmpty()) {
-            pq.optimize();
+        // 2. Balancing
+        chargeBox5.setCurrentLoad(22);
+        chargeBox5.setCharging(true);
+        strategy.addLV(chargeBox5);
+        anschluss.computeLoad();
+        log();
+        incCounter();
 
-            pq.getSuspendedList().forEach(chargeBox -> {
-                chargeBox.setCurrentLoad(0);
-            });
-
-            pq.getChargingList().forEach(chargeBox -> {
-                if (chargeBox.equals(chargeBox1)) {
-                    chargeBox1.setCurrentLoad(4);
-                } else if (chargeBox.equals(chargeBox2)) {
-                    chargeBox2.setCurrentLoad(7);
-                } else if (chargeBox.equals(chargeBox3)) {
-                    chargeBox3.setCurrentLoad(10);
-                } else if (chargeBox.equals(chargeBox4)) {
-                    chargeBox4.setCurrentLoad(10);
-                }
-            });
-            anschluss.computeLoad();
-
-            if (counterCB1 == 8) {
-                pq.removeLV(chargeBox1);
-                chargeBox1.setCurrentLoad(0);
-            }
-            if (counterCB2 == 5) {
-                pq.removeLV(chargeBox2);
-                chargeBox2.setCurrentLoad(0);
-            }
-            if (counterCB3 == 6) {
-                pq.removeLV(chargeBox3);
-                chargeBox3.setCurrentLoad(0);
-            }
-            if (counterCB4 == 4) {
-                pq.removeLV(chargeBox4);
-                chargeBox4.setCurrentLoad(0);
-            }
-            anschluss.computeLoad();
-            incCounter();
-            log();
-            Assert.assertTrue(anschluss.getCurrentLoad() < anschluss.getHardLimit());
-            sleep(200);
+        while (!((PriorityQueueStrategy) strategy).getPriorityQueue().isEmpty() || !strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
+            charge();
         }
-
+        Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
 
-    private void log() {
-        log.info("ChargingList: " + pq.printChargingList()
-                + " SuspendedList: " + pq.printSuspendedList()
-                + " Consumers: " + pq.printConsumerLoad()
-                + " Current Load: " + anschluss.getCurrentLoad());
-    }
 
     @Test
     public void chargeboxesWithConsumersTest() throws Exception {
         log.info("chargeboxesWithConsumers Test");
         Consumer consumer = new Consumer();
-        consumer.setCurrentLoad(1.5);
+        consumer.setCurrentLoad(2);
         anschluss.addConsumer(consumer);
         chargeBox1.setCurrentLoad(4);
-        pq.addLV(chargeBox1);
+        chargeBox1.setCharging(true);
+        strategy.addLV(chargeBox1);
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(10);
-        pq.addLV(chargeBox3);
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
         chargeBox2.setCurrentLoad(7);
-        pq.addLV(chargeBox2);
+        chargeBox2.setCharging(true);
+        strategy.addLV(chargeBox2);
         log();
         incCounter();
 
         // 1. Balancing
-        chargeBox4.setCurrentLoad(10);
-        pq.addLV(chargeBox4);
+        chargeBox4.setCurrentLoad(11);
+        chargeBox4.setCharging(true);
+        strategy.addLV(chargeBox4);
         anschluss.computeLoad();
         log();
         incCounter();
 
-        consumer.setCurrentLoad(9.5);
-        //anschluss.computeLoad();
+        consumer.setCurrentLoad(9);
 
-        while (!pq.getChargingList().isEmpty()) {
-            pq.optimize();
+        // 2. Balancing
+        chargeBox5.setCurrentLoad(22);
+        chargeBox5.setCharging(true);
+        strategy.addLV(chargeBox5);
+        anschluss.computeLoad();
+        log();
+        incCounter();
 
-            if (counterCB1 == 8) {
-                pq.removeLV(chargeBox1);
-                chargeBox1.setCurrentLoad(0);
+        while (!((PriorityQueueStrategy) strategy).getPriorityQueue().isEmpty() || !strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
+            charge();
+            if (zeitpunkt == 10) {
+                consumer.setCurrentLoad(4);
             }
-            if (counterCB2 == 5) {
-                pq.removeLV(chargeBox2);
-                chargeBox2.setCurrentLoad(0);
-            }
-            if (counterCB3 == 6) {
-                pq.removeLV(chargeBox3);
-                chargeBox3.setCurrentLoad(0);
-            }
-            if (counterCB4 == 4) {
-                pq.removeLV(chargeBox4);
-                chargeBox4.setCurrentLoad(0);
-            }
-            anschluss.computeLoad();
-            incCounter();
-            log();
-            Assert.assertTrue(anschluss.getCurrentLoad() < anschluss.getHardLimit());
-            sleep(200);
         }
+        Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
 
-    private void incCounter() {
-        pq.getChargingList().forEach(chargeBox -> {
-            if (chargeBox.equals(chargeBox1)) {
-                counterCB1++;
-            } else if (chargeBox.equals(chargeBox2)) {
-                counterCB2++;
-            } else if (chargeBox.equals(chargeBox3)) {
-                counterCB3++;
-            } else if (chargeBox.equals(chargeBox4)) {
-                counterCB4++;
+    @Test
+    public void chargeboxesEqual() throws Exception {
+        log.info("Starting Basic Test!");
+        chargeBox1.setCurrentLoad(11);
+        chargeBox1.setCharging(true);
+        strategy.addLV(chargeBox1);
+        log();
+        incCounter();
+
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
+        log();
+        incCounter();
+
+        chargeBox2.setCurrentLoad(11);
+        chargeBox2.setCharging(true);
+        strategy.addLV(chargeBox2);
+        log();
+        incCounter();
+
+        // 1. Balancing
+        chargeBox4.setCurrentLoad(11);
+        chargeBox4.setCharging(true);
+        strategy.addLV(chargeBox4);
+        anschluss.computeLoad();
+        log();
+        incCounter();
+
+        // 2. Balancing
+        chargeBox5.setCurrentLoad(11);
+        chargeBox5.setCharging(true);
+        strategy.addLV(chargeBox5);
+        anschluss.computeLoad();
+        log();
+        incCounter();
+
+        while (!((PriorityQueueStrategy) strategy).getPriorityQueue().isEmpty() || !strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
+            charge();
+        }
+        Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
+    }
+
+    @Test
+    public void chargeboxesEqualWithConsumersTest() throws Exception {
+        log.info("chargeboxesWithConsumers Test");
+        Consumer consumer = new Consumer();
+        consumer.setCurrentLoad(2);
+        anschluss.addConsumer(consumer);
+        chargeBox1.setCurrentLoad(11);
+        chargeBox1.setCharging(true);
+        strategy.addLV(chargeBox1);
+        log();
+        incCounter();
+
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
+        log();
+        incCounter();
+
+        chargeBox2.setCurrentLoad(11);
+        chargeBox2.setCharging(true);
+        strategy.addLV(chargeBox2);
+        log();
+        incCounter();
+
+        // 1. Balancing
+        chargeBox4.setCurrentLoad(11);
+        chargeBox4.setCharging(true);
+        strategy.addLV(chargeBox4);
+        anschluss.computeLoad();
+        log();
+        incCounter();
+
+        consumer.setCurrentLoad(9);
+
+        // 2. Balancing
+        chargeBox5.setCurrentLoad(11);
+        chargeBox5.setCharging(true);
+        strategy.addLV(chargeBox5);
+        anschluss.computeLoad();
+        log();
+        incCounter();
+
+        while (!((PriorityQueueStrategy) strategy).getPriorityQueue().isEmpty() || !strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
+            charge();
+            if (zeitpunkt == 10) {
+                consumer.setCurrentLoad(4);
             }
-        });
+        }
+        Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
+    }
+
+    @Override
+    protected void incCounter() {
+        super.incCounter();
+        ((PriorityQueueStrategy) strategy).getPriorityQueue().forEach(this::checkAndIncrease);
+
+    }
+
+    @Override
+    protected void log() {
+        log.info("Priority: " + ((PriorityQueueStrategy) strategy).printPrioryList()
+                + " ChargingList: " + strategy.printChargingList()
+                + " SuspendedList: " + strategy.printSuspendedList()
+                + " Consumers: " + strategy.printConsumerLoad()
+                + " Load: " + anschluss.getCurrentLoad()
+                + " T: " + zeitpunkt);
     }
 }

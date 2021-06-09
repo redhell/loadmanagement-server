@@ -54,7 +54,7 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public boolean removeAnschluss(String name) {
         Anschluss delAnschluss = anschlussRepository.getAnschlussByName(name);
-        if (delAnschluss != null) {
+        if (delAnschluss != null && delAnschluss.getId() != 1L) {
             anschlussRepository.delete(delAnschluss);
             return true;
         } else {
@@ -65,34 +65,48 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public void addChargeboxToAnschluss(String anschlussName, String chargeboxName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
-        ChargeBox chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
+        ChargeBox chargeBox = new ChargeBox(chargeboxName);
+        if (chargeboxRepository.existsChargeBoxByName(chargeboxName)) {
+            chargeBox = chargeboxRepository.getChargeBoxByName(chargeboxName);
+        }
         anschluss.addChargeBox(chargeBox);
     }
 
     @Override
     public void addConsumerToAnschluss(String anschlussName, String consumerName) {
         Anschluss anschluss = anschlussRepository.getAnschlussByName(anschlussName);
-        Consumer consumer = consumerRepository.getConsumerByName(consumerName);
+        Consumer consumer = new Consumer(consumerName);
+        if (consumerRepository.existsByName(consumerName)) {
+            consumerRepository.getConsumerByName(consumerName);
+        }
         anschluss.addConsumer(consumer);
     }
 
     @Override
-    public void addChargeboxToAnschluss(ChargeBox chargeBox) {
-        Anschluss anschluss = anschlussRepository.getOne(1L);
-        if (!chargeboxRepository.existsByEvseid(chargeBox.getEvseid())) {
+    public boolean addChargeboxToAnschluss(ChargeBox chargeBox) {
+        Anschluss anschluss = anschlussRepository.getById(1L);
+        if (chargeboxRepository.existsByEvseid(chargeBox.getEvseid())) {
             anschluss.addChargeBox(chargeBox);
+            return true;
+        } else {
+            return false;
         }
     }
 
     @Override
-    public void addConsumerToAnschluss(Consumer consumer) {
-        Anschluss anschluss = anschlussRepository.getOne(1L);
-        anschluss.addConsumer(consumer);
+    public boolean addConsumerToAnschluss(Consumer consumer) {
+        Anschluss anschluss = anschlussRepository.getById(1L);
+        if (consumerRepository.existsByName(consumer.getName())) {
+            anschluss.addConsumer(consumer);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public void removeChargeboxFromAnschluss(ChargeBox chargeBox) {
-        Anschluss anschluss = anschlussRepository.getOne(chargeBox.getAnschluss().getId());
+        Anschluss anschluss = anschlussRepository.getById(chargeBox.getAnschluss().getId());
         anschluss.removeChargebox(chargeBox);
         chargeboxRepository.deleteById(chargeBox.getChargeboxId());
     }
@@ -106,7 +120,7 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @Override
     public Anschluss getAnschlussById(long id) {
-        return anschlussRepository.getOne(id);
+        return anschlussRepository.getById(id);
     }
 
     @Override
@@ -142,5 +156,10 @@ public class AnschlussServiceImpl implements AnschlussService {
     @Override
     public void updateAnschluss(Anschluss anschluss) {
         anschlussRepository.save(anschluss);
+    }
+
+    @Override
+    public boolean exists(String name) {
+        return anschlussRepository.existsAnschlussByName(name);
     }
 }

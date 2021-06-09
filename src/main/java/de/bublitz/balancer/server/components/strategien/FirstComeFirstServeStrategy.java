@@ -9,10 +9,13 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Log4j2
 public class FirstComeFirstServeStrategy extends Strategy {
+    private final List<ChargeBox> stoppedDuePenalty = new LinkedList<>();
     private final Map<String, Integer> penaltyMap = new LinkedHashMap<>();
     @Getter
     @Setter
@@ -25,28 +28,17 @@ public class FirstComeFirstServeStrategy extends Strategy {
     @Override
     public void optimize() throws NotStoppedException {
         anschlussLoad = anschluss.getCurrentLoad();
-        if (!getSuspendedList().isEmpty()) {
+        if (!suspendedList.isEmpty()) {
             ChargeBox u0 = suspendedList.getFirst();
             suspendedList.remove(u0);
             u0.setCurrentLoad(u0.getLastLoad());
             addLV(u0);
-            start(u0);
+            // starte den LV
+            if (chargingList.contains(u0)) {
+                start(u0);
+            }
         } else {
-            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
-                // Anschlusslast verringern!
-                ChargeBox ln = chargingList.getLast();
-                chargingList.remove(ln);
-                anschlussLoad -= ln.getCurrentLoad();
-                tmpSuspendedList.add(ln); // Stop later
-            }
-            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
-            calculateFitting(anschlussLoad);
-            for (ChargeBox chargeBox : tmpSuspendedList) {
-                stop(chargeBox);
-            }
-            suspendedList.addAll(tmpSuspendedList);
-            tmpSuspendedList.clear();
-            anschluss.computeLoad();
+            decreaseLoad();
         }
     }
 
@@ -55,24 +47,22 @@ public class FirstComeFirstServeStrategy extends Strategy {
         anschlussLoad = anschluss.getCurrentLoad();
         if (anschlussLoad <= anschluss.getHardLimit()) {
             chargingList.add(chargeBox);
+            calculateFitting(anschlussLoad);
         } else {
             stopWithPenalty();
-            while (anschlussLoad > anschluss.getHardLimit()) {
+            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 ChargeBox ln = chargingList.getLast();
                 chargingList.remove(ln);
-                anschlussLoad = anschlussLoad - ln.getCurrentLoad();
+                anschlussLoad -= ln.getCurrentLoad();
                 tmpSuspendedList.add(ln); // Stop later
             }
-            //anschlussLoad = anschlussLoad + cbLoad; // Warum?
-            calculateFitting(anschlussLoad);
             // Penalty erhöhen
             chargingList.add(chargeBox);
+            // Chargingbox hat verbraucht zu viel
+            revertStartingIfNeeded(chargeBox);
+            decreaseLoad();
             penaltyMap.replaceAll((cb, p) -> p + 1);
         }
-        for (ChargeBox box : tmpSuspendedList) {
-            stop(box);
-        }
-        suspendedList.addAll(tmpSuspendedList);
         suspendedList.forEach(cb -> {
             // Ladevorgang wurde beendet -> Keine Penalty mehr
             penaltyMap.remove(cb.getEvseid());
@@ -80,11 +70,10 @@ public class FirstComeFirstServeStrategy extends Strategy {
         // Hinzufügen zur penaltyMap
         chargingList.forEach(cb -> {
             if (!penaltyMap.containsKey(cb.getEvseid())) {
-                penaltyMap.put(cb.getEvseid(), 0);
+                penaltyMap.put(cb.getEvseid(), 1);
             }
         });
-        tmpSuspendedList.clear();
-        anschluss.computeLoad();
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 
     private void stopWithPenalty() {
@@ -93,22 +82,53 @@ public class FirstComeFirstServeStrategy extends Strategy {
                 .stream()
                 .filter(entry -> entry.getValue() >= penalty)
                 .forEach(entry -> {
-                    log.info(entry.getKey() + " can be stopped (Reason: penalty)!");
+                    log.info(entry.getKey() + " will be stopped (Reason: penalty)!");
                     ChargeBox chargeBox = chargingList.stream().filter(cb -> cb.getEvseid().equals(entry.getKey())).findFirst().get();
                     chargingList.remove(chargeBox);
-                    tmpSuspendedList.add(chargeBox);
+                    suspendedList.add(chargeBox);
+                    stoppedDuePenalty.add(chargeBox);
                     anschlussLoad -= chargeBox.getCurrentLoad();
+                    try {
+                        stop(chargeBox);
+                    } catch (NotStoppedException e) {
+                        log.error(e.getMessage());
+                    }
+
                 });
     }
 
     @Override
-    public void removeLV(ChargeBox chargeBox) throws NotStoppedException {
+    public void removeLV(ChargeBox chargeBox) {
         if (chargingList.contains(chargeBox)) {
             chargingList.remove(chargeBox);
         } else {
             suspendedList.remove(chargeBox);
         }
         penaltyMap.remove(chargeBox.getEvseid());
-        optimize();
+    }
+
+    private void decreaseLoad() throws NotStoppedException {
+        while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
+            // Anschlusslast verringern!
+            ChargeBox ln = chargingList.getLast();
+            chargingList.remove(ln);
+            anschlussLoad -= ln.getCurrentLoad();
+            tmpSuspendedList.add(ln); // Stop later
+        }
+        // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
+        calculateFitting(anschlussLoad);
+        for (ChargeBox chargeBox : tmpSuspendedList) {
+            stop(chargeBox);
+        }
+        suspendedList.addAll(tmpSuspendedList);
+        tmpSuspendedList.clear();
+        stoppedDuePenalty.forEach(cb -> {
+            if (suspendedList.contains(cb)) {
+                suspendedList.remove(cb);
+                suspendedList.add(cb);
+            }
+        });
+        stoppedDuePenalty.clear();
+        anschlussLoad = anschluss.getCurrentLoad();
     }
 }

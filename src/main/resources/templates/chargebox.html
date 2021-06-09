@@ -73,7 +73,7 @@
                 <td th:text="${chargebox.getCurrentLoad() + 'A'}"></td>
             </tr>
             <tr>
-                <td>Idle Consumption</td>
+                <td>Leerlauflast in A</td>
                 <td th:text="${chargebox.getIdleConsumption()} + 'A'"></td>
             </tr>
             <tr>
@@ -90,7 +90,7 @@
                 <td th:text="${chargebox.isConnected()} ? 'Ja' : 'Nein'"></td>
             </tr>
             <tr>
-                <td>Am laden?</td>
+                <td>Am Laden?</td>
                 <td th:text="${chargebox.isCharging()}? 'Ja' : 'Nein'"></td>
             </tr>
             <tr>

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 
 @RestController
@@ -20,11 +21,14 @@ public class AnschlussController {
 
     @GetMapping("/add")
     public boolean addAnschluss(@RequestParam String name, @RequestParam double maxLoad) {
+        if (anschlussService.exists(name)) {
+            return false;
+        }
         Anschluss anschluss = new Anschluss();
         anschluss.setName(name);
         anschluss.setMaxLoad(maxLoad);
         anschlussService.addAnschluss(anschluss);
-        return true;
+        return anschlussService.exists(anschluss.getName());
     }
 
     @PostMapping("/add")
@@ -34,19 +38,19 @@ public class AnschlussController {
     }
 
     @GetMapping("/getAll")
-    public Iterable<Anschluss> getAllChargeBox() {
+    public List<Anschluss> getAllChargeBox() {
         return anschlussService.getAll();
     }
 
-    @GetMapping("/getByName")
-    public Anschluss getChargeBoxByName(@RequestParam String name) {
+    @GetMapping("/get")
+    public Anschluss getAnschluss(@RequestParam String name) {
         return anschlussService.getAnschlussByName(name);
     }
 
     @DeleteMapping("/remove")
     public void deleteAnschluss(@RequestParam String name, HttpServletResponse response) {
         if (!anschlussService.removeAnschluss(name)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Consumer not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Anschluss not found");
         }
     }
 

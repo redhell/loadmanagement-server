@@ -1,10 +1,7 @@
 package de.bublitz.balancer.server.components;
 
 
-import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrategy;
-import de.bublitz.balancer.server.components.strategien.FirstInFirstOutStrategy;
-import de.bublitz.balancer.server.components.strategien.PriorityQueueStrategy;
-import de.bublitz.balancer.server.components.strategien.Strategy;
+import de.bublitz.balancer.server.components.strategien.*;
 import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
@@ -75,6 +72,7 @@ public class BalancerComponent {
                     if (duration.toMinutes() > 10) {
                         chargeBox.setConnected(false);
                         chargeBox.setCurrentLoad(0);
+                        chargeBox.setCharging(false);
                         log.warn(chargeBox.getName() + " is not connected!");
                     } else {
                         log.debug(chargeBox.getName() + " is still connected!");
@@ -97,8 +95,9 @@ public class BalancerComponent {
                     strategy = new FirstComeFirstServeStrategy(anschluss);
                     break;
                 case FIFO:
-                default:
                     strategy = new FirstInFirstOutStrategy(anschluss);
+                default:
+                    strategy = new NoneStrategy(anschluss);
             }
             anschlussStrategyMap.put(anschluss, strategy);
         }
@@ -130,7 +129,7 @@ public class BalancerComponent {
                 if (chargeBox.getCurrentLoad() > chargeBox.getIdleConsumption() * 1.2) {
                     if (!chargeBox.isCharging()) {
                         // not charging -> charging
-                        log.info("Start charging");
+                        log.info("Start charging (" + chargeBox.getName() + ")");
                         try {
                             strategy.addLV(chargeBox);
                         } catch (NotStoppedException e) {
@@ -150,7 +149,7 @@ public class BalancerComponent {
                             log.error(e.getMessage());
                             errorService.addError(e);
                         }
-                        log.info("Stop charging");
+                        log.info("Stop charging (" + chargeBox.getName() + ")");
                     } else if (strategy.getSuspendedList().isEmpty()) {
                         chargeBox.setCharging(false);
                     }

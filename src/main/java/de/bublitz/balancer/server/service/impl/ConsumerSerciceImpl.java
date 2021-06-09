@@ -2,6 +2,7 @@ package de.bublitz.balancer.server.service.impl;
 
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.repository.ConsumerRepository;
+import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ConsumerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,17 +15,29 @@ import java.util.List;
 public class ConsumerSerciceImpl implements ConsumerService {
     @Autowired
     private ConsumerRepository consumerRepository;
+    @Autowired
+    private AnschlussService anschlussService;
 
     @Override
-    public void addConsumer(String name) {
-        Consumer consumer = new Consumer();
-        consumer.setName(name);
-        consumerRepository.save(consumer);
+    public boolean addConsumer(String name) {
+        if (!consumerRepository.existsByName(name)) {
+            Consumer consumer = new Consumer();
+            consumer.setName(name);
+            consumerRepository.save(consumer);
+            return anschlussService.addConsumerToAnschluss(consumer);
+        }
+        return false;
+        //consumerRepository.save(consumer);
     }
 
     @Override
     public void deleteConsumer(Long id) {
         consumerRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteConsumer(String name) {
+        consumerRepository.deleteConsumerByName(name);
     }
 
     @Override
@@ -45,20 +58,24 @@ public class ConsumerSerciceImpl implements ConsumerService {
 
     @Override
     public void update(Consumer consumer) {
-        Consumer oldConsmer = consumerRepository.getOne(consumer.getConsumerID());
+        Consumer oldConsmer = consumerRepository.getById(consumer.getConsumerID());
         oldConsmer.setName(consumer.getName());
         oldConsmer.setMaxLoad(consumer.getMaxLoad());
-        oldConsmer.setAnschluss(consumer.getAnschluss());
+        oldConsmer.setCurrentLoad(consumer.getCurrentLoad());
+        if (consumer.getAnschluss() != null) {
+            oldConsmer.setAnschluss(consumer.getAnschluss());
+        }
     }
 
     @Override
     public Consumer getConsumerById(long id) {
-        return consumerRepository.getOne(id);
+        return consumerRepository.getById(id);
     }
 
     @Override
-    public void addConsumer(Consumer consumer) {
+    public boolean addConsumer(Consumer consumer) {
         consumerRepository.save(consumer);
+        return anschlussService.addConsumerToAnschluss(consumer);
     }
 
 }

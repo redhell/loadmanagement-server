@@ -35,16 +35,13 @@ public class ChargeBoxController {
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
         chargeBox.setEmaid(emaid);
-        chargeboxService.addChargeBox(chargeBox);
-        anschlussService.addChargeboxToAnschluss(chargeBox);
-        return true;
+        return chargeboxService.addChargeBox(chargeBox);
     }
 
     @PostMapping("/add")
     public boolean addChargeBox(@RequestBody ChargeBox pChargebox) {
         //chargeboxService.addChargeBox(pChargebox);
-        anschlussService.addChargeboxToAnschluss(pChargebox);
-        return true;
+        return anschlussService.addChargeboxToAnschluss(pChargebox);
     }
 
     @GetMapping("/getAll")
@@ -57,16 +54,26 @@ public class ChargeBoxController {
         return chargeboxService.getChargeBoxByName(name);
     }
 
-    @GetMapping("/getById")
+    @GetMapping("/getByEvseId")
     public ChargeBox getChargeBoxById(@RequestParam String evseid) {
         return chargeboxService.getChargeboxById(evseid);
     }
 
-    @DeleteMapping("/remove")
-    public void deleteChargeBox(@RequestParam long id) {
-        chargeboxService.deleteChargeBox(id);
+    @DeleteMapping("/remove/id/{id}")
+    public void deleteChargeBox(@PathVariable long id) {
         if (!chargeboxService.exists(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chargebox not found");
+        } else {
+            chargeboxService.deleteChargeBox(id);
+        }
+    }
+
+    @DeleteMapping("/remove/evseid/{evseid}")
+    public void deleteChargeBoxByEvseid(@PathVariable String evseid) {
+        if (!chargeboxService.exists(evseid)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chargebox not found");
+        } else {
+            chargeboxService.deleteChargeBox(evseid);
         }
     }
 
@@ -78,5 +85,10 @@ public class ChargeBoxController {
     @GetMapping("/stopCharging")
     public void stopCharging(@RequestParam String name) {
         chargeboxService.setCharging(name, false);
+    }
+
+    @PostMapping("/update")
+    public void updateChargebox(@RequestBody ChargeBox chargeBox) {
+        chargeboxService.update(chargeBox);
     }
 }

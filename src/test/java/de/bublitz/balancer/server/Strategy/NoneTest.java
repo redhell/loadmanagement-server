@@ -1,6 +1,6 @@
 package de.bublitz.balancer.server.Strategy;
 
-import de.bublitz.balancer.server.components.strategien.FirstComeFirstServeStrategy;
+import de.bublitz.balancer.server.components.strategien.NoneStrategy;
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import lombok.extern.log4j.Log4j2;
@@ -13,14 +13,13 @@ import org.testng.annotations.Test;
 @SpringBootTest
 @TestPropertySource("classpath:test.properties")
 @Log4j2
-public class FcfsTest extends GeneralTest {
+public class NoneTest extends GeneralTest {
 
     @BeforeMethod
     public void SetUp() {
         prepare();
-        anschluss.setLoadStrategy(LoadStrategy.FCFS);
-        strategy = new FirstComeFirstServeStrategy(anschluss);
-        //((FirstComeFirstServeStrategy) strategy).setPenalty(1);
+        anschluss.setLoadStrategy(LoadStrategy.NONE);
+        strategy = new NoneStrategy(anschluss);
     }
 
     @Test

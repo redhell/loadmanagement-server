@@ -21,6 +21,9 @@
         <h1>Loadmanagement Server</h1>
     </div>
     <div class="row">
+        <h4>Anschlüsse</h4>
+    </div>
+    <div class="row">
         <table class="table table-bordered table-hover">
             <thead class="thead-light">
             <tr>
@@ -43,12 +46,16 @@
         </table>
     </div>
     <div class="row">
+        <h4>Ladeboxen</h4>
+    </div>
+    <div class="row">
         <table class="table table-bordered table-hover">
             <thead class="thead-light">
             <tr>
                 <th scope="col">EVSEID</th>
                 <th scope="col">Name</th>
                 <th scope="col">Aktuelle Last</th>
+                <th scope="col">Am Laden?</th>
                 <th scope="col">Details</th>
             </tr>
             </thead>
@@ -58,11 +65,15 @@
                     <th scope="row" th:text="${cb.getEvseid()}"></th>
                     <td th:text="${cb.getName()}"></td>
                     <td th:text="${cb.getCurrentLoad()}+ 'A'"></td>
+                    <td th:text="${cb.isConnected()} ? 'Ja' : 'Nein'"></td>
                     <td><a th:href="@{/chargebox/{id}(id = ${cb.getChargeboxId()})}">Anzeigen</a></td>
                 </tr>
             </th:block>
             </tbody>
         </table>
+    </div>
+    <div class="row">
+        <h4>Verbraucher</h4>
     </div>
     <div class="row">
         <table class="table table-bordered table-hover">
