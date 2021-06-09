@@ -9,10 +9,13 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Log4j2
 public class FirstComeFirstServeStrategy extends Strategy {
+    private final List<ChargeBox> stoppedDuePenalty = new LinkedList<>();
     private final Map<String, Integer> penaltyMap = new LinkedHashMap<>();
     @Getter
     @Setter
@@ -83,12 +86,14 @@ public class FirstComeFirstServeStrategy extends Strategy {
                     ChargeBox chargeBox = chargingList.stream().filter(cb -> cb.getEvseid().equals(entry.getKey())).findFirst().get();
                     chargingList.remove(chargeBox);
                     suspendedList.add(chargeBox);
+                    stoppedDuePenalty.add(chargeBox);
+                    anschlussLoad -= chargeBox.getCurrentLoad();
                     try {
                         stop(chargeBox);
                     } catch (NotStoppedException e) {
                         log.error(e.getMessage());
                     }
-                    anschlussLoad -= chargeBox.getCurrentLoad();
+
                 });
     }
 
@@ -117,6 +122,13 @@ public class FirstComeFirstServeStrategy extends Strategy {
         }
         suspendedList.addAll(tmpSuspendedList);
         tmpSuspendedList.clear();
+        stoppedDuePenalty.forEach(cb -> {
+            if (suspendedList.contains(cb)) {
+                suspendedList.remove(cb);
+                suspendedList.add(cb);
+            }
+        });
+        stoppedDuePenalty.clear();
         anschlussLoad = anschluss.getCurrentLoad();
     }
 }
