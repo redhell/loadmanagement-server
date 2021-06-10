@@ -25,7 +25,7 @@ public class PqTest extends GeneralTest {
     }
 
     @Test
-    public void onlyChargeboxesTest() throws Exception {
+    public void chargeboxesTest() throws Exception {
         log.info("Starting Basic Test!");
         chargeBox1.setCurrentLoad(4);
         chargeBox1.setCharging(true);
