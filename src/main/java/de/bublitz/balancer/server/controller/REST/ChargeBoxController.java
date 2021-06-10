@@ -27,12 +27,14 @@ public class ChargeBoxController {
     public boolean addChargeBox(@RequestParam String name,
                                 @RequestParam String evseid,
                                 @RequestParam String startURL,
-                                @RequestParam String stopURL) {
+                                @RequestParam String stopURL,
+                                @RequestParam String emaid) {
         ChargeBox chargeBox = new ChargeBox();
         chargeBox.setName(name);
         chargeBox.setStartURL(startURL);
         chargeBox.setStopURL(stopURL);
         chargeBox.setEvseid(evseid);
+        chargeBox.setEmaid(emaid);
         return chargeboxService.addChargeBox(chargeBox);
     }
 
