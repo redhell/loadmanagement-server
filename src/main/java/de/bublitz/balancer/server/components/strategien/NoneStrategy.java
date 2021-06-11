@@ -39,18 +39,19 @@ public class NoneStrategy extends Strategy {
             // Nichts machen hinten anstellen.
             chargingList.add(chargeBox);
 
-
             while (anschlussLoad > anschluss.getHardLimit()) {
                 ChargeBox lastCB = chargingList.getLast();
                 anschlussLoad -= lastCB.getCurrentLoad();
+                chargingList.remove(lastCB);
+
                 if (lastCB.isCharging()) {
                     stop(lastCB);
+                    suspendedList.add(lastCB);
                 } else {
                     lastCB.setLastLoad(lastCB.getCurrentLoad());
                     lastCB.setCurrentLoad(0);
+                    suspendedList.addFirst(lastCB);
                 }
-                chargingList.remove(lastCB);
-                suspendedList.add(lastCB);
             }
         }
         anschlussLoad = anschluss.getCurrentLoad();
