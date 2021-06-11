@@ -53,16 +53,18 @@ public abstract class Strategy {
         //optimize();
     }
 
-    public void calculateFitting(double tmpLoad) {
+    public boolean calculateFitting(double tmpLoad) {
         double restCapacity = anschluss.getHardLimit() - tmpLoad;
-
+        boolean hasReadded = false;
         // check tmpSuspended first
-        List<Boolean> result = runKnapsack(tmpSuspendedList, restCapacity);
-        restCapacity -= readdChargeBox(tmpSuspendedList, result, false);
+        List<Boolean> tmpResult = runKnapsack(tmpSuspendedList, restCapacity);
+        restCapacity -= readdChargeBox(tmpSuspendedList, tmpResult, false);
 
         // check already suspended
-        result = runKnapsack(suspendedList, restCapacity);
-        restCapacity -= readdChargeBox(suspendedList, result, true);
+        List<Boolean> susResult = runKnapsack(suspendedList, restCapacity);
+        restCapacity -= readdChargeBox(suspendedList, susResult, true);
+
+        return tmpResult.contains(true) || susResult.contains(true);
     }
 
     private double readdChargeBox(List<ChargeBox> chargeBoxList, List<Boolean> results, boolean startCharging) {
@@ -247,12 +249,16 @@ public abstract class Strategy {
         if (anschlussLoad > anschluss.getHardLimit()) {
             anschlussLoad -= chargeBox.getCurrentLoad();
             if (chargeBox.isCharging()) {
+                // Neuer Ladevorgang -> Ans Ende der Warteschlange
                 stop(chargeBox);
+                suspendedList.add(chargeBox);
             } else {
+                // Zurück in die Warteschlange (Platz 1)
                 chargeBox.setLastLoad(chargeBox.getCurrentLoad());
                 chargeBox.setCurrentLoad(0);
+                suspendedList.addFirst(chargeBox);
             }
-            suspendedList.add(chargeBox);
+            //suspendedList.add(chargeBox);
             remove(chargeBox);
             tmpSuspendedList.forEach(cb -> anschlussLoad += cb.getCurrentLoad());
             tmpSuspendedList.forEach(this::add);

@@ -50,19 +50,27 @@ public class FirstComeFirstServeStrategy extends Strategy {
             calculateFitting(anschlussLoad);
         } else {
             stopWithPenalty();
+            /*
             while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
                 ChargeBox ln = chargingList.getLast();
                 chargingList.remove(ln);
                 anschlussLoad -= ln.getCurrentLoad();
                 tmpSuspendedList.add(ln); // Stop later
-            }
+            }*/
             // Penalty erhöhen
-            chargingList.add(chargeBox);
-            // Chargingbox hat verbraucht zu viel
-            revertStartingIfNeeded(chargeBox);
+            if (suspendedList.isEmpty()) {
+                chargingList.add(chargeBox);
+                // Chargingbox hat verbraucht zu viel
+                revertStartingIfNeeded(chargeBox);
+            } else {
+                suspendedList.addFirst(chargeBox);
+                anschlussLoad -= chargeBox.getCurrentLoad();
+                stop(chargeBox);
+            }
             decreaseLoad();
-            penaltyMap.replaceAll((cb, p) -> p + 1);
+
         }
+        penaltyMap.replaceAll((cb, p) -> p + 1);
         suspendedList.forEach(cb -> {
             // Ladevorgang wurde beendet -> Keine Penalty mehr
             penaltyMap.remove(cb.getEvseid());
@@ -82,7 +90,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
                 .stream()
                 .filter(entry -> entry.getValue() >= penalty)
                 .forEach(entry -> {
-                    log.info(entry.getKey() + " will be stopped (Reason: penalty)!");
+                    log.debug(entry.getKey() + " will be stopped (Reason: penalty)!");
                     ChargeBox chargeBox = chargingList.stream().filter(cb -> cb.getEvseid().equals(entry.getKey())).findFirst().get();
                     chargingList.remove(chargeBox);
                     suspendedList.add(chargeBox);

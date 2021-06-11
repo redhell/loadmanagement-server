@@ -4,7 +4,10 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import de.bublitz.balancer.server.model.exception.NotStoppedException;
+import lombok.extern.log4j.Log4j2;
+
 // Round robin
+@Log4j2
 public class FirstInFirstOutStrategy extends Strategy {
 
     public FirstInFirstOutStrategy(Anschluss anschluss) {
@@ -37,40 +40,43 @@ public class FirstInFirstOutStrategy extends Strategy {
             chargingList.add(chargeBox);
             calculateFitting(anschlussLoad);
         } else {
-            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
-                ChargeBox l0 = chargingList.getFirst();
-                chargingList.remove(l0);
-                anschlussLoad -= l0.getCurrentLoad();
-                tmpSuspendedList.add(l0); // Stop later
-            }
+            decreaseLoad();
 
             chargingList.add(chargeBox);
             // Chargingbox hat verbraucht zu viel
-            revertStartingIfNeeded(chargeBox);
+            if (revertStartingIfNeeded(chargeBox)) {
+                if (calculateFitting(anschlussLoad - chargingList.getFirst().getCurrentLoad())) {
+                    ChargeBox l0 = chargingList.removeFirst();
+                    tmpSuspendedList.add(l0);
+                    anschlussLoad = anschluss.getCurrentLoad() - l0.getCurrentLoad();
+                }
+            }
 
             // Falls Last immer noch zu hoch
             decreaseLoad();
+
+            // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
+            calculateFitting(anschlussLoad);
+
+            for (ChargeBox stoppable : tmpSuspendedList) {
+                stop(stoppable);
+                log.debug(stoppable.getName() + " will be stopped");
+            }
+            suspendedList.addAll(tmpSuspendedList);
+            tmpSuspendedList.clear();
+            anschlussLoad = anschluss.getCurrentLoad();
         }
     }
 
 
-    private void decreaseLoad() throws NotStoppedException {
+    private void decreaseLoad() {
         while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
             // Anschlusslast verringern!
             ChargeBox l0 = chargingList.getFirst();
             chargingList.remove(l0);
             anschlussLoad -= l0.getCurrentLoad();
             tmpSuspendedList.add(l0); // Stop later
+            log.debug(l0.getName() + " maybe stopped");
         }
-
-        // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
-        calculateFitting(anschlussLoad);
-
-        for (ChargeBox chargeBox : tmpSuspendedList) {
-            stop(chargeBox);
-        }
-        suspendedList.addAll(tmpSuspendedList);
-        tmpSuspendedList.clear();
-        anschlussLoad = anschluss.getCurrentLoad();
     }
 }

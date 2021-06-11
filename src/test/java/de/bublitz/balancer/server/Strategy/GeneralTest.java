@@ -8,6 +8,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static java.lang.Thread.sleep;
 
 @Log4j2
@@ -31,8 +34,22 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
     private int suspenedCounterCB3 = 0;
     private int suspenedCounterCB4 = 0;
     private int suspenedCounterCB5 = 0;
+    protected int taskCounterCB1 = 8;
+    protected int taskCounterCB2 = 5;
+    protected int taskCounterCB3 = 6;
+    protected int taskCounterCB4 = 4;
+    protected int taskCounterCB5 = 2;
+    List<String> schedule = new ArrayList<>();
 
     protected void prepare() {
+
+        taskCounterCB1 = 8;
+        taskCounterCB2 = 5;
+        taskCounterCB3 = 6;
+        taskCounterCB4 = 4;
+        taskCounterCB5 = 2;
+
+        schedule.clear();
         anschluss = new Anschluss();
         anschluss.setMaxLoad(35);
         anschluss.setHardLimit(30);
@@ -138,33 +155,38 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
     }
 
     protected void checkIfFinished() throws NotStoppedException {
-        if (counterCB1 == 8) {
+        if (counterCB1 == taskCounterCB1) {
             chargeBox1.setCurrentLoad(0);
             strategy.removeLV(chargeBox1);
+            schedule.add("CB1");
             log.info("CB1 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB1);
             counterCB1++;
         }
-        if (counterCB2 == 5) {
+        if (counterCB2 == taskCounterCB2) {
             chargeBox2.setCurrentLoad(0);
             strategy.removeLV(chargeBox2);
+            schedule.add("CB2");
             log.info("CB2 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB2);
             counterCB2++;
         }
-        if (counterCB3 == 6) {
+        if (counterCB3 == taskCounterCB3) {
             chargeBox3.setCurrentLoad(0);
             strategy.removeLV(chargeBox3);
+            schedule.add("CB3");
             log.info("CB3 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB3);
             counterCB3++;
         }
-        if (counterCB4 == 4) {
+        if (counterCB4 == taskCounterCB4) {
             chargeBox4.setCurrentLoad(0);
             strategy.removeLV(chargeBox4);
+            schedule.add("CB4");
             log.info("CB4 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB4);
             counterCB4++;
         }
-        if (counterCB5 == 2) {
+        if (counterCB5 == taskCounterCB5) {
             chargeBox5.setCurrentLoad(0);
             strategy.removeLV(chargeBox5);
+            schedule.add("CB5");
             log.info("CB5 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB5);
             counterCB5++;
         }
@@ -179,6 +201,14 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
         log();
         incCounter();
         Assert.assertTrue(anschluss.getCurrentLoad() <= anschluss.getHardLimit());
-        sleep(100);
+        sleep(50);
+    }
+
+    protected void printSchedule() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("S={");
+        schedule.forEach(cb -> stringBuilder.append(cb).append(";"));
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1).append("}");
+        log.info(stringBuilder.toString());
     }
 }

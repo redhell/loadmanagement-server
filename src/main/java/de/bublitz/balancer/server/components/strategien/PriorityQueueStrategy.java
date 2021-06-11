@@ -65,7 +65,13 @@ public class PriorityQueueStrategy extends Strategy {
             }
             add(chargeBox);
             // Chargingbox hat verbraucht zu viel
-            revertStartingIfNeeded(chargeBox);
+            if (revertStartingIfNeeded(chargeBox)) {
+                if (!chargingList.isEmpty() && calculateFitting(anschlussLoad - chargingList.getFirst().getCurrentLoad())) {
+                    ChargeBox l0 = chargingList.removeFirst();
+                    tmpSuspendedList.add(l0);
+                    anschlussLoad = anschluss.getCurrentLoad() - l0.getCurrentLoad();
+                }
+            }
             decreaseLoad();
         }
     }
