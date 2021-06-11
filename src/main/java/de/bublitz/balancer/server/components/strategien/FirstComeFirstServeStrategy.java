@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Log4j2
 public class FirstComeFirstServeStrategy extends Strategy {
@@ -50,20 +51,18 @@ public class FirstComeFirstServeStrategy extends Strategy {
             calculateFitting(anschlussLoad);
         } else {
             stopWithPenalty();
-            /*
-            while (anschlussLoad > anschluss.getHardLimit() && !chargingList.isEmpty()) {
-                ChargeBox ln = chargingList.getLast();
-                chargingList.remove(ln);
-                anschlussLoad -= ln.getCurrentLoad();
-                tmpSuspendedList.add(ln); // Stop later
-            }*/
+
             // Penalty erhöhen
             if (suspendedList.isEmpty()) {
                 chargingList.add(chargeBox);
                 // Chargingbox hat verbraucht zu viel
                 revertStartingIfNeeded(chargeBox);
             } else {
-                suspendedList.addFirst(chargeBox);
+                if (chargeBox.isCharging()) {
+                    suspendedList.add(chargeBox);
+                } else {
+                    suspendedList.addFirst(chargeBox);
+                }
                 anschlussLoad -= chargeBox.getCurrentLoad();
                 stop(chargeBox);
             }
@@ -84,8 +83,9 @@ public class FirstComeFirstServeStrategy extends Strategy {
         anschlussLoad = anschluss.getCurrentLoad();
     }
 
-    private void stopWithPenalty() {
+    private boolean stopWithPenalty() {
         // Alle LV mit penalty p > p auf tmpSuspended packen!
+        AtomicReference<Boolean> hasPenalty = new AtomicReference<>(false);
         penaltyMap.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue() >= penalty)
@@ -96,6 +96,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
                     suspendedList.add(chargeBox);
                     stoppedDuePenalty.add(chargeBox);
                     anschlussLoad -= chargeBox.getCurrentLoad();
+                    hasPenalty.set(true);
                     try {
                         stop(chargeBox);
                     } catch (NotStoppedException e) {
@@ -103,6 +104,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
                     }
 
                 });
+        return hasPenalty.get();
     }
 
     @Override
