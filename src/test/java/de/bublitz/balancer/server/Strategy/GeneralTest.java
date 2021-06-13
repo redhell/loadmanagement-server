@@ -35,8 +35,8 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
     private int suspenedCounterCB4 = 0;
     private int suspenedCounterCB5 = 0;
     protected int taskCounterCB1 = 8;
-    protected int taskCounterCB2 = 5;
-    protected int taskCounterCB3 = 6;
+    protected int taskCounterCB2 = 6;
+    protected int taskCounterCB3 = 5;
     protected int taskCounterCB4 = 4;
     protected int taskCounterCB5 = 2;
     List<String> schedule = new ArrayList<>();
@@ -44,8 +44,8 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
     protected void prepare() {
 
         taskCounterCB1 = 8;
-        taskCounterCB2 = 5;
-        taskCounterCB3 = 6;
+        taskCounterCB2 = 6;
+        taskCounterCB3 = 5;
         taskCounterCB4 = 4;
         taskCounterCB5 = 2;
 

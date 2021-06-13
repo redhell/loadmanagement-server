@@ -32,15 +32,15 @@ public class FcfsTest extends GeneralTest {
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(11);
-        chargeBox3.setCharging(true);
-        strategy.addLV(chargeBox3);
+        chargeBox2.setCurrentLoad(11);
+        chargeBox2.setCharging(true);
+        strategy.addLV(chargeBox2);
         log();
         incCounter();
 
-        chargeBox2.setCurrentLoad(7);
-        chargeBox2.setCharging(true);
-        strategy.addLV(chargeBox2);
+        chargeBox3.setCurrentLoad(7);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
@@ -79,15 +79,15 @@ public class FcfsTest extends GeneralTest {
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(11);
-        chargeBox3.setCharging(true);
-        strategy.addLV(chargeBox3);
+        chargeBox2.setCurrentLoad(11);
+        chargeBox2.setCharging(true);
+        strategy.addLV(chargeBox2);
         log();
         incCounter();
 
-        chargeBox2.setCurrentLoad(7);
-        chargeBox2.setCharging(true);
-        strategy.addLV(chargeBox2);
+        chargeBox3.setCurrentLoad(7);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
@@ -128,15 +128,15 @@ public class FcfsTest extends GeneralTest {
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(11);
-        chargeBox3.setCharging(true);
-        strategy.addLV(chargeBox3);
-        log();
-        incCounter();
-
         chargeBox2.setCurrentLoad(11);
         chargeBox2.setCharging(true);
         strategy.addLV(chargeBox2);
+        log();
+        incCounter();
+
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
@@ -175,15 +175,15 @@ public class FcfsTest extends GeneralTest {
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(11);
-        chargeBox3.setCharging(true);
-        strategy.addLV(chargeBox3);
-        log();
-        incCounter();
-
         chargeBox2.setCurrentLoad(11);
         chargeBox2.setCharging(true);
         strategy.addLV(chargeBox2);
+        log();
+        incCounter();
+
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
@@ -230,15 +230,15 @@ public class FcfsTest extends GeneralTest {
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(11);
-        chargeBox3.setCharging(true);
-        strategy.addLV(chargeBox3);
-        log();
-        incCounter();
-
         chargeBox2.setCurrentLoad(11);
         chargeBox2.setCharging(true);
         strategy.addLV(chargeBox2);
+        log();
+        incCounter();
+
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
@@ -283,15 +283,15 @@ public class FcfsTest extends GeneralTest {
         log();
         incCounter();
 
-        chargeBox3.setCurrentLoad(11);
-        chargeBox3.setCharging(true);
-        strategy.addLV(chargeBox3);
-        log();
-        incCounter();
-
         chargeBox2.setCurrentLoad(11);
         chargeBox2.setCharging(true);
         strategy.addLV(chargeBox2);
+        log();
+        incCounter();
+
+        chargeBox3.setCurrentLoad(11);
+        chargeBox3.setCharging(true);
+        strategy.addLV(chargeBox3);
         log();
         incCounter();
 
