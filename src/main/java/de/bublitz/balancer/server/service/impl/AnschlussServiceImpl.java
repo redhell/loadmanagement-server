@@ -125,7 +125,7 @@ public class AnschlussServiceImpl implements AnschlussService {
 
     @Override
     public void update(Anschluss anschluss) {
-        Anschluss oldAnschluss = anschlussRepository.getOne(anschluss.getId());
+        Anschluss oldAnschluss = anschlussRepository.getById(anschluss.getId());
         oldAnschluss.setName(anschluss.getName());
         oldAnschluss.setMaxLoad(anschluss.getMaxLoad());
         oldAnschluss.setHardLimit(anschluss.getHardLimit());

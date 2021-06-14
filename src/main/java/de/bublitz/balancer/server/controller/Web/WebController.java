@@ -5,12 +5,16 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ChargeboxService;
 import de.bublitz.balancer.server.service.ConsumerService;
+import de.bublitz.balancer.server.service.DynamicScheduler;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @Log4j2
@@ -23,6 +27,8 @@ public class WebController {
     private ConsumerService consumerService;
     @Autowired
     private BalancerComponent balancerComponent;
+    @Autowired
+    private DynamicScheduler dynamicScheduler;
 
     @GetMapping("/")
     public String getIndex(Model model) {
@@ -31,6 +37,21 @@ public class WebController {
         model.addAttribute("consumers", consumerService.getAllConsumers());
         model.addAttribute("seite", "index");
         return "index";
+    }
+
+    @PostMapping("/settings/update")
+    public ModelAndView postSettings(@RequestParam int balanceRate) {
+        ModelAndView modelAndView = new ModelAndView("redirect:/settings");
+        dynamicScheduler.setBalancingRate(balanceRate);
+        log.debug("Updating intervall Rate: " + balanceRate);
+        return modelAndView;
+    }
+
+    @GetMapping("/settings")
+    public String getSettings(Model model) {
+        model.addAttribute("seite", "settings");
+        model.addAttribute("balanceRate", dynamicScheduler.getBalancingRate());
+        return "settings";
     }
 
     @GetMapping("/anschluss/{id}")

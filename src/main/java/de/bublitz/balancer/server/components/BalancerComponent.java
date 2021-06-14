@@ -6,7 +6,6 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.model.ChargeBox;
 import de.bublitz.balancer.server.model.Consumer;
 import de.bublitz.balancer.server.model.ConsumptionPoint;
-import de.bublitz.balancer.server.model.enums.LoadStrategy;
 import de.bublitz.balancer.server.model.exception.NotStoppedException;
 import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ErrorService;
@@ -32,6 +31,7 @@ public class BalancerComponent {
     private final InfluxService influxService;
     private final Map<Anschluss, Strategy> anschlussStrategyMap;
 
+
     @Autowired
     private ErrorService errorService;
 
@@ -42,12 +42,8 @@ public class BalancerComponent {
         this.anschlussStrategyMap = new LinkedHashMap<>();
     }
 
-    @Scheduled(fixedRate = 15000, initialDelay = 2000)
     public void triggerBalance() {
-        anschlussService.getAll()
-                .stream()
-                .filter(anschluss -> anschluss.getLoadStrategy() != LoadStrategy.NONE)
-                .forEach(this::balance);
+        anschlussService.getAll().forEach(this::balance);
     }
 
     public void triggerBalance(Anschluss anschluss) {

@@ -34,5 +34,10 @@
       "name": "spring",
       "type": "java.lang.String",
       "description": "Description for spring."
+    },
+    {
+      "name": "balancing.rate",
+      "type": "java.lang.String",
+      "description": "Balancing rate in ms."
     }
   ] }
