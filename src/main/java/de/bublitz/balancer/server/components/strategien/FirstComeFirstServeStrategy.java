@@ -77,7 +77,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
         // Hinzufügen zur penaltyMap
         chargingList.forEach(cb -> {
             if (!penaltyMap.containsKey(cb.getEvseid())) {
-                penaltyMap.put(cb.getEvseid(), 1);
+                penaltyMap.put(cb.getEvseid(), 0);
             }
         });
         anschlussLoad = anschluss.getCurrentLoad();
@@ -115,6 +115,7 @@ public class FirstComeFirstServeStrategy extends Strategy {
             suspendedList.remove(chargeBox);
         }
         penaltyMap.remove(chargeBox.getEvseid());
+        //calculateFitting(anschluss.getCurrentLoad());
     }
 
     private void decreaseLoad() throws NotStoppedException {
@@ -140,5 +141,16 @@ public class FirstComeFirstServeStrategy extends Strategy {
         });
         stoppedDuePenalty.clear();
         anschlussLoad = anschluss.getCurrentLoad();
+    }
+
+    @Override
+    public boolean calculateFitting(double tmpLoad) {
+        boolean hasFitted = super.calculateFitting(tmpLoad);
+        chargingList.forEach(cb -> {
+            if (!penaltyMap.containsKey(cb.getEvseid())) {
+                penaltyMap.put(cb.getEvseid(), 0);
+            }
+        });
+        return hasFitted;
     }
 }

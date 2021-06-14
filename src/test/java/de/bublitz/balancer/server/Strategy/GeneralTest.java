@@ -7,11 +7,15 @@ import de.bublitz.balancer.server.model.exception.NotStoppedException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
+import org.testng.ITestResult;
+import org.testng.Reporter;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.DataProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Thread.sleep;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Log4j2
 public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
@@ -39,7 +43,9 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
     protected int taskCounterCB3 = 5;
     protected int taskCounterCB4 = 4;
     protected int taskCounterCB5 = 2;
-    List<String> schedule = new ArrayList<>();
+    protected List<String> schedule = new ArrayList<>();
+    protected Map<String, Integer> startTime = new TreeMap<>();
+    protected Map<String, Integer> endTime = new TreeMap<>();
 
     protected void prepare() {
 
@@ -50,6 +56,9 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
         taskCounterCB5 = 2;
 
         schedule.clear();
+        startTime.clear();
+        endTime.clear();
+
         anschluss = new Anschluss();
         anschluss.setMaxLoad(35);
         anschluss.setHardLimit(30);
@@ -113,8 +122,13 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
 
     protected void incCounter() {
         zeitpunkt++;
+        strategy.getChargingList().forEach(this::noteStarttime);
         strategy.getChargingList().forEach(this::checkAndIncrease);
         strategy.getSuspendedList().forEach(this::checkAndIncreaseSuspended);
+    }
+
+    protected void noteStarttime(ChargeBox chargeBox) {
+        startTime.putIfAbsent(chargeBox.getName(), zeitpunkt - 1);
     }
 
     protected void checkAndIncrease(ChargeBox chargeBox) {
@@ -145,6 +159,24 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
         }
     }
 
+    @AfterMethod
+    public void stats(ITestResult result) {
+
+        Reporter.setCurrentTestResult(result);
+        Reporter.log("Schedule: " + printSchedule() + "<br \\>");
+        StringBuilder startBuilder = new StringBuilder();
+        startTime.forEach((name, start) -> startBuilder
+                .append(name)
+                .append(": ")
+                .append(start)
+                .append(";\t"));
+        Reporter.log("Starttime: " + startBuilder + "<br \\>");
+        StringBuilder endBuilder = new StringBuilder();
+        endTime.forEach((name, end) -> endBuilder.append(name).append(": ").append(end).append(";\t"));
+        Reporter.log("Endtime: " + endBuilder + "<br \\>");
+        Reporter.log("Schedulelänge: " + endTime.values().stream().max(Integer::compareTo).get());
+    }
+
 
     protected void log() {
         log.info("ChargingList: " + strategy.printChargingList()
@@ -154,13 +186,16 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
                 + " T: " + zeitpunkt);
     }
 
-    protected void checkIfFinished() throws NotStoppedException {
+    protected boolean checkIfFinished() throws NotStoppedException {
+        boolean hasFinished = false;
         if (counterCB1 == taskCounterCB1) {
             chargeBox1.setCurrentLoad(0);
             strategy.removeLV(chargeBox1);
             schedule.add("CB1");
             log.info("CB1 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB1);
             counterCB1++;
+            endTime.put("CB1", zeitpunkt);
+            hasFinished = true;
         }
         if (counterCB2 == taskCounterCB2) {
             chargeBox2.setCurrentLoad(0);
@@ -168,6 +203,8 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
             schedule.add("CB2");
             log.info("CB2 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB2);
             counterCB2++;
+            endTime.put("CB2", zeitpunkt);
+            hasFinished = true;
         }
         if (counterCB3 == taskCounterCB3) {
             chargeBox3.setCurrentLoad(0);
@@ -175,6 +212,8 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
             schedule.add("CB3");
             log.info("CB3 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB3);
             counterCB3++;
+            endTime.put("CB3", zeitpunkt);
+            hasFinished = true;
         }
         if (counterCB4 == taskCounterCB4) {
             chargeBox4.setCurrentLoad(0);
@@ -182,6 +221,8 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
             schedule.add("CB4");
             log.info("CB4 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB4);
             counterCB4++;
+            endTime.put("CB4", zeitpunkt);
+            hasFinished = true;
         }
         if (counterCB5 == taskCounterCB5) {
             chargeBox5.setCurrentLoad(0);
@@ -189,26 +230,38 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
             schedule.add("CB5");
             log.info("CB5 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB5);
             counterCB5++;
+            endTime.put("CB5", zeitpunkt);
+            hasFinished = true;
         }
+        return hasFinished;
     }
 
-    protected void charge() throws NotStoppedException, InterruptedException {
+    @DataProvider(name = "zeitscheiben")
+    public Object[][] dpMethod() {
+        return new Object[][]{{1}, {2}, {4}};
+    }
+
+    protected void charge(int timeslice) throws NotStoppedException {
         checkIfFinished();
 
-        strategy.optimize();
+        if (zeitpunkt % timeslice == 0) {
+            strategy.optimize();
+        } else {
+            strategy.calculateFitting(anschluss.getCurrentLoad());
+        }
 
         anschluss.computeLoad();
         log();
         incCounter();
         Assert.assertTrue(anschluss.getCurrentLoad() <= anschluss.getHardLimit());
-        sleep(50);
     }
 
-    protected void printSchedule() {
+    protected String printSchedule() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("S={");
         schedule.forEach(cb -> stringBuilder.append(cb).append(";"));
         stringBuilder.deleteCharAt(stringBuilder.length() - 1).append("}");
         log.info(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 }

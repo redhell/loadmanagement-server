@@ -50,7 +50,7 @@ public abstract class Strategy {
         } else {
             suspendedList.remove(chargeBox);
         }
-        //optimize();
+        //calculateFitting(anschluss.getCurrentLoad());
     }
 
     public boolean calculateFitting(double tmpLoad) {
@@ -167,9 +167,7 @@ public abstract class Strategy {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{");
-        consumerList.forEach(consumer -> {
-            stringBuilder.append(consumer.getCurrentLoad()).append(", ");
-        });
+        consumerList.forEach(consumer -> stringBuilder.append(consumer.getCurrentLoad()).append(", "));
         stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "}");
         return stringBuilder.toString();
     }
@@ -181,9 +179,7 @@ public abstract class Strategy {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{");
-        chargeBoxList.forEach(chargeBox -> {
-            stringBuilder.append(chargeBox.getName()).append(", ");
-        });
+        chargeBoxList.forEach(chargeBox -> stringBuilder.append(chargeBox.getName()).append(", "));
         stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "}");
         return stringBuilder.toString();
     }

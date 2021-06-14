@@ -98,6 +98,7 @@ public class PriorityQueueStrategy extends Strategy {
     public void removeLV(ChargeBox chargeBox) {
         if (!remove(chargeBox))
             suspendedList.remove(chargeBox);
+        //calculateFitting(anschluss.getCurrentLoad());
     }
 
     public String printPrioryList() {

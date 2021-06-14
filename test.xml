@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="Suite1" verbose="1">
+<suite name="TestSuite" verbose="1">
     <!--
     <test name="ControllerTest">
         <classes>
@@ -8,11 +8,23 @@
             <class name="de.bublitz.balancer.server.AnschlussControllerTest"/>
         </classes>
     </test>-->
-    <test name="Strategy">
+    <test name="FIFO">
         <classes>
             <class name="de.bublitz.balancer.server.Strategy.FifoTest"/>
+        </classes>
+    </test>
+    <test name="FCFS">
+        <classes>
             <class name="de.bublitz.balancer.server.Strategy.FcfsTest"/>
+        </classes>
+    </test>
+    <test name="PQ">
+        <classes>
             <class name="de.bublitz.balancer.server.Strategy.PqTest"/>
+        </classes>
+    </test>
+    <test name="NONE">
+        <classes>
             <class name="de.bublitz.balancer.server.Strategy.NoneTest"/>
         </classes>
     </test>

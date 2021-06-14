@@ -56,4 +56,9 @@ public class NoneStrategy extends Strategy {
         }
         anschlussLoad = anschluss.getCurrentLoad();
     }
+
+    @Override
+    public boolean calculateFitting(double tmpLoad) {
+        return false;
+    }
 }

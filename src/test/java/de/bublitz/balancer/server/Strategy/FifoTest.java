@@ -24,9 +24,9 @@ public class FifoTest extends GeneralTest {
 
     }
 
-    @Test
-    public void chargeboxesTest() throws Exception {
-        log.info("Starting Basic Test!");
+    @Test(dataProvider = "zeitscheiben")
+    public void a_chargeboxesTest(int zeitscheibe) throws Exception {
+        log.info("Starte Test mit Zeitscheibe: " + zeitscheibe);
         chargeBox1.setCurrentLoad(4);
         chargeBox1.setCharging(true);
         strategy.addLV(chargeBox1);
@@ -61,16 +61,16 @@ public class FifoTest extends GeneralTest {
         log();
         incCounter();
 
-        while (!strategy.getChargingList().isEmpty()) {
-            charge();
+        while (!strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
+            charge(zeitscheibe);
         }
         printSchedule();
         Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
 
-    @Test
-    public void chargeboxesWithConsumersTest() throws Exception {
-        log.info("chargeboxesWithConsumers Test");
+    @Test(dataProvider = "zeitscheiben")
+    public void b_chargeboxesWithConsumersTest(int zeitscheibe) throws Exception {
+        log.info("Starte Test mit Zeitscheibe: " + zeitscheibe);
         Consumer consumer = new Consumer();
         consumer.setCurrentLoad(2);
         anschluss.addConsumer(consumer);
@@ -111,7 +111,7 @@ public class FifoTest extends GeneralTest {
         incCounter();
 
         while (!strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
-            charge();
+            charge(zeitscheibe);
             if (zeitpunkt == 10) {
                 consumer.setCurrentLoad(4);
             }
@@ -120,9 +120,9 @@ public class FifoTest extends GeneralTest {
         Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
 
-    @Test
-    public void chargeboxesEqual() throws Exception {
-        log.info("Starting Basic Test!");
+    @Test(dataProvider = "zeitscheiben")
+    public void c_chargeboxesEqualTest(int zeitscheibe) throws Exception {
+        log.info("Starte Test mit Zeitscheibe: " + zeitscheibe);
         chargeBox1.setCurrentLoad(11);
         chargeBox1.setCharging(true);
         strategy.addLV(chargeBox1);
@@ -158,15 +158,15 @@ public class FifoTest extends GeneralTest {
         incCounter();
 
         while (!strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
-            charge();
+            charge(zeitscheibe);
         }
         printSchedule();
         Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
 
-    @Test
-    public void chargeboxesEqualWithConsumersTest() throws Exception {
-        log.info("chargeboxesWithConsumers Test");
+    @Test(dataProvider = "zeitscheiben")
+    public void d_chargeboxesEqualWithConsumersTest(int zeitscheibe) throws Exception {
+        log.info("Starte Test mit Zeitscheibe: " + zeitscheibe);
         Consumer consumer = new Consumer();
         consumer.setCurrentLoad(2);
         anschluss.addConsumer(consumer);
@@ -207,7 +207,7 @@ public class FifoTest extends GeneralTest {
         incCounter();
 
         while (!strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
-            charge();
+            charge(zeitscheibe);
             if (zeitpunkt == 10) {
                 consumer.setCurrentLoad(4);
             }
@@ -216,15 +216,15 @@ public class FifoTest extends GeneralTest {
         Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
 
-    @Test
-    public void chargeboxesAllEqual() throws Exception {
+    @Test(dataProvider = "zeitscheiben")
+    public void e_chargeboxesAllEqualTest(int zeitscheibe) throws Exception {
         taskCounterCB1 = 5;
         taskCounterCB2 = 5;
         taskCounterCB3 = 5;
         taskCounterCB4 = 5;
         taskCounterCB5 = 5;
 
-        log.info("Starting Basic Test!");
+        log.info("Starte Test mit Zeitscheibe: " + zeitscheibe);
         chargeBox1.setCurrentLoad(11);
         chargeBox1.setCharging(true);
         strategy.addLV(chargeBox1);
@@ -260,21 +260,22 @@ public class FifoTest extends GeneralTest {
         incCounter();
 
         while (!strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
-            charge();
+            charge(zeitscheibe);
+
         }
         printSchedule();
         Assert.assertTrue(strategy.getChargingList().isEmpty() && strategy.getSuspendedList().isEmpty());
     }
 
-    @Test
-    public void chargeboxesAllEqualConsumersTest() throws Exception {
+    @Test(dataProvider = "zeitscheiben")
+    public void f_chargeboxesAllEqualConsumersTest(int zeitscheibe) throws Exception {
         taskCounterCB1 = 5;
         taskCounterCB2 = 5;
         taskCounterCB3 = 5;
         taskCounterCB4 = 5;
         taskCounterCB5 = 5;
 
-        log.info("chargeboxesWithConsumers Test");
+        log.info("Starte Test mit Zeitscheibe: " + zeitscheibe);
         Consumer consumer = new Consumer();
         consumer.setCurrentLoad(2);
         anschluss.addConsumer(consumer);
@@ -315,7 +316,7 @@ public class FifoTest extends GeneralTest {
         incCounter();
 
         while (!strategy.getChargingList().isEmpty() || !strategy.getSuspendedList().isEmpty()) {
-            charge();
+            charge(zeitscheibe);
             if (zeitpunkt == 10) {
                 consumer.setCurrentLoad(4);
             }
