@@ -65,20 +65,20 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
 
         // Chargeboxes
         chargeBox1 = new ChargeBox();
-        chargeBox1.setName("CB1");
-        chargeBox1.setEvseid("CB1");
+        chargeBox1.setName("L1");
+        chargeBox1.setEvseid("L1");
         chargeBox2 = new ChargeBox();
-        chargeBox2.setName("CB2");
-        chargeBox2.setEvseid("CB2");
+        chargeBox2.setName("L2");
+        chargeBox2.setEvseid("L2");
         chargeBox3 = new ChargeBox();
-        chargeBox3.setName("CB3");
-        chargeBox3.setEvseid("CB3");
+        chargeBox3.setName("L3");
+        chargeBox3.setEvseid("L3");
         chargeBox4 = new ChargeBox();
-        chargeBox4.setName("CB4");
-        chargeBox4.setEvseid("CB4");
+        chargeBox4.setName("L4");
+        chargeBox4.setEvseid("L4");
         chargeBox5 = new ChargeBox();
-        chargeBox5.setName("CB5");
-        chargeBox5.setEvseid("CB5");
+        chargeBox5.setName("L5");
+        chargeBox5.setEvseid("L5");
 
         chargeBox1.setStartURL("testStart");
         chargeBox2.setStartURL("testStart");
@@ -191,46 +191,46 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
         if (counterCB1 == taskCounterCB1) {
             chargeBox1.setCurrentLoad(0);
             strategy.removeLV(chargeBox1);
-            schedule.add("CB1");
-            log.info("CB1 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB1);
+            schedule.add("L1");
+            log.info("L1 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB1);
             counterCB1++;
-            endTime.put("CB1", zeitpunkt);
+            endTime.put("L1", zeitpunkt);
             hasFinished = true;
         }
         if (counterCB2 == taskCounterCB2) {
             chargeBox2.setCurrentLoad(0);
             strategy.removeLV(chargeBox2);
-            schedule.add("CB2");
-            log.info("CB2 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB2);
+            schedule.add("L2");
+            log.info("L2 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB2);
             counterCB2++;
-            endTime.put("CB2", zeitpunkt);
+            endTime.put("L2", zeitpunkt);
             hasFinished = true;
         }
         if (counterCB3 == taskCounterCB3) {
             chargeBox3.setCurrentLoad(0);
             strategy.removeLV(chargeBox3);
-            schedule.add("CB3");
-            log.info("CB3 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB3);
+            schedule.add("L3");
+            log.info("L3 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB3);
             counterCB3++;
-            endTime.put("CB3", zeitpunkt);
+            endTime.put("L3", zeitpunkt);
             hasFinished = true;
         }
         if (counterCB4 == taskCounterCB4) {
             chargeBox4.setCurrentLoad(0);
             strategy.removeLV(chargeBox4);
-            schedule.add("CB4");
-            log.info("CB4 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB4);
+            schedule.add("L4");
+            log.info("L4 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB4);
             counterCB4++;
-            endTime.put("CB4", zeitpunkt);
+            endTime.put("L4", zeitpunkt);
             hasFinished = true;
         }
         if (counterCB5 == taskCounterCB5) {
             chargeBox5.setCurrentLoad(0);
             strategy.removeLV(chargeBox5);
-            schedule.add("CB5");
-            log.info("CB5 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB5);
+            schedule.add("L5");
+            log.info("L5 Ende: " + zeitpunkt + " Unterbrechungen: " + suspenedCounterCB5);
             counterCB5++;
-            endTime.put("CB5", zeitpunkt);
+            endTime.put("L5", zeitpunkt);
             hasFinished = true;
         }
         return hasFinished;
