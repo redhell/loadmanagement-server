@@ -179,11 +179,13 @@ public abstract class GeneralTest extends AbstractTestNGSpringContextTests {
 
 
     protected void log() {
-        log.info("ChargingList: " + strategy.printChargingList()
+        String logs = "ChargingList: " + strategy.printChargingList()
                 + " SuspendedList: " + strategy.printSuspendedList()
                 + " Consumers: " + strategy.printConsumerLoad()
                 + " Load: " + anschluss.getCurrentLoad()
-                + " T: " + zeitpunkt);
+                + " T: " + zeitpunkt;
+        Reporter.log(logs + "<br \\>");
+        log.info(logs);
     }
 
     protected boolean checkIfFinished() throws NotStoppedException {

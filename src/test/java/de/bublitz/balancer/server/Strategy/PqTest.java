@@ -7,6 +7,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.testng.Assert;
+import org.testng.Reporter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -336,11 +337,13 @@ public class PqTest extends GeneralTest {
 
     @Override
     protected void log() {
-        log.info("Priority: " + ((PriorityQueueStrategy) strategy).printPrioryList()
+        String logs = "Priority: " + ((PriorityQueueStrategy) strategy).printPrioryList()
                 + " ChargingList: " + strategy.printChargingList()
                 + " SuspendedList: " + strategy.printSuspendedList()
                 + " Consumers: " + strategy.printConsumerLoad()
                 + " Load: " + anschluss.getCurrentLoad()
-                + " T: " + zeitpunkt);
+                + " T: " + zeitpunkt;
+        Reporter.log(logs + "<br \\>");
+        log.info(logs);
     }
 }
