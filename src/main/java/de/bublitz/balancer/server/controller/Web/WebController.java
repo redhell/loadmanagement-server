@@ -5,7 +5,7 @@ import de.bublitz.balancer.server.model.Anschluss;
 import de.bublitz.balancer.server.service.AnschlussService;
 import de.bublitz.balancer.server.service.ChargeboxService;
 import de.bublitz.balancer.server.service.ConsumerService;
-import de.bublitz.balancer.server.service.DynamicScheduler;
+import de.bublitz.balancer.server.service.DynamicSchedulerService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,7 +28,7 @@ public class WebController {
     @Autowired
     private BalancerComponent balancerComponent;
     @Autowired
-    private DynamicScheduler dynamicScheduler;
+    private DynamicSchedulerService dynamicSchedulerService;
 
     @GetMapping("/")
     public String getIndex(Model model) {
@@ -42,7 +42,7 @@ public class WebController {
     @PostMapping("/settings/update")
     public ModelAndView postSettings(@RequestParam int balanceRate) {
         ModelAndView modelAndView = new ModelAndView("redirect:/settings");
-        dynamicScheduler.setBalancingRate(balanceRate);
+        dynamicSchedulerService.setBalancingRate(balanceRate);
         log.debug("Updating intervall Rate: " + balanceRate);
         return modelAndView;
     }
@@ -50,7 +50,7 @@ public class WebController {
     @GetMapping("/settings")
     public String getSettings(Model model) {
         model.addAttribute("seite", "settings");
-        model.addAttribute("balanceRate", dynamicScheduler.getBalancingRate());
+        model.addAttribute("balanceRate", dynamicSchedulerService.getBalancingRate());
         return "settings";
     }
 

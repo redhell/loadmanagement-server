@@ -24,7 +24,7 @@ import java.util.GregorianCalendar;
  */
 @Service
 @Log4j2
-public class DynamicScheduler implements SchedulingConfigurer {
+public class DynamicSchedulerService implements SchedulingConfigurer {
     @Autowired
     private ConfigurationRepository configurationRepository;
     @Autowired

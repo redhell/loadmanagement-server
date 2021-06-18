@@ -41,7 +41,6 @@ public class FirstInFirstOutStrategy extends Strategy {
             calculateFitting(anschlussLoad);
         } else {
             decreaseLoad();
-
             chargingList.add(chargeBox);
             // Chargingbox hat verbraucht zu viel
             if (revertStartingIfNeeded(chargeBox)) {
@@ -51,10 +50,8 @@ public class FirstInFirstOutStrategy extends Strategy {
                     anschlussLoad = anschluss.getCurrentLoad() - l0.getCurrentLoad();
                 }
             }
-
             // Falls Last immer noch zu hoch
             decreaseLoad();
-
             // Gibt's evtl. Restkapazitäten? -> falls ja LV starten
             calculateFitting(anschlussLoad);
 
