@@ -1,16 +1,22 @@
 @startuml
 !include skin.pu
-interface ErrorRepository <<Repository>> {
+
+interface ConfigurationRepository {
+~ ConfigurationItem getByConfigKey(String)
+~ boolean existsByConfigKey(String)
 }
-interface AnschlussRepository <<Repository>>{
+interface ErrorRepository {
+}
+interface AnschlussRepository {
 ~ Anschluss getAnschlussByName(String)
 ~ Boolean existsAnschlussByName(String)
 }
-interface ConsumerRepository <<Repository>> {
+interface ConsumerRepository {
 ~ Consumer getConsumerByName(String)
 ~ void deleteConsumerByName(String)
+~ boolean existsByName(String)
 }
-interface ChargeboxRepository <<Repository>> {
+interface ChargeboxRepository {
 ~ ChargeBox getChargeBoxByName(String)
 ~ ChargeBox getChargeBoxByEvseid(String)
 ~ boolean existsChargeBoxByName(String)
@@ -18,10 +24,10 @@ interface ChargeboxRepository <<Repository>> {
 ~ List<ChargeBox> findChargeBoxesByCalibratedFalseAndConnectedTrue()
 }
 
-interface JpaRepository
 
-JpaRepository <|-- ErrorRepository
-JpaRepository <|-- AnschlussRepository
-JpaRepository <|-- ConsumerRepository
-JpaRepository <|-- ChargeboxRepository
+jpaRepository <|-- ConfigurationRepository
+jpaRepository <|-- ErrorRepository
+jpaRepository <|-- AnschlussRepository
+jpaRepository <|-- ConsumerRepository
+jpaRepository <|-- ChargeboxRepository
 @enduml

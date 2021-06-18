@@ -1,7 +1,15 @@
 @startuml
 !include skin.pu
 class FirstComeFirstServeStrategy {
-
+- List<ChargeBox> stoppedDuePenalty
+- Map<String,Integer> penaltyMap
+- int penalty
++ void optimize()
++ void addLV(ChargeBox)
+- boolean stopWithPenalty()
++ void removeLV(ChargeBox)
+- void decreaseLoad()
++ boolean calculateFitting(double)
 }
 abstract class Strategy {
 - LoadStrategy loadStrategy
@@ -30,38 +38,29 @@ abstract class Strategy {
 # boolean revertStartingIfNeeded(ChargeBox)
 }
 class FirstInFirstOutStrategy {
-}
-class BalancerComponent <<Component>> {
-- AnschlussService anschlussService
-- InfluxService influxService
-- Map<Anschluss,Strategy> anschlussStrategyMap
-- ErrorService errorService
-+ void triggerBalance()
-+ void triggerBalance(Anschluss)
-+ void triggerCheckConnected()
-- void checkConnected(Anschluss)
-- void balance(Anschluss)
-- void updateConsumer(Consumer)
-- void updateChargeBox(ChargeBox)
++ void optimize()
++ void addLV(ChargeBox)
+- void decreaseLoad()
 }
 class PriorityQueueStrategy {
+- LinkedList<ChargeBox> priorityQueue
++ void optimize()
++ void addLV(ChargeBox)
++ boolean add(ChargeBox)
++ boolean remove(ChargeBox)
++ void removeLV(ChargeBox)
++ String printPrioryList()
+- void decreaseLoad()
 }
 class NoneStrategy {
++ void optimize()
++ void addLV(ChargeBox)
++ boolean calculateFitting(double)
 }
 
-class InfluxService <<Service>>
-interface AnschlussService
-interface ErrorService
 
 Strategy <|-- FirstComeFirstServeStrategy
 Strategy <|-- FirstInFirstOutStrategy
 Strategy <|-- PriorityQueueStrategy
 Strategy <|-- NoneStrategy
-
-BalancerComponent --> AnschlussService
-BalancerComponent --> InfluxService
-BalancerComponent --> ErrorService
-
-BalancerComponent -l-> Strategy
-
 @enduml

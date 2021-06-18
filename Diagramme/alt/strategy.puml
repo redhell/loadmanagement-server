@@ -1,53 +1,44 @@
 @startuml
-!include skin.pu
-class FirstComeFirstServeStrategy {
+!include ../skin.pu
 
-}
 abstract class Strategy {
 - LoadStrategy loadStrategy
 # Anschluss anschluss
 # LinkedList<ChargeBox> chargingList
-# LinkedList<ChargeBox> suspendedList
-# List<ChargeBox> tmpSuspendedList
+# LinkedList<ChargeBox> suspended
+# List<ChargeBox> tmpSuspended
 # double anschlussLoad
 + {abstract}void optimize()
 + {abstract}void addLV(ChargeBox)
 + void removeLV(ChargeBox)
-+ boolean calculateFitting(double)
-- double readdChargeBox(List<ChargeBox>,List<Boolean>,boolean)
++ void calculateFitting(double)
+- double readdChargeBox(List<ChargeBox>,List<Boolean>)
 - List<Boolean> runKnapsack(List<ChargeBox>,double)
 + List<Boolean> knapSack(int,int[],int[],int)
 + String printChargingList()
 + String printSuspendedList()
 + String printConsumerList()
 + String printConsumerLoad()
-# String getString(List<T>)
+- String getString(List<T>)
 # boolean stop(ChargeBox)
 # boolean start(ChargeBox)
 - boolean queryURL(String)
-+ boolean add(ChargeBox)
-+ boolean remove(ChargeBox)
-# boolean revertStartingIfNeeded(ChargeBox)
 }
-class FirstInFirstOutStrategy {
-}
+
 class BalancerComponent <<Component>> {
 - AnschlussService anschlussService
 - InfluxService influxService
 - Map<Anschluss,Strategy> anschlussStrategyMap
 - ErrorService errorService
 + void triggerBalance()
-+ void triggerBalance(Anschluss)
 + void triggerCheckConnected()
-- void checkConnected(Anschluss)
-- void balance(Anschluss)
+# void checkConnected(Anschluss)
+# void balance(Anschluss)
 - void updateConsumer(Consumer)
 - void updateChargeBox(ChargeBox)
 }
-class PriorityQueueStrategy {
-}
-class NoneStrategy {
-}
+
+class InfluxService << Service >>
 
 class InfluxService <<Service>>
 interface AnschlussService
@@ -56,12 +47,10 @@ interface ErrorService
 Strategy <|-- FirstComeFirstServeStrategy
 Strategy <|-- FirstInFirstOutStrategy
 Strategy <|-- PriorityQueueStrategy
-Strategy <|-- NoneStrategy
 
 BalancerComponent --> AnschlussService
 BalancerComponent --> InfluxService
 BalancerComponent --> ErrorService
 
 BalancerComponent -l-> Strategy
-
 @enduml
